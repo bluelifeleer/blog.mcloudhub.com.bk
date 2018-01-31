@@ -6,9 +6,11 @@
     <link rel="stylesheet" href="https://bootswatch.com/4/simplex/bootstrap.min.css">
     <link rel="stylesheet" href="/public/css/public.css" />
     <link rel="stylesheet" href="/public/css/main.css" />
+    <script type="text/javascript" src="/public/js/vue.js"></script>
+    <script type="text/javascript" src="/public/js/vue-resource.js"></script>
 </head>
 <body>
-    <div id="myBlogApp">
+    <div id="app">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <a class="navbar-brand" href="#">MyBlog</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,16 +93,17 @@
                     <div class="model-box">
                         <div class="model-tag-name">登录</div>
                         <div class="model-contents-box">
-                            <form>
+                            <form v-on:submit.prevent="submitForm($event)">
                                 <fieldset>
                                     <div class="form-group">
                                         <label for="exampleInputEmail1">用户名/邮箱/手机号：</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="用户名/邮箱/手机号">
+                                        <input type="text" v-model="name" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="用户名/邮箱/手机号">
                                         <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="exampleInputPassword1">密码：</label>
-                                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="密码">
+                                        <input type="password" v-model="password" class="form-control" id="exampleInputPassword1" placeholder="密码">
+                                        <input type="hidden" name="_token" value="{{ token }}" />
                                     </div>
                                     <fieldset class="form-group">
                                         <div class="form-check">
@@ -153,4 +156,5 @@
         <footer class="footer-bar"></footer>
     </div>
 </body>
+<script type="text/javascript" src="/public/js/main.js"></script>
 </html>

@@ -1,8 +1,13 @@
 const express = require('express');
-
+const session = require('express-session')
+const ctr_token = require('../libs/ctr_token');
 const router = express.Router();
-
 router.get('/', (req, res, next) => {
+    // let data = {};
+    // let token = ctr_token();
+    // data.token = token;
+    // console.log(data);
+    // res.session.token = token;
     res.render('../views/index');
 });
 
@@ -11,21 +16,6 @@ router.get('/articles',(req, res, next)=>{
     res.render('../views/articles.html');
 });
 
-router.get('/article',(req, res, next)=>{
-    res.render('../views/article_content.html');
-})
-
-router.get('/imgpgs',(req, res, next)=>{
-    res.render('../views/imgpgs.html');
-});
-
-router.get('/articlefullwidth',(req,res,next)=>{
-    res.render('../views/articlefullwidth.html');
-})
-
-router.get('/timeline',(req, res, next)=>{
-    res.render('../views/timeline.html');
-});
 
 router.get('/login', (req, res, next) => {
     res.render('../views/login');

@@ -31,3 +31,13 @@
 * require() 返回的是 module.exports 而不是 exports
 
 [参考连接：https://nodejs.org/api/modules.html#modules_module_exports]('https://nodejs.org/api/modules.html#modules_module_exports')
+
+
+#### 应用在类unix系统下启动报错
+> 错误：Error: listen EACCES 0.0.0.0:80
+> 原因是在类unix系统下监听小于1024的端口要sudo权限
+
+#### http2：
+> 在node+express中使用http2需要用spdy模块，node官网提供的http2现在只是用于测试阶段。
+    npm install spdy
+
