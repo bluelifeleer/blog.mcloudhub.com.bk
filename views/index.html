@@ -103,7 +103,7 @@
                                     <div class="form-group">
                                         <label for="exampleInputPassword1">密码：</label>
                                         <input type="password" v-model="password" class="form-control" id="exampleInputPassword1" placeholder="密码">
-                                        <input type="hidden" name="_token" value="{{ token }}" />
+                                        <input type="hidden" name="token" v-model="token" value="" />
                                     </div>
                                     <fieldset class="form-group">
                                         <div class="form-check">

@@ -4,6 +4,7 @@ const cookie = require('cookie');
 const session = require('express-session');
 const md5 = require('md5');
 const salt = require('../libs/salt');
+const crt_token = require('../libs/ctr_token');
 const router = express.Router();
 const Users = require('../models/Users_model');
 
@@ -18,6 +19,17 @@ router.use(function(req, res, next) {
     };
     next();
 });
+
+router.get('/gettoken',(req, res, next)=>{
+    responseData.code = 1;
+    responseData.msg = 'success';
+    responseData.ok = true;
+    responseData.data = {
+        token:crt_token()
+    };
+    res.json(responseData);
+    return;
+})
 
 router.post('/signin', (req, res, next) => {
     let username = req.body.name;
