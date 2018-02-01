@@ -1,19 +1,25 @@
 const VM = new Vue({
+    delimiters: ['${', '}'],
     el:'#article-editor-app',
     data:{
         title:'',
         describe:'',
-        html:'',
-        preview:''
+        textareaText:'',
+        previewHtml:'',
+        tags:null,
+        editorType:1,
+        wangEditor:'block',
+        markdownEditor:'none'
     },
     methods:{
         init:function(){
             this.initEditor();
+            this.getTags();
         },
         html2markdown:function(){
             // let markDown = new showdown();
             let converter = new showdown.Converter();
-            this.preview = converter.makeHtml(this.html);
+            this.previewHtml = converter.makeHtml(this.textareaText);
         },
         initEditor:function(){
             const E = window.wangEditor;
@@ -43,6 +49,22 @@ const VM = new Vue({
                 console.log(html)
             }
             editor.create();
+        },
+        getTags:function(){
+            this.$http.get('/api/tags').then(res=>{
+                this.tags = res.body.data;
+            });
+        },
+        switchEditor:function(e,editor){
+            if(editor == 'wang'){
+                this.wangEditor = 'block';
+                this.markdownEditor = 'none';
+                this.editorType = 1;
+            }else{
+                this.wangEditor = 'none';
+                this.markdownEditor = 'block';
+                this.editorType = 2;
+            }
         }
     }
 });

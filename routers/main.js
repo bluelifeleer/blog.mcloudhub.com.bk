@@ -14,4 +14,8 @@ router.get('/', (req, res, next) => {
 router.get('/editor',(req,res,next)=>{
     res.render('../views/article_editor');
 });
+
+router.get('/account',(req,res,next)=>{
+    res.render('../views/account');
+})
 module.exports = router;

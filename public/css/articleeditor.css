@@ -1,2 +1,21 @@
 .contents-bar{width:100%;height:auto;margin:3% 0 0 0;}
+.tags-block-box{width:100%;height:auto;}
+.tags-buts{display:inline-block;width:auto;padding:auto;padding:5px;margin:0 5px 5px 0;border:1px solid #ff0000;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;}
+.tags-buts:hover{text-decoration: none;}
 .editor-block-box{width:80%;height:auto;margin:0 auto;}
+.editor-switch-buts{display:inline-block;float:right;width:auto;height:auto;margin-left:20px;}
+.editor-switch-buts:last-child{margin-left:600px;}
+.text-editor{width:100%;height:330px;}
+.textarea-block{float:left;width:48%;height:330px;border:1px solid #c1c1c1;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;}
+#textareaText{width:100%;height:328px;border:none;resize:none;}
+.separate-block{float:left;width:4%;height:330px;line-height:330px;text-align:center;color:#459bee;}
+.markdoen-preview-block{float:left;width:48%;height:330px;background:#FFF;border:1px solid #c1c1c1;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;padding:10px;}

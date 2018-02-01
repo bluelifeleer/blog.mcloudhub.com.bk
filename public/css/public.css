@@ -1,10 +1,22 @@
+/**
+ * public style
+ */
+body{background:#FFF;}
+h1,h2,h3,h4,h5,h6,a,div,ul,li,p,input,table,tr,tb{margin:0;padding:0;}
+ul{list-style: none;}
+a:hover{text-decoration: none;}
+.hidden{display:none;}
+input,textarea{outline:none !important;}
+/*
+ * iconfont
+ */
 @font-face {
     font-family: 'iconfont';  /* project id 558588 */
-    src: url('//at.alicdn.com/t/font_558588_1ot7j7v2m6b9be29.eot');
-    src: url('//at.alicdn.com/t/font_558588_1ot7j7v2m6b9be29.eot?#iefix') format('embedded-opentype'),
-    url('//at.alicdn.com/t/font_558588_1ot7j7v2m6b9be29.woff') format('woff'),
-    url('//at.alicdn.com/t/font_558588_1ot7j7v2m6b9be29.ttf') format('truetype'),
-    url('//at.alicdn.com/t/font_558588_1ot7j7v2m6b9be29.svg#iconfont') format('svg');
+    src: url('//at.alicdn.com/t/font_558588_xvsdpbbcamezsemi.eot');
+    src: url('//at.alicdn.com/t/font_558588_xvsdpbbcamezsemi.eot?#iefix') format('embedded-opentype'),
+    url('//at.alicdn.com/t/font_558588_xvsdpbbcamezsemi.woff') format('woff'),
+    url('//at.alicdn.com/t/font_558588_xvsdpbbcamezsemi.ttf') format('truetype'),
+    url('//at.alicdn.com/t/font_558588_xvsdpbbcamezsemi.svg#iconfont') format('svg');
 }
 
 .iconfont{
@@ -15,7 +27,9 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-
+/**
+ * MarkDown Editor
+ */
 blockquote{border-left:#eee solid 5px;padding:0 0 0 5px}
 ul li {line-height: 20px;padding:0;}
 pre{background: #F6F6F6;}

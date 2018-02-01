@@ -41,7 +41,11 @@
             <div class="account-center-block">
                 <span class="account-avatar-block"><img src="/public/images/f15.jpg" alt="" class="account-avatar-img"></span>
                 <span class="account-username">bluelife</span>
-                <a href="javascript:void(0);" class="account-contr-buts"><i class="icon iconfont">&#xe68f;</i></a>
+                <a href="javascript:void(0);" class="account-contr-buts" v-on:click="showAccountBox"><i class="icon iconfont" v-html="accountSymbol"></i></a>
+                <div class="account-options-box" v-bind:style="{display:accountBox}">
+                    <a href="/account" class="account-setting-but"><i class="icon iconfont">&#xe614;</i>个人中心</a>
+                    <a href="/api/signout" class="account-signout-but"><i class="icon iconfont">&#xe633;</i>退出</a>
+                </div>
             </div>
         </nav>
         <section class="contents-bar">

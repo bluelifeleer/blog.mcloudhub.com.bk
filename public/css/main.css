@@ -1,15 +1,15 @@
-body{background:#FFF;}
-h1,h2,h3,h4,h5,h6,a,div,ul,li,p,input,table,tr,tb{margin:0;padding:0;}
-ul{list-style: none;}
-a:hover{text-decoration: none;}
-.hidden{display:none;}
 .contents-bar{width:100%;height:auto;}
 
-.account-center-block{float:left;width:10%;height:auto;margin-left:50px;}
+.account-center-block{float:left;width:10%;height:auto;margin-left:50px;position:relative;}
 .account-avatar-block{display:block;float:left;width:40px;height:40px;border-radius:50%;overflow:hidden;}
 .account-avatar-img{display:block;width:40px;height:40px;border:none;}
 .account-username{display:block;float:left;width:auto;height:40px;padding:0 10px;line-height:40px;}
-.account-contr-buts{display:block;float:left;width:auto;height:40px;padding:0 5px;line-height:40px;color:#000;}
+.account-contr-buts{display:block;float:left;width:auto;height:40px;padding:0 5px;line-height:40px;color:#000;font-size:18px;}
+.account-options-box{width:100%;height:auto;position:absolute;left:-8%;top:53px;z-index:999;border:1px solid #eee;
+    -webkit-border-radius: 0 0 5px 5px;
+    -moz-border-radius: 0 0 5px 5px;
+    border-radius: 0 0 5px 5px;}
+.account-setting-but,.account-signout-but{display:block;width:95%;height:40px;line-height:40px;color:#3d3d3d;padding:0 0 0 5%;}
 .slide-bar{width:1024px;height:380px;position:relative;margin:0 auto;overflow:hidden;}
 .slide-list-group{width:4096px;height:380px;position:absolute;left:0;top:0;}
 .slide-lists{float:left;width:1024px;height:380px;position:relative;}

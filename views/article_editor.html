@@ -60,27 +60,40 @@
                             <small id="fileHelp" class="form-text text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
                         </div>
                         <div class="form-group">
-                            <label for="exampleSelect1">标签：</label>
-
+                            <label for="exampleSelect1">标签：<a href="javascript:void(0);" class="add-tag-but"><i class="icon iconfont">&#xe673;</i>添加标签</a></label>
+                            <p class="tags-block-box">
+                                <a href="javascript:void(0);" class="tags-buts" v-for="tag in tags" v-bind:data-id="tag._id"><i class="icon iconfont">&#xe622;</i>${tag.name}</a>
+                            </p>
                         </div>
                         <div class="form-group">
-                            <label for="exampleTextarea">文章内容<span style="color:#ff0000;font-size:12px;">(本编辑器支持MarkDown语法)</span></label>
-                            <div id="exampleTextarea"></div>
-                            <!--<textarea class="form-control" v-on:keyup="html2markdown" v-model="html" id="exampleTextarea" rows="10"></textarea>-->
+                            <label for="exampletitle">文章内容<span style="color:#ff0000;font-size:12px;">(本编辑器支持MarkDown语法,注意：由于两个编辑器原理不同，故编辑器之间切换后已输入内容不会保存。)</span><a
+                                    href="javascript:void(0);" v-on:click="switchEditor($event,'wang')" class="editor-switch-buts" title="富文本编辑器"><i class="incon iconfont">&#xe6df;</i></a><a
+                                    href="javascript:void(0);" v-on:click="switchEditor($event,'markdown')" class="editor-switch-buts" title="MarkDown"><i class="incon iconfont">&#xe7e5;</i></a></label>
+                            <div id="exampleTextarea" v-bind:style="{display:wangEditor}"></div>
+                            <div class="text-editor" v-bind:style="{display:markdownEditor}">
+                                <div class="textarea-block">
+                                    <textarea class="form-control" v-on:keyup="html2markdown" v-model="textareaText" id="textareaText" rows="10"></textarea>
+                                </div>
+                                <div class="separate-block"><i class="icon iconfont">&#xe610;</i></div>
+                                <div class="markdoen-preview-block">
+                                    <div class="markdown-preview-box" v-html="previewHtml"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="editor-type" v-model="editorType" value="" />
                         </div>
-                        <div class="markdown-preview-box" v-html="preview"></div>
+
                         <fieldset class="form-group">
                             <legend>文章属性：</legend>
                             <div class="form-check">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" value="" checked="" type="checkbox">
-                                    公开
+                                    <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="1" checked="">
+                                    公开(所有人都可看到)。
                                 </label>
                             </div>
                             <div class="form-check">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" value="" checked="" type="checkbox">
-                                    私有
+                                    <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="2" checked="">
+                                    私有(只有登录才能看到)。
                                 </label>
                             </div>
                         </fieldset>

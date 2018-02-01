@@ -15,6 +15,8 @@ const vm = new Vue({
             index:0,
             cursor:null
         },
+        accountSymbol:'&#xe68f;',
+        accountBox:'none'
     },
     methods:{
         init:function(){
@@ -79,6 +81,15 @@ const vm = new Vue({
                 this.slide_list = res.body.data;
                 this.slideAttr.length = res.body.data.length;
             });
+        },
+        showAccountBox:function(){
+            if(this.accountBox == 'none'){
+                this.accountBox = 'block';
+                this.accountSymbol = '&#xe68d';
+            }else{
+                this.accountBox = 'none';
+                this.accountSymbol = '&#xe68f;'
+            }
         }
     }
 });
