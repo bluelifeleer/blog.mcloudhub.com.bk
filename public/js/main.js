@@ -1,24 +1,59 @@
 const vm = new Vue({
+    delimiters: ['${', '}'],
     el: '#app',
     data: {
-        // hello: 'Hello Node.js',
-        // textHtml:'## 请输入博客内容',
-        // html:'',
         token:'',
-        name:'bluelife',
+        name:'',
         password:'',
+        slide_list:{},
+        tags_list:{},
+        slideAttr:{
+            timer:null,
+            left:0,
+            length:0,
+            value:1024,
+            index:0,
+            cursor:null
+        },
     },
     methods:{
-        // html2markdown:function(e){
-        //     // alert(this.textHtml);
-        //     let markdown = new showdown.Converter();
-        //     let html = markdown.makeHtml(this.textHtml);
-        //     //展示到对应的地方  result便是id名称
-        //     this.html = html;
-        // },
-        // switchRegin:function(){
-        //     alert('注册');
-        // },
+        init:function(){
+            this.get_tags();
+            this.get_token();
+            this.get_slides();
+            this.slideAutoPlay();
+        },
+        switchSlide:function(e,direction){
+            if(direction == 'next'){
+                this.slideAttr.index--;
+                if(this.slideAttr.index <= -this.slideAttr.length){
+                    this.slideAttr.index = 0;
+                }
+            }else{
+                this.slideAttr.index++;
+                if(this.slideAttr.index >= 0){
+                    this.slideAttr.index = -this.slideAttr.length+1;
+                }
+            }
+            this.slidePlay(this.slideAttr.index);
+        },
+        slidePlay:function(index){
+            this.slideAttr.left = index*this.slideAttr.value;
+        },
+        slideAutoPlay:function(){
+            let _this = this;
+            this.slideAttr.timer = setInterval(function(){
+                _this.switchSlide(null,'next');
+            },1000);
+        },
+        stopSlidePlay:function(){
+            this.slideAttr.cursor = 'pointer';
+            clearInterval(this.slideAttr.timer);
+        },
+        autoSlidePlay:function(){
+            this.slideAttr.cursor = null;
+            this.slideAutoPlay();
+        },
         submitForm:function(e){
             this.$http.post('/api/signin',{name:this.name,password:this.password,token:this.token}).then((err,res)=>{
                 if(err) throw console.log(err);
@@ -33,8 +68,19 @@ const vm = new Vue({
                     this.token = res.body.data.token;
                 })
             }
+        },
+        get_tags:function(){
+            this.$http.get('/api/tags').then(res=>{
+                this.tags_list = res.body.data;
+            });
+        },
+        get_slides:function(){
+            this.$http.get('/api/slides').then(res=>{
+                this.slide_list = res.body.data;
+                this.slideAttr.length = res.body.data.length;
+            });
         }
     }
 });
-vm.get_token();
+vm.init();
 // vm.html2markdown();

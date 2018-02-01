@@ -20,9 +20,9 @@
             <div class="collapse navbar-collapse" id="navbarColor03">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="#">首页<span class="sr-only">(current)</span></a>
+                        <a class="nav-link nav-a-but" href="#">首页<span class="sr-only">(current)</span></a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item nav-a-but">
                         <a class="nav-link" href="#">文章列表</a>
                     </li>
                     <li class="nav-item">
@@ -37,12 +37,26 @@
                     <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                 </form>
             </div>
+            <a href="/editor" class="badge badge-primary write-article-but"><i class="icon iconfont">&#xe63e;</i>写文章</a>
+            <div class="account-center-block">
+                <span class="account-avatar-block"><img src="/public/images/f15.jpg" alt="" class="account-avatar-img"></span>
+                <span class="account-username">bluelife</span>
+                <a href="javascript:void(0);" class="account-contr-buts"><i class="icon iconfont">&#xe68f;</i></a>
+            </div>
         </nav>
         <section class="contents-bar">
-            <div class="slide-bar">
-                <ul class="slide-list-group">
-                    <il class="slide-lists"><img src="/public/images/b1.jpg" alt=""></il>
+            <div class="slide-bar" v-on:mouseover="stopSlidePlay($event)" v-on:mouseout="autoSlidePlay($event)" v-bind:style="{cursor:slideAttr.cursor}">
+                <ul class="slide-list-group" v-bind:style="{left:slideAttr.left+'px'}">
+                    <li class="slide-lists" v-for="slide in slide_list">
+                        <div class="slide-img-block"><img v-bind:src="slide.path" alt="" class="slide-img-block"></div>
+                        <div class="slide-title-block">${slide.title}</div>
+                        <div class="slide-text-block">${slide.describe}</div>
+                    </li>
                 </ul>
+                <div class="buts-block-box">
+                    <a href="javascript:void(0);" class="prev-but-block" v-on:click="switchSlide($event,'prev')"><i class="icon iconfont prev-incofont">&#xe639;</i></a>
+                    <a href="javascript:void(0);" class="next-but-block" v-on:click="switchSlide($event,'next')"><i class="icon iconfont next-incofont">&#xe638;</i></a>
+                </div>
             </div>
             <div id="body-content"><!--jumbotron-->
                 <div class="body-layout-l">
@@ -130,13 +144,9 @@
                     <div class="model-box">
                         <div class="model-tag-name">热门标签</div>
                         <div class="model-contents-box">
-                            <a href="javascript:void(0);" class="tages-box">Html5</a>
-                            <a href="javascript:void(0);" class="tages-box">Javascript</a>
-                            <a href="javascript:void(0);" class="tages-box">Python</a>
-                            <a href="javascript:void(0);" class="tages-box">NodeJs</a>
-                            <a href="javascript:void(0);" class="tages-box">Go</a>
-                            <a href="javascript:void(0);" class="tages-box">中国红</a>
-                            <a href="javascript:void(0);" class="tages-box">世界风</a>
+                            <a href="javascript:void(0);" class="tages-box"  v-for="tag in tags_list" v-bind:data-id="tag._id">
+                                ${tag.name}
+                            </a>
                         </div>
                     </div>
                     <div class="model-box">
@@ -153,7 +163,7 @@
                 </div>
             </div>
         </section>
-        <footer class="footer-bar"></footer>
+        <div class="footer-bar"></div>
     </div>
 </body>
 <script type="text/javascript" src="/public/js/main.js"></script>

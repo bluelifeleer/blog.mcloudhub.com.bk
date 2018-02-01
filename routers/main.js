@@ -11,17 +11,7 @@ router.get('/', (req, res, next) => {
     res.render('../views/index');
 });
 
-router.get('/articles',(req, res, next)=>{
-    // res.send('articles');
-    res.render('../views/articles.html');
-});
-
-
-router.get('/login', (req, res, next) => {
-    res.render('../views/login');
-});
-
-router.get('/register', (req, res, next) => {
-    res.render('../views/register');
+router.get('/editor',(req,res,next)=>{
+    res.render('../views/article_editor');
 });
 module.exports = router;

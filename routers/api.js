@@ -7,6 +7,8 @@ const salt = require('../libs/salt');
 const crt_token = require('../libs/ctr_token');
 const router = express.Router();
 const Users = require('../models/Users_model');
+const Tags = require('../models/Tags_model');
+const Slide = require('../models/Slide_model');
 
 let responseData = {};
 
@@ -20,6 +22,9 @@ router.use(function(req, res, next) {
     next();
 });
 
+/**
+ * 获取TOKEN
+ */
 router.get('/gettoken',(req, res, next)=>{
     responseData.code = 1;
     responseData.msg = 'success';
@@ -29,6 +34,54 @@ router.get('/gettoken',(req, res, next)=>{
     };
     res.json(responseData);
     return;
+})
+
+/**
+ * 获取所有标签
+ */
+router.get('/tags',(req, res, next)=>{
+    // console.log(Tags);
+    // res.send();
+    Tags.find().then(tags=>{
+        if(tags){
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = tags;
+            res.json(responseData);
+            return;
+        }else{
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+            return;
+        }
+    });
+});
+
+/**
+ * 获取幻灯片
+ */
+router.get('/slides',(req, res, next)=>{
+    Slide.find().then(slides=>{
+        if(slides){
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = slides;
+            res.json(responseData);
+            return;
+        }else{
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+            return;
+        }
+    });
 })
 
 router.post('/signin', (req, res, next) => {
@@ -74,7 +127,7 @@ router.post('/signin', (req, res, next) => {
             return;
         } else {
             responseData.code = 0;
-            responseData.msg = "error";
+            responseData.msg = "您还没有帐号，请注册帐号";
             responseData.data = '';
             res.json(responseData);
         }
