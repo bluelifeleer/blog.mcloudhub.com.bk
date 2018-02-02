@@ -15,6 +15,10 @@ router.get('/editor',(req,res,next)=>{
     res.render('../views/article_editor');
 });
 
+router.get('/upfile',(req,res,next)=>{
+    res.render('../views/upfile');
+})
+
 router.get('/account',(req,res,next)=>{
     res.render('../views/account');
 })

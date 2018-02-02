@@ -9,7 +9,12 @@ const VM = new Vue({
         tags:null,
         editorType:1,
         wangEditor:'block',
-        markdownEditor:'none'
+        markdownEditor:'none',
+        imgSrc:'',
+        accountSymbol:'&#xe68f;',
+        accountBox:'none',
+        checked:false,
+        tagLists:[]
     },
     methods:{
         init:function(){
@@ -65,6 +70,38 @@ const VM = new Vue({
                 this.markdownEditor = 'block';
                 this.editorType = 2;
             }
+        },
+        uploadfile:function(e){
+            console.log(e);
+            let _this = this;
+            let file = e.target.files[0];
+            let Reader = new FileReader();
+            Reader.addEventListener('load', function(e){
+                console.log(e);
+                console.log(Reader);
+                _this.imgSrc = Reader.result;
+            },false);
+            Reader.readAsDataURL(file);
+        },
+        showAccountBox:function(){
+            if(this.accountBox == 'none'){
+                this.accountBox = 'block';
+                this.accountSymbol = '&#xe68d';
+            }else{
+                this.accountBox = 'none';
+                this.accountSymbol = '&#xe68f;'
+            }
+        },
+        checkTags:function(e,id){
+            if(this.checked){
+                this.checked = false;
+            }else{
+                this.checked = true;
+                this.tagLists.push(id);
+            }
+            // this.tagLists.push(id);
+            // alert(id);
+            // console.log(this.tagLists);
         }
     }
 });

@@ -39,7 +39,20 @@
                     <input class="form-control mr-sm-2" type="text" placeholder="Search">
                     <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
                 </form>
-                <a href="" class="badge badge-primary write-article-but"><i class="icon iconfont">&#xe63e;</i>写文章</a>
+            </div>
+            <a href="" class="badge badge-primary write-article-but"><i class="icon iconfont">&#xe63e;</i>写文章</a>
+            <div class="account-center-block">
+                <span class="account-avatar-block"><img src="/public/images/f15.jpg" alt="" class="account-avatar-img"></span>
+                <span class="account-username">bluelife</span>
+                <a href="javascript:void(0);" class="account-contr-buts" v-on:click="showAccountBox"><i class="icon iconfont" v-html="accountSymbol"></i></a>
+                <div class="account-options-box" v-bind:style="{display:accountBox}">
+                    <a href="/account" class="account-setting-but"><i class="icon iconfont">&#xe614;</i>我的主页</a>
+                    <a href="/bookmarks" class="account-setting-but"><i class="icon iconfont">&#xe6a8;</i>我收藏的文章</a>
+                    <a href="/liked" class="account-setting-but"><i class="icon iconfont">&#xe641;</i>我喜欢的文章</a>
+                    <a href="/setting" class="account-setting-but"><i class="icon iconfont">&#xe632;</i>设置</a>
+                    <a href="/help" class="account-setting-but"><i class="icon iconfont">&#xe60a;</i>问题与反馈</a>
+                    <a href="/api/signout" class="account-signout-but"><i class="icon iconfont">&#xe633;</i>退出</a>
+                </div>
             </div>
         </nav>
         <section class="contents-bar">
@@ -56,13 +69,14 @@
                         </div>
                         <div class="form-group">
                             <label for="exampleInputFile">图片：</label>
-                            <input class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp" type="file">
-                            <small id="fileHelp" class="form-text text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
+                            <input class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp" type="file" v-on:change="uploadfile" />
+                            <small id="fileHelp" class="form-text text-muted"></small>
+                            <div class="show-upload-file-box"><img src="" alt="" v-bind:src="imgSrc" class="artlice-img-show"></div>
                         </div>
                         <div class="form-group">
                             <label for="exampleSelect1">标签：<a href="javascript:void(0);" class="add-tag-but"><i class="icon iconfont">&#xe673;</i>添加标签</a></label>
                             <p class="tags-block-box">
-                                <a href="javascript:void(0);" class="tags-buts" v-for="tag in tags" v-bind:data-id="tag._id"><i class="icon iconfont">&#xe622;</i>${tag.name}</a>
+                                <a href="javascript:void(0);" class="tags-buts" v-for="tag in tags" v-bind:data-id="tag._id" v-bind:data-checked="checked" v-on:click="checkTags($event,tag._id)"><i class="icon iconfont">&#xe622;</i>${tag.name}</a>
                             </p>
                         </div>
                         <div class="form-group">

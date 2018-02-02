@@ -7,8 +7,8 @@
 .tags-buts:hover{text-decoration: none;}
 .editor-block-box{width:80%;height:auto;margin:0 auto;}
 .editor-switch-buts{display:inline-block;float:right;width:auto;height:auto;margin-left:20px;}
-.editor-switch-buts:last-child{margin-left:600px;}
-.text-editor{width:100%;height:330px;}
+.editor-switch-buts:last-child{margin-left:400px;}
+.text-editor{width:100%;height:340px;}
 .textarea-block{float:left;width:48%;height:330px;border:1px solid #c1c1c1;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -18,4 +18,6 @@
 .markdoen-preview-block{float:left;width:48%;height:330px;background:#FFF;border:1px solid #c1c1c1;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-    box-sizing: border-box;padding:10px;}
+    box-sizing: border-box;padding:10px;overflow:auto;}
+.show-upload-file-box{width:100%;height:auto;}
+.artlice-img-show{display:block;width:100%;}
