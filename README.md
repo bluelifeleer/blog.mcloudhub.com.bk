@@ -1,10 +1,10 @@
 # blog-node
 
-# express(框架)
-# swig(模板)
-# mongodb(数据库)
-# node(服务器)
-# Vue(js库)
+### express(框架)
+### swig(模板)
+### mongodb(数据库)
+### node(服务器)
+### Vue(js库)
 
 #### 注：在写schema的过程中出现不能保存数据的情况(总是提示数据验证失败)，经多方调试发现是没有把schema导入到node环境中，使用module.exports将自定义的schema导入到node模块中。
 
@@ -73,3 +73,5 @@
     FileReader.readAsBinaryString() // 开始读取指定的Blob中的内容。一旦完成，result属性中将包含所读取文件的原始二进制数据。
     FileReader.readAsDataURL() // 开始读取指定的Blob中的内容。一旦完成，result属性中将包含一个data: URL格式的字符串以表示所读取文件的内容。
     FileReader.readAsText() // 开始读取指定的Blob中的内容。一旦完成，result属性中将包含一个字符串以表示所读取的文件内容。
+    
+ [参考资料：https://developer.mozilla.org/zh-CN/docs/Web/API/FileReader]('https://developer.mozilla.org/zh-CN/docs/Web/API/FileReader')
