@@ -75,3 +75,6 @@
     FileReader.readAsText() // 开始读取指定的Blob中的内容。一旦完成，result属性中将包含一个字符串以表示所读取的文件内容。
     
  [参考资料：https://developer.mozilla.org/zh-CN/docs/Web/API/FileReader]('https://developer.mozilla.org/zh-CN/docs/Web/API/FileReader')
+
+#### 2018-02-5
+    添加登录注册对用户名\手机\邮箱的支持，添加请求api接口对token验证的支持，以及登录时对骓插件骓的支持
