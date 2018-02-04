@@ -22,6 +22,7 @@
                         href="javascript:void(0);" class="eye-iconfont" v-on:click="showpassword($event)"><i class="icon iconfont" v-html="eyeText">&#xe61e;</i></a></div>
                 <div class="login-user-password-input-block"><i class="icon iconfont iconfontset">&#xe66c;</i><input type="password" v-bind:type="inputType" name="password-confirm" v-model="passwordConfirm" v-on:blur="blur($event)" id="password-confirm" placeholder="确认密码"  style="width:90%;" /><a
                         href="javascript:void(0);" class="eye-iconfont" v-on:click="showpassword($event)"><i class="icon iconfont" v-html="eyeText">&#xe61e;</i></a></div>
+                <input type="hidden" name="token" id="token" v-model="token" />
                 <div class="validate-block" style="display:none;">
                     <span class="validate-tip">点击完成验证</span>
                     <span id="captcha-block"></span>

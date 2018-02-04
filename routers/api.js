@@ -10,6 +10,8 @@ const Users = require('../models/Users_model');
 const Tags = require('../models/Tags_model');
 const Slide = require('../models/Slide_model');
 const Geetest = require('gt3-sdk');
+const emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+const phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
 
 let responseData = {};
 
@@ -115,24 +117,47 @@ router.get('/slides',(req, res, next)=>{
 })
 
 router.post('/signin', (req, res, next) => {
-    let username = req.body.name;
-    let userpwd = req.body.password;
-    if (username == '') {
+    let name = req.body.name;
+    let password = req.body.password;
+    let token = req.body.token;
+    let form = req.body.form;
+    let validateCode = form == 'login' ? req.body.validateCode : '';
+    let remember = req.body.remember;
+    if (name == '') {
         responseData.code = 0;
         responseData.msg = '用户名不能为空';
         res.json(responseData);
         return;
     }
-    if (userpwd == '') {
+    if (password == '') {
         responseData.code = 0;
         responseData.msg = "密码不能为空";
         res.json(responseData);
         return;
     }
-
-    Users.findOne({
-        name: username
-    }).then(function(userInfo) {
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = "非法请求";
+        res.json(responseData);
+        return;
+    }
+    if(form == 'login'){
+        if(validateCode == ''){
+            responseData.code = 0;
+            responseData.msg = "请先通过验证";
+            res.json(responseData);
+            return;
+        }
+    }
+    let user = {};
+    if(emailRegexp.test(name)){
+        user.email = name;
+    }else if(phoneRegexp.test(name)){
+        user.phone = name;
+    }else{
+        user.name = name;
+    }
+    Users.findOne(user).then(function(userInfo) {
         if (userInfo) {
             console.log(cookie);
             console.log(res.cookie);
@@ -165,48 +190,58 @@ router.post('/signin', (req, res, next) => {
 });
 
 router.post('/signup',(req, res, next)=>{
-    let username = req.body.name;
-    let userpwd = req.body.password;
-    if (username == '') {
+    let name = req.body.name;
+    let phone = req.body.phone;
+    let password = req.body.password;
+    let passwordConfirm = req.body.passwordConfirm;
+    let token = req.body.token;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    if (name == '') {
         responseData.code = 0;
         responseData.msg = '用户名不能为空';
         res.json(responseData);
         return;
     }
-    if (userpwd == '') {
+    if (password == '') {
         responseData.code = 0;
         responseData.msg = "密码不能为空";
         res.json(responseData);
         return;
     }
 
-    Users.findOne({
-        name: username
-    }).then(function(userInfo) {
-        if (userInfo) {
-            // cookies.set('uid', userInfo._id, { signed: true });
-            // res.cookies.set('uid',userInfo._id);
-            responseData.code = -4;
-            responseData.msg = "用户已注册";
-            res.json(responseData);
-            return;
-        } else {
-            let t_salt = salt();
-            let newUsers = new Users({
-                name: username,
-                password: md5(userpwd+t_salt),
-                salt:t_salt
-            });
-            // console.log(newUsers);
-            return newUsers.save();
-            // console.log(newUsers);
-        }
-    }).then(newuser => {
+    if(password != passwordConfirm){
+        responseData.code = 0;
+        responseData.msg = "两次输入密码不同";
+        res.json(responseData);
+        return;
+    }
+
+    let t_salt = salt();
+    let user = {};
+    if(emailRegexp.test(name)){
+        user.email = name;
+    }else if(phoneRegexp.test(name)){
+        user.phone = name;
+    }else{
+        user.name = name;
+    }
+    user.phone = phone;
+    user.password = md5(password+t_salt);
+    user.salt = t_salt;
+
+    let newUsers = new Users(user);
+    newUsers.save().then(inser => {
         // cookies.set('uid', newuser._id, { signed: true });
         // res.cookies.set('uid',newuser._id);
         responseData.code = 1;
         responseData.ok = true;
-        responseData.msg = newuser._id;
+        responseData.msg = '注册成功';
+        responseData.data = {id:inser._id};
         res.json(responseData);
     });
 })

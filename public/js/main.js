@@ -5,6 +5,7 @@ const vm = new Vue({
         token:'',
         name:'',
         password:'',
+        remember:true,
         slide_list:{},
         tags_list:{},
         slideAttr:{
@@ -20,9 +21,9 @@ const vm = new Vue({
     },
     methods:{
         init:function(){
-            this.get_tags();
-            this.get_token();
-            this.get_slides();
+            this.getTags();
+            this.getToken();
+            this.getSlides();
             this.slideAutoPlay();
         },
         switchSlide:function(e,direction){
@@ -56,27 +57,30 @@ const vm = new Vue({
             this.slideAttr.cursor = null;
             this.slideAutoPlay();
         },
-        submitForm:function(e){
-            this.$http.post('/api/signin',{name:this.name,password:this.password,token:this.token}).then((err,res)=>{
-                if(err) throw console.log(err);
-                console.log(res);
+        submitForm:function(e,type){
+            this.$http.post('/api/signin',{name:this.name,password:this.password,token:this.token,form:'index',remember:this.remember}).then((res)=>{
+                if(!res) throw console.log(res);
+                if(res.body.code == 0 && res.body.ok == false){
+                    window.location = '/register';
+                }else{
+                    console.log(res);
+                }
             });
         },
-        get_token:function(){
+        getToken:function(){
             if(!this.token || this.token == ''){
                 this.$http.get('/api/gettoken').then((res)=>{
                     if(!res) throw console.log(err);
-                    console.log(res.body.data.token);
                     this.token = res.body.data.token;
                 })
             }
         },
-        get_tags:function(){
+        getTags:function(){
             this.$http.get('/api/tags').then(res=>{
                 this.tags_list = res.body.data;
             });
         },
-        get_slides:function(){
+        getSlides:function(){
             this.$http.get('/api/slides').then(res=>{
                 this.slide_list = res.body.data;
                 this.slideAttr.length = res.body.data.length;

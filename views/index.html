@@ -92,12 +92,12 @@
                 <div class="model-box">
                     <div class="model-tag-name">登录</div>
                     <div class="model-contents-box">
-                        <form v-on:submit.prevent="submitForm($event)">
+                        <form v-on:submit.prevent="submitForm($event,'signin')">
                             <fieldset>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">用户名/邮箱/手机号：</label>
                                     <input type="text" v-model="name" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="用户名/邮箱/手机号">
-                                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                                    <!--<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>-->
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputPassword1">密码：</label>
@@ -107,7 +107,7 @@
                                 <fieldset class="form-group">
                                     <div class="form-check">
                                         <label class="form-check-label">
-                                            <input class="form-check-input" type="checkbox" value="" checked="">
+                                            <input class="form-check-input" type="checkbox" value="" checked="" v-model="remember" />
                                             记住密码
                                         </label>
                                     </div>

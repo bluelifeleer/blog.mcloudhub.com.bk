@@ -16,12 +16,13 @@
             <div class="form-title-text"><a href="/login" class="login-tab active">登录</a>-<a href="/register" class="login-tab">注册</a></div>
             <div class="form-input-block">
                 <form v-on:submit.prevent="submitForm($event,'signin')">
-                    <div class="login-user-name-input-block"><i class="icon iconfont iconfontset">&#xe623;</i><input type="text" name="name" v-model="name" id="name" placeholder="手机号/邮箱" style="width:90%;" /></div>
+                    <div class="login-user-name-input-block"><i class="icon iconfont iconfontset">&#xe623;</i><input type="text" name="name" v-model="name" id="name" placeholder="用户名/手机号/邮箱" style="width:90%;" /></div>
                     <div class="login-user-password-input-block"><i class="icon iconfont iconfontset">&#xe66c;</i><input type="password" v-bind:type="inputType" v-model="password" name="password" id="password" placeholder="密码"  style="width:90%;" /><a
                             href="javascript:void(0);" class="eye-iconfont" v-on:click="showpassword($event)"><i class="icon iconfont" v-html="eyeText">&#xe61e;</i></a></div>
                     <div class="form-help-block">
-                        <span class="login-rememberme"><input type="checkbox" name="remember-me" v-model="remember" value="1" checked="checked">&nbsp;&nbsp;记住我</span>
+                        <span class="login-rememberme"><input type="checkbox" name="remember-me" v-model="remember" value="1" >&nbsp;&nbsp;记住我</span>
                         <span class="login-problem">登录遇到问题?</span>
+                        <input type="hidden" name="token" id="token" v-model="token" />
                     </div>
                     <div class="validate-block">
                         <span class="validate-tip">点击完成验证</span>
