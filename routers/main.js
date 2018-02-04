@@ -22,4 +22,17 @@ router.get('/upfile',(req,res,next)=>{
 router.get('/account',(req,res,next)=>{
     res.render('../views/account');
 })
+
+router.get('/signout',(req,res,next)=>{
+    res.location('../views/login');
+});
+
+router.get('/register',(req,res,next)=>{
+    res.render('../views/register');
+});
+
+router.get('/login', (req, res, next) => {
+    res.render('../views/login');
+});
+
 module.exports = router;

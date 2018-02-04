@@ -95,6 +95,8 @@ app.use('/public', express.static(__dirname + '/public'));
 app.use('/admin', require('./routers/admin'));
 app.use('/api', require('./routers/api'));
 app.use('/', require('./routers/main'));
+app.use('/article',require('./routers/article'));
+app.use('/setting',require('./routers/setting'));
 //设置响应头
 //  app.setHeader('content-type','text-css');
 //  app.set('*/css',(req,res,next)=>{

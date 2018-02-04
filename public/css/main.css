@@ -10,6 +10,26 @@
 .prev-but-block{display:block;width:60px;height:60px;background:#3d3d3d;border-radius:0 10px 10px 0;opacity: .8;position:absolute;left:0;top:160px;text-align:center;line-height:60px;}
 .next-but-block{display:block;width:60px;height:60px;background:#3d3d3d;border-radius:10px 0 0 10px;opacity: .8;position:absolute;left:964px;top:160px;text-align:center;line-height:60px;}
 .prev-incofont,.next-incofont{font-size:30px;color:#FFF;}
+#say-something-block{width:1024px;height:200px;margin:0 auto;margin-top:20px;}
+.say-something-title{width:100%;height:40px;line-height:40px;font-family: "WBswficon" !important;}
+.something-contents-block{width:100%;height:100px;}
+.something-textarea{display:block;width:100%;height:100px;border:1px solid #c1c1c1;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    resize: none;
+}
+.something-ctr-block{width:100%;height:400px;margin:10px 0 0 0;}
+.add-something-price-but{display:inline-block;float:left;width:30px;height:40px;line-height:40px;}
+.add-something-attr-but{display:inline-block;float:left;width:30px;height:40px;line-height:40px;}
+.something-iconfont{font-size:20px !important;color:#3d3d3d;}
+.add-something-send-but{display:inline-block;float:right;width:120px;height:40px;line-height:40px;color:#FFF;background:#ffc09f;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    text-align:center;
+}
+
 #body-content{width:1024px;height:auto;margin:2% auto;background:#FFF;}
 .body-layout-l{float:left;width:70%;height:auto;}
 .body-layout-r{float:left;width:30%;height:auto;}
@@ -21,7 +41,7 @@
 .article-list-describe-author{width:100%;height:40px;line-height:40px;font-size:13px;}
 .article-tags,.article-author,.article-date{margin-right:10px;}
 .article-list-describe-title{width:100%;height:60px;line-height:60px;font-weight:bold;}
-.article-list-describe-text{width:100%;height:100px;font-size:17px;}
+.article-list-describe-text{width:100%;height:60px;font-size:17px;}
 .clear-both{clear:both;}
 
 .model-box{width:90%;height:auto;padding:6%;margin:0 0 15% 10%;border:1px solid #c1c1c1;position:relative;}
@@ -40,5 +60,10 @@
 .github{background:#000;}
 .sina{background:#e05244;}
 .iconfont-set{color:#FFF;}
+
+.ctr-buts-block{width:100%;height:40px;}
+.share-but-box{display:inline-block;width:40px;height:40px;line-height:40px;text-align:center;color:#777;}
+.liked-but-box{display:inline-block;width:40px;height:40px;line-height:40px;text-align:center;color:#777;}
+.collection-but-box{display:inline-block;width:40px;height:40px;line-height:40px;text-align:center;color:#777;}
 
 .footer-bar{width:100%;height:auto;}
