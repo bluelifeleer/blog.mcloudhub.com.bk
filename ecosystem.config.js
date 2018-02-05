@@ -5,7 +5,7 @@ module.exports = {
             script: "./app.js",
             watch: true,
             env: {
-                "PORT": 80,
+                "PORT": 443,
                 "NODE_ENV": "development"
             },
             env_production: {

@@ -116,6 +116,24 @@ router.get('/slides',(req, res, next)=>{
     });
 })
 
+router.get('/getUsers',(req, res, next)=>{
+    Users.findOne({_id:'5a787c69a0f8974c2ee35734'}).then(usersInfo=>{
+        if(usersInfo){
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = usersInfo;
+            res.json(responseData);
+        }else{
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+        }
+    });
+})
+
 router.post('/signin', (req, res, next) => {
     let name = req.body.name;
     let password = req.body.password;
@@ -222,7 +240,24 @@ router.post('/signup',(req, res, next)=>{
     }
 
     let t_salt = salt();
-    let user = {};
+    let user = {
+        name:'',
+        phone : '',
+        email : '',
+        password:'',
+        salt : '',
+        sex: 3,
+        nick: '',
+        wechat: '',
+        qq: '',
+        avatar: '',
+        signature:'',
+        website: '',
+        introduce : '',
+        editors : 2,
+        add_date : new Date(),
+        isDel : 0,
+    };
     if(emailRegexp.test(name)){
         user.email = name;
     }else if(phoneRegexp.test(name)){
@@ -230,9 +265,8 @@ router.post('/signup',(req, res, next)=>{
     }else{
         user.name = name;
     }
-    user.phone = phone;
-    user.password = md5(password+t_salt);
     user.salt = t_salt;
+    user.password = md5(password+t_salt);
 
     let newUsers = new Users(user);
     newUsers.save().then(inser => {
@@ -244,7 +278,86 @@ router.post('/signup',(req, res, next)=>{
         responseData.data = {id:inser._id};
         res.json(responseData);
     });
-})
+});
 
+router.post('/updateUserBasic',(req,res,next)=>{
+    let token = req.body.token;
+    let updateUserBasic = {
+        nick: req.body.nick,
+        phone: req.body.phone,
+        email: req.body.email,
+        editors: req.body.editors,
+        avatar: req.body.avatar,
+        qq:req.body.qq,
+        wechat:req.body.wechat
+    };
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Users.update({_id:'5a787c69a0f8974c2ee35734'},updateUserBasic,{multi:false},(err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '用户基础信息修改成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.post('/changeProfile',(req,res,next)=>{
+    let token = req.body.token;
+    let updateProfile = {
+        sex:req.body.sex,
+        introduce:req.body.introduce,
+        website:req.body.website
+    };
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Users.update({_id:'5a787c69a0f8974c2ee35734'},updateProfile,{multi:false},(err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '用户个人资料修改成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.post('/changeReward',(req,res,next)=>{
+    let token = req.body.token;
+    let updateReward = {
+        rewardStatus:req.body.rewardStatus,
+        rewardDesc:req.body.rewardDesc
+    };
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Users.update({_id:'5a787c69a0f8974c2ee35734'},updateReward,{multi:false},(err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '赞赏修改成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.get('/downloadAllArticles',(req,res,next)=>{
+    responseData.code = 1;
+    responseData.ok = true;
+    responseData.msg = '所有文章打包下载完成';
+    responseData.data = {};
+    res.json(responseData);
+})
 
 module.exports = router;

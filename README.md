@@ -78,3 +78,11 @@
 
 #### 2018-02-5
     添加登录注册对用户名\手机\邮箱的支持，添加请求api接口对token验证的支持，以及登录时对骓插件骓的支持
+
+
+#### 使用body-parser模块提交表单如果请求实体过大时会报 413 PayloadTooLargeError: request entity too large错误
+    解决办法：设置请求实体大小
+
+
+    app.use(bodyParser.json({limit: '50mb'}));
+    app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));

@@ -6,6 +6,21 @@ const vm = new Vue({
         name:'',
         password:'',
         remember:true,
+        phone:'',
+        nick:'',
+        email:'',
+        qq:'',
+        wechat:'',
+        introduce:'',
+        website:'',
+        introduce:'',
+        editors:'',
+        avatar:'/public/images/QQ20180131-224008@2x.png',
+        sex:3,
+        introduce:'',
+        website:'http://|https://',
+        rewardStatus:2,
+        rewardDesc:'赞赏描述',
         slide_list:{},
         tags_list:{},
         slideAttr:{
@@ -17,7 +32,13 @@ const vm = new Vue({
             cursor:null
         },
         accountSymbol:'&#xe68f;',
-        accountBox:'none'
+        accountBox:'none',
+        popupLayerBoxShow:'none',
+        popupLayerWidth:'100%',
+        popupLayerHeight:'100%',
+        popupLayerLeft:0,
+        popupLayerTop:0,
+        popupLayerText:''
     },
     methods:{
         init:function(){
@@ -25,6 +46,7 @@ const vm = new Vue({
             this.getToken();
             this.getSlides();
             this.slideAutoPlay();
+            this.getUsers();
         },
         switchSlide:function(e,direction){
             if(direction == 'next'){
@@ -92,8 +114,99 @@ const vm = new Vue({
                 this.accountSymbol = '&#xe68d';
             }else{
                 this.accountBox = 'none';
-                this.accountSymbol = '&#xe68f;'
+                this.accountSymbol = '&#xe68f;';
             }
+        },
+        getUsers:function(){
+            this.$http.get('/api/getUsers').then(res=>{
+                if(!res) throw console.log(err);
+                console.log(res);
+                this.nick = res.body.data.nick;
+                this.phone = res.body.data.phone;
+                this.email = res.body.data.email;
+                this.qq = res.body.data.qq;
+                this.wechat = res.body.data.wechat;
+                this.editors = res.body.data.editors;
+                this.avatar = res.body.data.avatar ? res.body.data.avatar : this.avatar;
+                this.sex = res.body.data.sex;
+                this.introduce = res.body.data.introduce;
+                this.website = res.body.data.website;
+                this.rewardStatus = res.body.data.rewardStatus ? res.body.data.rewardStatus :this.rewardStatus;
+                this.rewardDesc = res.body.data.rewardDesc;
+            });
+        },
+        changeAvatar:function(e){
+            console.log(e);
+            let _this = this;
+            let file = e.target.files[0];
+            let Reader = new FileReader();
+            Reader.addEventListener('load', function(e){
+                console.log(e);
+                console.log(Reader);
+                _this.avatar = Reader.result;
+            },false);
+            Reader.readAsDataURL(file);
+        },
+        changeUserBasicSubmitForm:function(){
+            this.$http.post('/api/updateUserBasic',{
+                nick:this.nick,
+                phone:this.phone,
+                email:this.email,
+                editors:this.editors,
+                avatar:this.avatar,
+                qq:this.qq,
+                wechat:this.wechat,
+                token:this.token
+            }).then(res=>{
+                if(!res) throw console.log(res);
+                console.log(res);
+                if(res.body.code && res.body.ok){
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = res.body.msg;
+                }
+            });
+        },
+        changeUserProfileSubmitForm:function(e){
+            this.$http.post('/api/changeProfile',{
+                sex:this.sex,
+                introduce:this.introduce,
+                website:this.website,
+                token:this.token
+            }).then(res=>{
+                if(!res) throw console.log(res);
+                console.log(res);
+                if(res.body.code && res.body.ok){
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = res.body.msg;
+                }
+            });
+        },
+        changeRewardSubmitForm:function(e){
+            this.$http.post('/api/changeReward',{
+                rewardStatus:this.rewardStatus,
+                rewardDesc:this.rewardDesc,
+                token:this.token
+            }).then(res=>{
+                if(!res) throw console.log(res);
+                console.log(res);
+                if(res.body.code && res.body.ok){
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = res.body.msg;
+                }
+            });
+        },
+        closePopupLayer:function(){
+            this.popupLayerBoxShow = 'none';
+        },
+        downloadAllArticles:function(){
+            this.$http.get('/api/downloadAllArticles').then(res=>{
+                if(!res) throw console.log(res);
+                console.log(res);
+                if(res.body.code && res.body.ok){
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = res.body.msg;
+                }
+            });
         }
     }
 });

@@ -11,8 +11,12 @@ module.exports = new mongoose.Schema({
     phone: String, //手机
     wechat: String, //微信
     avatar: String, //头像
-    signature: String, //签名
     email: String, //邮箱
+    website: String, // 个人网站
+    introduce: String, //个人介绍
+    editors: Number, //常用编辑器
+    rewardStatus: Number,  // 赞赏设置
+    rewardDesc: String, // 赞赏描述
     add_date: Date,
     isDel: Number,
 });

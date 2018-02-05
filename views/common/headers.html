@@ -35,8 +35,8 @@
                 <!--</li>-->
             </ul>
             <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search">
-                <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                <input class="form-control mr-sm-2" type="text" placeholder="请输入要搜索的关键字">
+                <button class="btn btn-secondary my-2 my-sm-0" type="submit">搜索</button>
             </form>
         </div>
         <a href="/editor" class="badge badge-primary write-article-but"><i class="icon iconfont">&#xe63e;</i>写文章</a>
@@ -57,6 +57,27 @@
 </header>
 {% block content %}{% endblock %}
 <footer class="footer-bar"></footer>
+    <div class="popup-layer" v-bind:style="{display:popupLayerBoxShow}">
+        <div class="popup-marsk-layer" v-bind:style="{width:popupLayerWidth,height:popupLayerHeight}"></div>
+        <div class="modal" v-bind:style="{left:popupLayerLeft,top:popupLayerTop}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">提示：</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" v-on:click="closePopupLayer">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p v-text="popupLayerText"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" v-on:click="closePopupLayer">确定</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <script type="text/javascript" src="/public/js/main.js"></script>
