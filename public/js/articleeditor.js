@@ -2,31 +2,90 @@ const VM = new Vue({
     delimiters: ['${', '}'],
     el:'#article-editor-app',
     data:{
-        title:'',
-        describe:'',
+        title:'无标题文档',
         textareaText:'',
         previewHtml:'',
         tags:null,
-        editorType:1,
+        editors:2,
+        editorsWidth:"100%",
+        editorsHeight:"100%",
         wangEditor:'block',
         markdownEditor:'none',
         imgSrc:'',
         accountSymbol:'&#xe68f;',
         accountBox:'none',
         checked:false,
-        tagLists:[]
+        tagLists:[],
+        uid:'',
+        token:'',
+        docName:'输入文集名称',
+        docInputBox:'none'
     },
     methods:{
         init:function(){
-            this.initEditor();
-            this.getTags();
+            this.getUser();
+            this.getToken();
         },
-        html2markdown:function(){
-            // let markDown = new showdown();
-            let converter = new showdown.Converter();
-            this.previewHtml = converter.makeHtml(this.textareaText);
+        initMarked:function(w,h){
+            $(function() {
+                let editor = editormd("editormd", {
+                    width: w,
+                    height: h,
+                    emoji: true,
+                    syncScrolling: "single",
+                    path: "/public/js/marked/lib/", // Autoload modules mode, codemirror, marked... dependents libs path
+                    toolbarIcons : function() {
+                        // return editormd.toolbarModes['full']; // full, simple, mini
+                        // Using "||" set icons align right.
+                        return ["undo", "redo", "|", "bold","del","italic","quote","ucwords","uppercase","lowercase","|","list-ul","list-ol", "hr", "|","h1","h2","h3","h4","h5","h6", "|","link","image", "code","preformatted-text","code-block","emoji","table","html-entities","||", "watch", "fullscreen", "preview","clear","help"]
+                    },
+                    // theme: "dark",
+                    // previewTheme: "dark",
+                    // editorTheme: "pastel-on-dark",
+                    // //markdown: md,
+                    // codeFold: true,
+                    saveHTMLToTextarea: true, //注意3：这个配置，方便post提交表单
+                    // /**设置主题颜色*/
+                    // // editorTheme: "pastel-on-dark",
+                    // theme: "gray",
+                    // previewTheme: "dark",
+                    // // taskList: true,
+                    // searchReplace: true,
+                    watch: false, // 关闭实时预览
+                    // htmlDecode: "style,script,iframe|on*", // 开启 HTML 标签解析，为了安全性，默认不开启
+                    toolbar: true, //关闭工具栏
+                    // previewCodeHighlight: false, // 关闭预览 HTML 的代码块高亮，默认开启
+                    // tocm: true, // Using [TOCM]
+                    tex: false, // 开启科学公式TeX语言支持，默认关闭
+                    flowChart: true, //开启流程图支持，默认关闭
+                    sequenceDiagram: true, //开启时序/序列图支持，默认关闭,
+                    dialogLockScreen: false, //设置弹出层对话框不锁屏，全局通用，默认为true
+                    dialogShowMask: false, //设置弹出层对话框显示透明遮罩层，全局通用，默认为true
+                    dialogDraggable: false, //设置弹出层对话框不可拖动，全局通用，默认为true
+                    dialogMaskOpacity: 0.4, //设置透明遮罩层的透明度，全局通用，默认值为0.1
+                    dialogMaskBgColor: "#000", //设置透明遮罩层的背景颜色，全局通用，默认为#fff
+                    //
+                    // codeFold: true,
+                    //
+                    // imageUpload: true,
+                    // imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                    // imageUploadURL: "/smart-api/upload/editormdPic/",
+                    // onload: function() {
+                    //     //console.log('onload', this);
+                    //     //this.fullscreen();
+                    //     //this.unwatch();
+                    //     //this.watch().fullscreen();
+                    //     //this.width("100%");
+                    //     //this.height(480);
+                    //     //this.resize("100%", 640);
+                    // },
+                    onchange:function(){
+                        console.log(this);
+                    }
+                });
+            });
         },
-        initEditor:function(){
+        initEditor:function(w,h){
             const E = window.wangEditor;
             let editor = new E('#exampleTextarea');
             editor.customConfig.menus = [
@@ -55,21 +114,37 @@ const VM = new Vue({
             }
             editor.create();
         },
+        getToken:function(){
+            if(!this.token || this.token == ''){
+                this.$http.get('/api/gettoken').then((res)=>{
+                    if(!res) throw console.log(err);
+                    this.token = res.body.data.token;
+                })
+            }
+        },
         getTags:function(){
             this.$http.get('/api/tags').then(res=>{
                 this.tags = res.body.data;
             });
         },
-        switchEditor:function(e,editor){
-            if(editor == 'wang'){
-                this.wangEditor = 'block';
-                this.markdownEditor = 'none';
-                this.editorType = 1;
-            }else{
-                this.wangEditor = 'none';
-                this.markdownEditor = 'block';
-                this.editorType = 2;
-            }
+        getUser:function(){
+            let winH = document.body.clientHeight || document.documentElement.clientHeight;
+            this.editorsHeight = winH+'px';
+            this.$http.get('/api/getUsers').then(res=>{
+                if(!res) throw console.log(err);
+                this.uid = res.body.data._id;
+                this.editors = res.body.data.editors;
+                if(this.editors == 2){
+                    this.markdownEditor = 'block';
+                    this.wangEditor = 'none';
+                    this.initMarked(this.editorsWidth,this.editorsHeight);
+                }else{
+                    this.initEditor(this.editorsWidth,this.editorsHeight);
+                    this.markdownEditor = 'none';
+                    this.wangEditor = 'block';
+                }
+                console.log(this.editors)
+            });
         },
         uploadfile:function(e){
             console.log(e);
@@ -92,16 +167,23 @@ const VM = new Vue({
                 this.accountSymbol = '&#xe68f;'
             }
         },
-        checkTags:function(e,id){
-            if(this.checked){
-                this.checked = false;
-            }else{
-                this.checked = true;
-                this.tagLists.push(id);
-            }
-            // this.tagLists.push(id);
-            // alert(id);
-            // console.log(this.tagLists);
+        createDocument:function(e){
+            this.docInputBox='block';
+        },
+        confirmDocSubmitForm:function(e){
+            alert(this.docName);
+        },
+        cleanDocConfirm:function(e){
+            this.docInputBox='none';
+        },
+        documentSetting:function(e){
+            alert('document');
+        },
+        createArticle:function(e){
+            alert('article')
+        },
+        articleSetting:function(e){
+            alert('article');
         }
     }
 });
