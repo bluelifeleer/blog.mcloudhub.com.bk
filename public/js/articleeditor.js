@@ -20,13 +20,20 @@ const VM = new Vue({
         token:'',
         docName:'输入文集名称',
         docList:[],
-        docInputBox:'none'
+        articleLsts:[],
+        docInputBox:'none',
+        doc_id:'5a7b147e25ba4dd3b58615be',
+        nowArticleId:'',
     },
     methods:{
         init:function(){
-            this.getUser();
-            this.getDocLists();
-            this.getToken();
+            if(token != '' && uid != ''){
+                this.getUser();
+                this.getDocLists();
+                this.getArticleLists();
+                this.token = token;
+                this.uid = uid;
+            }
         },
         initMarked:function(w,h){
             $(function() {
@@ -155,6 +162,13 @@ const VM = new Vue({
                 this.docList = res.body.data;
             });
         },
+        getArticleLists:function(){
+            this.$http.get('/api/getArticleLists').then(res=>{
+                console.log(res);
+                if(!res) throw console.log(res);
+                this.articleLsts = res.body.data;
+            });
+        },
         uploadfile:function(e){
             console.log(e);
             let _this = this;
@@ -179,6 +193,9 @@ const VM = new Vue({
         createDocument:function(e){
             this.docInputBox='block';
         },
+        focus:function(e){
+            this.docName = '';
+        },
         confirmDocSubmitForm:function(e){
             this.$http.post('/api/newDocument',{
                 uid:this.uid,
@@ -191,14 +208,22 @@ const VM = new Vue({
         cleanDocConfirm:function(e){
             this.docInputBox='none';
         },
-        documentSetting:function(e){
-            alert('document');
+        documentSetting:function(e,id){
+            alert(id);
         },
         createArticle:function(e){
-            alert('article')
+            this.$http.post('/api/newArticle',{
+                uid:this.uid,
+                doc_id:this.doc_id,
+                token:this.token
+            }).then(res=>{
+                if(!res) throw console.log(res);
+                console.log(res);
+                this.nowArticleId = res.body.data.id;
+            });
         },
-        articleSetting:function(e){
-            alert('article');
+        articleSetting:function(e,id){
+            alert(id);
         },
     }
 });

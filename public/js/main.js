@@ -8,6 +8,7 @@ const vm = new Vue({
         remember:true,
         phone:'',
         nick:'',
+        fullname:'',
         email:'',
         qq:'',
         wechat:'',
@@ -42,11 +43,15 @@ const vm = new Vue({
     },
     methods:{
         init:function(){
+            console.log();
+            if(token != '' && uid !=''){
+                this.uid = uid;
+                this.token = token;
+                this.getUsers();
+            }
             this.getTags();
-            this.getToken();
             this.getSlides();
             this.slideAutoPlay();
-            this.getUsers();
         },
         switchSlide:function(e,direction){
             if(direction == 'next'){
@@ -80,12 +85,13 @@ const vm = new Vue({
             this.slideAutoPlay();
         },
         submitForm:function(e,type){
-            this.$http.post('/api/signin',{name:this.name,password:this.password,token:this.token,form:'index',remember:this.remember}).then((res)=>{
+            this.$http.post('/api/signin',{name:this.name,password:this.password,form:'index',remember:this.remember}).then((res)=>{
                 if(!res) throw console.log(res);
-                if(res.body.code == 0 && res.body.ok == false){
+                console.log(res);
+                if(res.body.code == 0){
                     window.location = '/register';
                 }else{
-                    console.log(res);
+                    window.location.reload();
                 }
             });
         },
@@ -120,9 +126,10 @@ const vm = new Vue({
         getUsers:function(){
             this.$http.get('/api/getUsers').then(res=>{
                 if(!res) throw console.log(err);
-                console.log(res);
                 this.nick = res.body.data.nick;
                 this.phone = res.body.data.phone;
+                this.name = res.body.data.name.length >10 ? res.body.data.name.substr(0,10)+'...' : res.body.data.name;
+                this.fullname = res.body.data.name;
                 this.email = res.body.data.email;
                 this.qq = res.body.data.qq;
                 this.wechat = res.body.data.wechat;

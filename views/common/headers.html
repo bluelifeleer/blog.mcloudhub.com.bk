@@ -9,6 +9,10 @@
     <script type="text/javascript" src="/public/js/vue.js"></script>
     <!--<script type="text/javascript" src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>-->
     <script type="text/javascript" src="/public/js/vue-resource.js"></script>
+    <script type="text/javascript">
+        var token = '{{ token }}';
+        var uid = '{{ userInfo.uid }}';
+    </script>
 </head>
 <body>
 <div id="app">
@@ -41,8 +45,10 @@
         </div>
         <a href="/editor" class="badge badge-primary write-article-but"><i class="icon iconfont">&#xe63e;</i>写文章</a>
         <div class="account-center-block">
-            <span class="account-avatar-block"><img src="/public/images/f15.jpg" alt="" class="account-avatar-img"></span>
-            <span class="account-username">bluelife</span>
+            <span class="account-avatar-block"><img src="" v-bind:src="avatar" alt="" class="account-avatar-img"></span>
+            <span class="account-username">
+                <a href="" v-bind:title="fullname">${name}</a>
+            </span>
             <a href="javascript:void(0);" class="account-contr-buts" v-on:click="showAccountBox"><i class="icon iconfont" v-html="accountSymbol"></i></a>
             <div class="account-options-box" v-bind:style="{display:accountBox}">
                 <a href="/account" class="account-setting-but"><i class="icon iconfont">&#xe614;</i>&nbsp;&nbsp;我的主页</a>
@@ -50,7 +56,7 @@
                 <a href="/liked" class="account-setting-but"><i class="icon iconfont">&#xe641;</i>&nbsp;&nbsp;我喜欢的文章</a>
                 <a href="/setting/basic" class="account-setting-but"><i class="icon iconfont">&#xe632;</i>&nbsp;&nbsp;设置</a>
                 <a href="/help" class="account-setting-but"><i class="icon iconfont">&#xe60a;</i>&nbsp;&nbsp;问题与反馈</a>
-                <a href="/login" class="account-signout-but"><i class="icon iconfont">&#xe633;</i>&nbsp;&nbsp;退出</a>
+                <a href="/api/signout" class="account-signout-but"><i class="icon iconfont">&#xe633;</i>&nbsp;&nbsp;退出</a>
             </div>
         </div>
     </nav>

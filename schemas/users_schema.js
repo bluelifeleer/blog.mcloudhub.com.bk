@@ -17,6 +17,7 @@ module.exports = new mongoose.Schema({
     editors: Number, //常用编辑器
     rewardStatus: Number,  // 赞赏设置
     rewardDesc: String, // 赞赏描述
+    type: Number, // 用户注册类型
     add_date: Date,
     isDel: Number,
 });

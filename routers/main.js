@@ -1,13 +1,23 @@
 const express = require('express');
-const session = require('express-session')
 const ctr_token = require('../libs/ctr_token');
 const router = express.Router();
 router.get('/', (req, res, next) => {
-    res.render('../views/index');
+    res.render('../views/index',{
+        token:req.token,
+        userInfo:req.userInfo
+    });
 });
 
 router.get('/editor',(req,res,next)=>{
-    res.render('../views/article_editor');
+    if(req.token && req.userInfo.uid){
+        res.render('../views/article_editor',{
+            token:req.token,
+            userInfo:req.userInfo
+        });
+    }else{
+        res.redirect(302,'/login');
+    }
+
 });
 
 router.get('/upfile',(req,res,next)=>{

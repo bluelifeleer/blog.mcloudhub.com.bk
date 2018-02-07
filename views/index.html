@@ -89,6 +89,20 @@
                 </div>
             </div>
             <div class="body-layout-r">
+                {% if token && userInfo.uid %}
+                <div class="model-box">
+                    <div class="model-tag-name">用户信息</div>
+                    <div class="model-contents-box">
+                        <div class="index-user-avatar-img-box"><img src="" v-bind:src="avatar"></div>
+                        <div class="index-user-name-box">
+                            用户名：<span v-bind:title="fullname">${name}</span>
+                        </div>
+                        <div class="index-user-nick-box">昵称：<span>${nick}</span></div>
+                        <div class="insex-user-introduce-box">简介：<span>${introduce}</span></div>
+                        <div class="index-user-website-box"><span>个人网站：<a v-bind:href="website">${website}</a></span></div>
+                    </div>
+                </div>
+                {% else %}
                 <div class="model-box">
                     <div class="model-tag-name">登录</div>
                     <div class="model-contents-box">
@@ -126,6 +140,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="model-box">
                     <div class="model-tag-name">热门标签</div>
                     <div class="model-contents-box">

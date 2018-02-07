@@ -7,11 +7,7 @@ const https = require('https');
 //引入http2模块
 const http2 = require('spdy');
 const fs = require('fs');
-// const cookies = require('cookies');
-// const cookie = require('cookie');
-const cookieSession = require('cookie-session');
-const cookieParser = require('cookie-parser')
-const session = require('express-session');
+const Cookies = require('cookies');
 const crt_token = require(__dirname+'/libs/ctr_token');
 const swig = require('swig');
 const mongoose = require('mongoose');
@@ -37,13 +33,17 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 // 服务器启动时默认配置/动作
 app.use(function(req, res, next) {
-    cookieParser();
-    cookieSession({
-        name:'blog',
-        keys:['a','b'],
-        secret:true,
-        maxAge: 60*60
-    });
+    req.cookies = new Cookies(req, res);
+    req.userInfo = {};
+    //将登录后的用户信息附加到request头信息中
+    if(req.cookies.get('user_info') && req.cookies.get('user_info') != ''){
+        try{
+            req.token = req.cookies.get('token') ? req.cookies.get('token') :'';
+            req.userInfo = JSON.parse(req.cookies.get('user_info'));
+        }catch (e) {
+            console.log(e);
+        }
+    }
     if(start_log){
         let arr = [],i='';
         arr.push('url='+req.url);
@@ -60,29 +60,8 @@ app.use(function(req, res, next) {
             if (err) throw err;
         });
     }
-    //设置cookies
-    // req.cookies = new cookies(req, res);
-    //设置session
-
-    // console.log(req.cookies.get('uid'));
-    console.log(req.headers);
-    console.log(req.cookies);
     next();
 });
-
-// app.use(cookieParser());
-
-// app.use(cookieSession({
-//     name:'blog',
-//     keys:['a','b'],
-//     secret:true
-// }));
-// app.use(session({
-//     secret: crt_token(),
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: {maxAge: 60 * 1000 * 30}
-// }));
 
 //设置响应头
 // app.setHeader('content-type', 'text-css');

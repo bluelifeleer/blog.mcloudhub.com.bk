@@ -69,20 +69,27 @@ const VM = new Vue({
             if(type == 'signup'){ //signup
                 this.$http.post('/api/signup',{name:this.name,phone:this.phone,password:this.password,passwordConfirm:this.passwordConfirm,token:this.token}).then((res)=>{
                     if(!res) throw console.log(res);
-                    // if(res.body.code == 0 && res.body.ok == false){
-                    //     window.location = '/register';
-                    // }else{
-                    //     console.log(res);
-                    // }
+                    if(res.body.code == 0 && res.body.ok == false){
+                        window.location = '/register';
+                    }else{
+                        window.location = '/login';
+                    }
                 });
             }else{ // signin
                 this.$http.post('/api/signin',{name:this.name,password:this.password,token:this.token,validateCode:this.validateCode,form:'login',remember:this.remember}).then((res)=>{
                     if(!res) throw console.log(res);
-                    // if(res.body.code == 0 && res.body.ok == false){
-                    //     window.location = '/register';
-                    // }else{
-                    //     console.log(res);
-                    // }
+                    // console.log(res);
+                    switch(parseInt(res.body.code)){
+                        case 1:
+                            window.location = '/';
+                            break;
+                        case 2:
+                            window.location = '/login';
+                            break;
+                        default:
+                            window.location = '/register';
+                            break;
+                    }
                 });
             }
             // console.log(params);

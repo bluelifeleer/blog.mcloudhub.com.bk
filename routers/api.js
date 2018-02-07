@@ -1,7 +1,5 @@
 const express = require('express');
-// const cookies = require('cookies');
-const cookie = require('cookie');
-const session = require('express-session');
+const Cookies = require('cookies');
 const md5 = require('md5');
 const salt = require('../libs/salt');
 const crt_token = require('../libs/ctr_token');
@@ -63,9 +61,16 @@ router.get('/gettoken',(req, res, next)=>{
     responseData.code = 1;
     responseData.msg = 'success';
     responseData.ok = true;
-    responseData.data = {
-        token:crt_token()
-    };
+    if(req.cookies.get('token') && req.cookies.get('token') != ''){
+        responseData.data = {
+            token:req.cookies.get('token')
+        };
+    }else{
+        let token = crt_token();
+        responseData.data = {
+            token:crt_token
+        };
+    }
     res.json(responseData);
     return;
 })
@@ -119,7 +124,7 @@ router.get('/slides',(req, res, next)=>{
 })
 
 router.get('/getUsers',(req, res, next)=>{
-    Users.findOne({_id:'5a7a9582f7e89a46e46f5c52'}).then(usersInfo=>{
+    Users.findOne({_id:req.userInfo.uid}).then(usersInfo=>{
         if(usersInfo){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -137,7 +142,7 @@ router.get('/getUsers',(req, res, next)=>{
 });
 
 router.get('/getDocLists',(req, res, next)=>{
-    Docs.find({uid:'5a7a9582f7e89a46e46f5c52'}).then(docs=>{
+    Docs.find({uid:req.userInfo.uid}).then(docs=>{
         if(docs){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -152,12 +157,32 @@ router.get('/getDocLists',(req, res, next)=>{
             res.json(responseData);
         }
     });
-})
+});
+
+router.get('/getArticleLists',(req, res, next)=>{
+    Articles.find({
+        uid:req.userInfo.uid,
+    }).then(articles=>{
+        console.log(articles);
+        if(articles){
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = articles;
+            res.json(responseData);
+        }else{
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+        }
+    });
+});
 
 router.post('/signin', (req, res, next) => {
     let name = req.body.name;
     let password = req.body.password;
-    let token = req.body.token;
     let form = req.body.form;
     let validateCode = form == 'login' ? req.body.validateCode : '';
     let remember = req.body.remember;
@@ -170,12 +195,6 @@ router.post('/signin', (req, res, next) => {
     if (password == '') {
         responseData.code = 0;
         responseData.msg = "密码不能为空";
-        res.json(responseData);
-        return;
-    }
-    if(token == ''){
-        responseData.code = 0;
-        responseData.msg = "非法请求";
         res.json(responseData);
         return;
     }
@@ -197,27 +216,33 @@ router.post('/signin', (req, res, next) => {
     }
     Users.findOne(user).then(function(userInfo) {
         if (userInfo) {
-            console.log(cookie);
-            console.log(res.cookie);
-            res.cookie('uid',userInfo._id,{
-                // signed: true,
-                secure:true,
-                httpOnly: false,
-                maxAge: 60 * 60 * 24 * 7 // 1 week
-            });
-            // cookies.set('uid', userInfo._id, { signed: true });
-            // res.cookie.set('uid',userInfo._id);
-            // res.setHeader('Set-Cookie', cookie.serialize('uid', userInfo._id, {
-            //     secure:true,
-            //     httpOnly: false,
-            //     maxAge: 60 * 60 * 24 * 7 // 1 week
-            // }));
-            responseData.code = 1;
-            responseData.msg = "success";
-            responseData.ok = true;
-            responseData.data = userInfo;
-            res.json(responseData);
-            return;
+            if(userInfo.password == md5(password+userInfo.salt)){
+                responseData.code = 1;
+                responseData.msg = "success";
+                responseData.ok = true;
+                responseData.data = userInfo;
+                let cookiesData = {};
+                cookiesData.uid = userInfo._id;
+                cookiesData.type = userInfo.type;
+                if(userInfo.type == 3){
+                    cookiesData.email = userInfo.email;
+                }else if(userInfo.type == 2){
+                    cookiesData.phone = userInfo.phone;
+                }else{
+                    cookiesData.username = userInfo.name;
+                }
+
+                req.cookies.set('user_info',JSON.stringify(cookiesData));
+                req.cookies.set('token',crt_token());
+                res.json(responseData);
+                return;
+            }else{
+                responseData.code = 2;
+                responseData.msg = "登录失败，密码不正确";
+                responseData.ok = false;
+                responseData.data = null;
+                res.json(responseData);
+            }
         } else {
             responseData.code = 0;
             responseData.msg = "您还没有帐号，请注册帐号";
@@ -259,45 +284,80 @@ router.post('/signup',(req, res, next)=>{
         return;
     }
 
-    let t_salt = salt();
-    let user = {
-        name:'',
-        phone : '',
-        email : '',
-        password:'',
-        salt : '',
-        sex: 3,
-        nick: '',
-        wechat: '',
-        qq: '',
-        avatar: '',
-        signature:'',
-        website: '',
-        introduce : '',
-        editors : 2,
-        add_date : new Date(),
-        isDel : 0,
-    };
+    let findData = {};
     if(emailRegexp.test(name)){
-        user.email = name;
+        findData.email = name;
     }else if(phoneRegexp.test(name)){
-        user.phone = name;
+        findData.phone = name;
     }else{
-        user.name = name;
+        findData.name = name;
     }
-    user.salt = t_salt;
-    user.password = md5(password+t_salt);
-
-    let newUsers = new Users(user);
-    newUsers.save().then(inser => {
-        // cookies.set('uid', newuser._id, { signed: true });
-        // res.cookies.set('uid',newuser._id);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '注册成功';
-        responseData.data = {id:inser._id};
-        res.json(responseData);
+    Users.findOne(findData).then(userInfo=>{
+        if(userInfo){
+            responseData.code = 0;
+            responseData.ok = false;
+            responseData.msg = '帐号已存在，请注册新帐号';
+            responseData.data = null;
+            res.json(responseData);
+        }else{
+            let t_salt = salt();
+            let user = {
+                name:'',
+                phone : '',
+                email : '',
+                password:'',
+                salt : '',
+                sex: 3,
+                nick: '',
+                wechat: '',
+                qq: '',
+                avatar: '',
+                signature:'',
+                website: '',
+                introduce : '',
+                editors : 2,
+                add_date : new Date(),
+                isDel : 0,
+            };
+            if(emailRegexp.test(name)){
+                user.email = name;
+                user.type = 3;
+            }else if(phoneRegexp.test(name)){
+                user.phone = name;
+                user.type = 2;
+            }else{
+                user.name = name;
+                user.type = 1;
+            }
+            user.name = name;
+            user.salt = t_salt;
+            user.password = md5(password+t_salt);
+            let newUsers = new Users(user);
+            return newUsers.save();
+        }
+    }).then(inser => {
+        if(inser){
+            responseData.code = 1;
+            responseData.ok = true;
+            responseData.msg = '注册成功';
+            responseData.data = {id:inser._id};
+            res.json(responseData);
+        }else{
+            responseData.code = 2;
+            responseData.ok = true;
+            responseData.msg = '注册失败';
+            responseData.data = null;
+            res.json(responseData);
+        }
     });
+});
+
+router.get('/signout',(req,res,next)=>{
+    req.cookies.set('token','');
+    req.cookies.set('user_info','');
+    req.token = '';
+    req.userInfo = null;
+    res.redirect(302,'/login');
 });
 
 router.post('/updateUserBasic',(req,res,next)=>{
@@ -395,6 +455,38 @@ router.post('/newDocument',(req,res,next)=>{
         responseData.code = 1;
         responseData.ok = true;
         responseData.msg = '文集创建成功';
+        responseData.data = {id:insert._id};
+        res.json(responseData);
+    });
+});
+
+router.post('/newArticle',(req,res,next)=>{
+    let uid = req.body.uid;
+    let doc_id = req.body.doc_id;
+    let token = req.body.token;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    let article = new Articles({
+        uid: uid,
+        doc_id:doc_id,  // 文章所属文档id
+        title: String, // 文章标题
+        describe: '', // 文章描述
+        photos: '', // 文章图片
+        contents: '', // 文章内容
+        watch: 0,
+        start: 0,
+        fork: 0,
+        add_date: new Date(),
+        isDel: 0,
+    });
+    article.save().then(insert =>{
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文章创建成功';
         responseData.data = {id:insert._id};
         res.json(responseData);
     });

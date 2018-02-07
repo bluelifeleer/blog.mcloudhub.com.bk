@@ -1,5 +1,4 @@
 const express = require('express');
-const session = require('express-session')
 const ctr_token = require('../libs/ctr_token');
 const router = express.Router();
 
