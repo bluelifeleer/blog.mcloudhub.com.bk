@@ -35,14 +35,14 @@
                         <span class="document-name">随笔</span>
                         <span class="document-setting-buts" v-on:click="documentSetting($event)"><i class="icon iconfont">&#xe926;</i></span>
                     </li>
-                    <li class="documents-list-box">
-                        <span class="document-name">随笔</span>
+                    <li class="documents-list-box" v-for="doc in docList" v-bind:data-doc-id="doc._id">
+                        <span class="document-name">${doc.name}</span>
                         <span class="document-setting-buts" v-on:click="documentSetting($event)"><i class="icon iconfont">&#xe926;</i></span>
                     </li>
-                    <li class="documents-list-box">
-                        <span class="document-name">随笔</span>
-                        <span class="document-setting-buts" v-on:click="documentSetting($event)"><i class="icon iconfont">&#xe926;</i></span>
-                    </li>
+                    <!--<li class="documents-list-box">-->
+                        <!--<span class="document-name">随笔</span>-->
+                        <!--<span class="document-setting-buts" v-on:click="documentSetting($event)"><i class="icon iconfont">&#xe926;</i></span>-->
+                    <!--</li>-->
                 </ul>
             </div>
         </div>

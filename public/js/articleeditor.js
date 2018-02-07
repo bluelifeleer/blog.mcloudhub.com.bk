@@ -19,11 +19,13 @@ const VM = new Vue({
         uid:'',
         token:'',
         docName:'输入文集名称',
+        docList:[],
         docInputBox:'none'
     },
     methods:{
         init:function(){
             this.getUser();
+            this.getDocLists();
             this.getToken();
         },
         initMarked:function(w,h){
@@ -146,6 +148,13 @@ const VM = new Vue({
                 console.log(this.editors)
             });
         },
+        getDocLists:function(){
+            this.$http.get('/api/getDocLists').then(res=>{
+                console.log(res);
+                if(!res) throw console.log(res);
+                this.docList = res.body.data;
+            });
+        },
         uploadfile:function(e){
             console.log(e);
             let _this = this;
@@ -171,7 +180,13 @@ const VM = new Vue({
             this.docInputBox='block';
         },
         confirmDocSubmitForm:function(e){
-            alert(this.docName);
+            this.$http.post('/api/newDocument',{
+                uid:this.uid,
+                name:this.docName
+            }).then(res=>{
+                if(res) throw console.log(res);
+                console.log(res);
+            });
         },
         cleanDocConfirm:function(e){
             this.docInputBox='none';
@@ -184,7 +199,7 @@ const VM = new Vue({
         },
         articleSetting:function(e){
             alert('article');
-        }
+        },
     }
 });
 VM.init();

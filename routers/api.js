@@ -7,6 +7,8 @@ const salt = require('../libs/salt');
 const crt_token = require('../libs/ctr_token');
 const router = express.Router();
 const Users = require('../models/Users_model');
+const Docs = require('../models/Document_model');
+const Articles = require('../models/Articles_model');
 const Tags = require('../models/Tags_model');
 const Slide = require('../models/Slide_model');
 const Geetest = require('gt3-sdk');
@@ -117,12 +119,30 @@ router.get('/slides',(req, res, next)=>{
 })
 
 router.get('/getUsers',(req, res, next)=>{
-    Users.findOne({_id:'5a787c69a0f8974c2ee35734'}).then(usersInfo=>{
+    Users.findOne({_id:'5a7a9582f7e89a46e46f5c52'}).then(usersInfo=>{
         if(usersInfo){
             responseData.code = 1;
             responseData.msg = 'success';
             responseData.ok = true;
             responseData.data = usersInfo;
+            res.json(responseData);
+        }else{
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+        }
+    });
+});
+
+router.get('/getDocLists',(req, res, next)=>{
+    Docs.find({uid:'5a7a9582f7e89a46e46f5c52'}).then(docs=>{
+        if(docs){
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = docs;
             res.json(responseData);
         }else{
             responseData.code = 0;
@@ -359,5 +379,25 @@ router.get('/downloadAllArticles',(req,res,next)=>{
     responseData.data = {};
     res.json(responseData);
 })
+
+router.post('/newDocument',(req,res,next)=>{
+    let uid = req.body.uid;
+    let name = req.body.name;
+    let docs = new Docs({
+        uid:uid,
+        name: name,
+        photos: '',
+        describe: '',
+        add_date: new Date(),
+        isDel: 0,
+    });
+    docs.save().then(insert=>{
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文集创建成功';
+        responseData.data = {id:insert._id};
+        res.json(responseData);
+    });
+});
 
 module.exports = router;
