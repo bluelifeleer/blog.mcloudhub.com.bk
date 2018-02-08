@@ -36,7 +36,7 @@
             <div class="documents-list-group-block">
                 <ul class="documents-list-group-box">
                     <!--document-list-default-->
-                    <li class="documents-list-box" v-for="(doc,index) in docList" v-bind:data-doc-id="doc._id">
+                    <li class="documents-list-box" v-for="(doc,$index) in docList" v-on:click="selectDocumentButs($event,doc,$index)" v-bind:class="{'document-active':doc.active,'document-unactive':!doc.active}">
                         <span class="document-name">${doc.name}</span>
                         <span class="document-setting-buts" v-on:click="documentSetting($event,doc._id)"><i class="icon iconfont">&#xe926;</i></span>
                     </li>
@@ -48,11 +48,11 @@
             </div>
         </div>
         <div class="article-editor-layout-center">
-            <div class="create-article-but-block"><a href="javascript:void(0);" class="create-article-but" v-on:click="createArticle($event)"><i class="icon iconfont">&#xe6a3;</i>&nbsp;&nbsp;创建文章</a></div>
+            <div class="create-article-but-block"><a href="javascript:void(0);" class="create-article-but" v-on:click="createArticle($event)"><i class="icon iconfont">&#xe6a3;</i>&nbsp;&nbsp;创建文章&nbsp;&nbsp;<span class="loading-box" v-bind:style="{display:showLoadBut}"></span></a></div>
             <div class="article-list-group-block">
                 <ul class="article-list-group-box">
                     <!--article-list-default-->
-                    <li class="article-list-box" v-for="(article,index) in articleLsts" v-bind:data-article-id="article._id">
+                    <li class="article-list-box" v-for="(article,$index) in articleLsts" v-on:click="selectArticleBut($event,article,$index)" v-bind:class="{'article-active':article.active,'article-unactive':!article.active}">
                         <i class="icon iconfont article-iconfont">&#xe62e;</i>
                         <span class="article-name">${article.title}</span>
                         <span class="article-setting-buts" v-on:click="articleSetting($event,article._id)"><i class="icon iconfont">&#xe926;</i></span>
@@ -75,13 +75,13 @@
                 <div class="article-editor-title">
                     <input type="text" name="article-title" id="article-title" value="" v-model="title">
                     <span class="save-tip-box">已保存</span>
-                    <a href="javascript:void(0);" class="send-article-but" title="发布文章"><i class="icon iconfont">&#xe662;</i></a>
+                    <a href="javascript:void(0);" class="send-article-but" title="发布文章" v-on:click="saveArticle($event,nowArticleId)"><i class="icon iconfont">&#xe662;</i></a>
                 </div>
                 <div class="article-editor-contents-block">
                     <div id="editormd" v-bind:style="{display:markdownEditor,width:editorsWidth,height:editorsHeight}">
-                        <textarea style="display:none;">### 文章详情</textarea>
+                        <textarea style="display:none;" v-model="contents">### 文章详情</textarea>
                     </div>
-                    <div id="exampleTextarea" v-bind:style="{display:wangEditor,width:editorsWidth,height:editorsHeight}"></div>
+                    <div id="exampleTextarea" v-bind:style="{display:wangEditor,width:editorsWidth,height:editorsHeight}" v-text="contents"></div>
                     <input type="hidden" name="uid" id="uid" v-model="uid" value="" />
                     <input type="hidden" name="token" id="token" v-model="token" value="" />
                     <input type="hidden" name="doc-id" id="doc-id" v-model="doc_id" value="" />

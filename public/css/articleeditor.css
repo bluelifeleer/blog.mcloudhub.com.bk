@@ -20,7 +20,8 @@
 .documents-list-group-block,.documents-list-group-box{width:100%;height:auto;}
 .documents-list-box{width:100%;height:40px;background:#666;border-left:3px solid #666;margin:0 0 8px 0;}
 .documents-list-box:hover{cursor:pointer;border-left:3px solid #ec7259;}
-.document-list-default{border-left:3px solid #ec7259;}
+.document-active{border-left:3px solid #ec7259;}
+.document-unactive{border-left:3px solid #666;}
 .document-name{display:block;float:left;width:80%;height:40px;line-height:40px;padding:0 0 0 5%;color:#FFF;}
 .document-setting-buts{display:block;float:left;width:15%;height:40px;line-height:40px;text-align:center;color:#FFF;}
 .document-setting-buts:hover{cursor:pointer;}
@@ -31,11 +32,13 @@
 .article-list-group-block,.article-list-group-box{width:100%;height:auto;}
 .article-list-box{width:100%;height:60px;padding:10px 0;background:#e6e6e6;border-left:6px solid #e6e6e6;border-top:1px solid #ddd;border-bottom:1px solid #ddd;margin:0 0 8px 0;}
 .article-list-box:hover{cursor:pointer;border-left:6px solid #ec7259}
-.article-list-default{border-top:1px solid #ddd;border-bottom:1px solid #ddd;border-left:6px solid #ec7259;}
+.article-active{border-top:1px solid #ddd;border-bottom:1px solid #ddd;border-left:6px solid #ec7259;}
+.article-unactive{border-top:1px solid #ddd;border-bottom:1px solid #ddd;border-left:6px solid #e6e6e6;}
 .article-iconfont{display:block;float:left;width:13%;height:40px;line-height:40px;padding:0 0 0 5%;font-size:30px;}
 .article-name{display:block;float:left;width:72%;height:40px;line-height:40px;padding:0 0 0 5%;}
 .article-setting-buts{display:block;float:left;width:15%;height:40px;line-height:40px;text-align:center;}
 .article-setting-buts:hover{cursor:pointer;}
+.loading-box{display:inline-block;width:20px;height:20px;background:url("/public/images/loading.gif") no-repeat 0 0;background-size: 100% 100%;}
 
 
 

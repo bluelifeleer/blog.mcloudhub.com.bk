@@ -3,10 +3,12 @@ const VM = new Vue({
     el:'#article-editor-app',
     data:{
         title:'无标题文档',
-        textareaText:'',
+        contents:'',
         previewHtml:'',
         tags:null,
         editors:2,
+        marked:null,
+        wangedit:null,
         editorsWidth:"100%",
         editorsHeight:"100%",
         wangEditor:'block',
@@ -22,22 +24,23 @@ const VM = new Vue({
         docList:[],
         articleLsts:[],
         docInputBox:'none',
-        doc_id:'5a7b147e25ba4dd3b58615be',
+        doc_id:'',
+        docActive:'document-active',
         nowArticleId:'',
+        showLoadBut:'none'
     },
     methods:{
         init:function(){
             if(token != '' && uid != ''){
-                this.getUser();
-                this.getDocLists();
-                this.getArticleLists();
                 this.token = token;
                 this.uid = uid;
+                this.getUser();
             }
         },
         initMarked:function(w,h){
+            let _this = this;
             $(function() {
-                let editor = editormd("editormd", {
+                _this.editormd = editormd("editormd", {
                     width: w,
                     height: h,
                     emoji: true,
@@ -96,8 +99,8 @@ const VM = new Vue({
         },
         initEditor:function(w,h){
             const E = window.wangEditor;
-            let editor = new E('#exampleTextarea');
-            editor.customConfig.menus = [
+            this.wangedit = new E('#exampleTextarea');
+            this.wangedit.customConfig.menus = [
                 'head',  // 标题
                 'bold',  // 粗体
                 'italic',  // 斜体
@@ -117,11 +120,12 @@ const VM = new Vue({
                 'undo',  // 撤销
                 'redo'  // 重复
             ];
-            editor.customConfig.onchange = function (html) {
-                // html 即变化之后的内容
-                console.log(html)
-            }
-            editor.create();
+            // editor.customConfig.onchange = function (html) {
+            //     // html 即变化之后的内容
+            //     this.contents = html;
+            //     // console.log(html)
+            // }
+            this.wangedit.create();
         },
         getToken:function(){
             if(!this.token || this.token == ''){
@@ -139,8 +143,8 @@ const VM = new Vue({
         getUser:function(){
             let winH = document.body.clientHeight || document.documentElement.clientHeight;
             this.editorsHeight = winH+'px';
-            this.$http.get('/api/getUsers').then(res=>{
-                if(!res) throw console.log(err);
+            this.$http.get('/api/getUsers?uid='+this.uid).then(res=>{
+                if(!res) throw console.log(res);
                 this.uid = res.body.data._id;
                 this.editors = res.body.data.editors;
                 if(this.editors == 2){
@@ -152,21 +156,33 @@ const VM = new Vue({
                     this.markdownEditor = 'none';
                     this.wangEditor = 'block';
                 }
-                console.log(this.editors)
+                this.getDocLists();
             });
         },
         getDocLists:function(){
-            this.$http.get('/api/getDocLists').then(res=>{
-                console.log(res);
+            this.$http.get('/api/getDocLists?uid='+this.uid).then(res=>{
                 if(!res) throw console.log(res);
                 this.docList = res.body.data;
+                this.docList[0].active = true;
+                this.doc_id = res.body.data[0]._id;
+                this.getArticleLists();
             });
         },
         getArticleLists:function(){
-            this.$http.get('/api/getArticleLists').then(res=>{
-                console.log(res);
+            this.$http.get('/api/getArticleLists?doc_id='+this.doc_id).then(res=>{
                 if(!res) throw console.log(res);
                 this.articleLsts = res.body.data;
+                this.articleLsts[0].active = true;
+                this.nowArticleId = res.body.data[0]._id;
+                this.title = res.body.data[0].title;
+            });
+        },
+        getArticle:function(){
+            this.$http.get('/api/getArticle?id='+this.nowArticleId).then(res=>{
+                if(!res) throw console.log(res);
+                this.title = res.body.data.title;
+                this.nowArticleId = res.body.data._id;
+                this.contents = res.body.data.contents;
             });
         },
         uploadfile:function(e){
@@ -212,19 +228,52 @@ const VM = new Vue({
             alert(id);
         },
         createArticle:function(e){
+            this.showLoadBut = 'block';
             this.$http.post('/api/newArticle',{
                 uid:this.uid,
                 doc_id:this.doc_id,
                 token:this.token
             }).then(res=>{
+                this.showLoadBut = 'none';
                 if(!res) throw console.log(res);
                 console.log(res);
                 this.nowArticleId = res.body.data.id;
+                this.getArticleLists();
             });
+        },
+        saveArticle:function(e,id){
+
+            // markdownToHTML
+            let contents = this.editors == 2 ? this.editormd.getHTML() :this.wangedit.txt.html();
+            alert(contents);
+            // this.$http.post('/api/saveArticle',{
+            //     id:id,
+            //     title:this.title,
+            //     contents:contents
+            // }).then(res=>{
+            //     console.log(res);
+            // });
         },
         articleSetting:function(e,id){
             alert(id);
         },
+        selectDocumentButs:function(e,doc,i){
+            this.docList.forEach(item=>{
+                Vue.set(item,'active',false);
+            })
+            this.doc_id = doc._id;
+            Vue.set(doc,'active',true);
+            this.getArticleLists();
+        },
+        selectArticleBut:function(e,article,i){
+            this.articleLsts.forEach(item=>{
+                Vue.set(item,'active',false);
+            })
+            this.nowArticleId = article._id;
+            Vue.set(article,'active',true);
+            this.title = article.title;
+            this.getArticle();
+        }
     }
 });
 VM.init();

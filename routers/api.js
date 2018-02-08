@@ -1,6 +1,6 @@
 const express = require('express');
-const Cookies = require('cookies');
 const md5 = require('md5');
+const sillyDateTime = require('silly-datetime');
 const salt = require('../libs/salt');
 const crt_token = require('../libs/ctr_token');
 const router = express.Router();
@@ -124,7 +124,8 @@ router.get('/slides',(req, res, next)=>{
 })
 
 router.get('/getUsers',(req, res, next)=>{
-    Users.findOne({_id:req.userInfo.uid}).then(usersInfo=>{
+    let uid = req.query.uid;
+    Users.findOne({_id:uid}).then(usersInfo=>{
         if(usersInfo){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -142,7 +143,8 @@ router.get('/getUsers',(req, res, next)=>{
 });
 
 router.get('/getDocLists',(req, res, next)=>{
-    Docs.find({uid:req.userInfo.uid}).then(docs=>{
+    let uid = req.query.uid;
+    Docs.find({uid:uid}).then(docs=>{
         if(docs){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -160,10 +162,12 @@ router.get('/getDocLists',(req, res, next)=>{
 });
 
 router.get('/getArticleLists',(req, res, next)=>{
+    let doc_id = req.query.doc_id;
+    console.log(doc_id);
     Articles.find({
-        uid:req.userInfo.uid,
+        doc_id:doc_id,
     }).then(articles=>{
-        console.log(articles);
+        // console.log(articles);
         if(articles){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -179,6 +183,25 @@ router.get('/getArticleLists',(req, res, next)=>{
         }
     });
 });
+
+router.get('/getArticle',(req, res, next)=>{
+    let id = req.query.id;
+    Articles.findOne({_id:id}).then(article=>{
+        if(article){
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = article;
+            res.json(responseData);
+        }else{
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+        }
+    });
+})
 
 router.post('/signin', (req, res, next) => {
     let name = req.body.name;
@@ -316,7 +339,7 @@ router.post('/signup',(req, res, next)=>{
                 website: '',
                 introduce : '',
                 editors : 2,
-                add_date : new Date(),
+                add_date : sillyDateTime.format(new Date(),'YYYY-MMM-DD HH:mm:ss'),
                 isDel : 0,
             };
             if(emailRegexp.test(name)){
@@ -362,6 +385,7 @@ router.get('/signout',(req,res,next)=>{
 
 router.post('/updateUserBasic',(req,res,next)=>{
     let token = req.body.token;
+    let uid = req.body.uid;
     let updateUserBasic = {
         nick: req.body.nick,
         phone: req.body.phone,
@@ -377,7 +401,7 @@ router.post('/updateUserBasic',(req,res,next)=>{
         res.json(responseData);
         return;
     }
-    Users.update({_id:'5a787c69a0f8974c2ee35734'},updateUserBasic,{multi:false},(err,docs)=>{
+    Users.update({_id:uid},updateUserBasic,{multi:false},(err,docs)=>{
         if(err) throw console.log(err);
         responseData.code = 1;
         responseData.ok = true;
@@ -389,6 +413,7 @@ router.post('/updateUserBasic',(req,res,next)=>{
 
 router.post('/changeProfile',(req,res,next)=>{
     let token = req.body.token;
+    let uid = req.body.uid;
     let updateProfile = {
         sex:req.body.sex,
         introduce:req.body.introduce,
@@ -400,7 +425,7 @@ router.post('/changeProfile',(req,res,next)=>{
         res.json(responseData);
         return;
     }
-    Users.update({_id:'5a787c69a0f8974c2ee35734'},updateProfile,{multi:false},(err,docs)=>{
+    Users.update({_id:uid},updateProfile,{multi:false},(err,docs)=>{
         if(err) throw console.log(err);
         responseData.code = 1;
         responseData.ok = true;
@@ -412,6 +437,7 @@ router.post('/changeProfile',(req,res,next)=>{
 
 router.post('/changeReward',(req,res,next)=>{
     let token = req.body.token;
+    let uid = req.body.uid;
     let updateReward = {
         rewardStatus:req.body.rewardStatus,
         rewardDesc:req.body.rewardDesc
@@ -422,11 +448,32 @@ router.post('/changeReward',(req,res,next)=>{
         res.json(responseData);
         return;
     }
-    Users.update({_id:'5a787c69a0f8974c2ee35734'},updateReward,{multi:false},(err,docs)=>{
+    Users.update({_id:uid},updateReward,{multi:false},(err,docs)=>{
         if(err) throw console.log(err);
         responseData.code = 1;
         responseData.ok = true;
         responseData.msg = '赞赏修改成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.post('/saveArticle',(req,res,next)=>{
+    let token = req.body.token;
+    let id = req.body.id;
+    let contents = req.body.contents;
+    let title = req.body.title;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Articles.update({_id:id},{contents:contents,title:title},{multi:false},(err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文章修改成功';
         responseData.data = {};
         res.json(responseData);
     });
@@ -448,7 +495,7 @@ router.post('/newDocument',(req,res,next)=>{
         name: name,
         photos: '',
         describe: '',
-        add_date: new Date(),
+        add_date: sillyDateTime.format(new Date(),'YYYY-MMM-DD HH:mm:ss'),
         isDel: 0,
     });
     docs.save().then(insert=>{
@@ -473,14 +520,14 @@ router.post('/newArticle',(req,res,next)=>{
     let article = new Articles({
         uid: uid,
         doc_id:doc_id,  // 文章所属文档id
-        title: String, // 文章标题
+        title: sillyDateTime.format(new Date(),'YYYY-MMM-DD'), // 文章标题
         describe: '', // 文章描述
         photos: '', // 文章图片
         contents: '', // 文章内容
         watch: 0,
         start: 0,
         fork: 0,
-        add_date: new Date(),
+        add_date: sillyDateTime.format(new Date(),'YYYY-MMM-DD HH:mm:ss'),
         isDel: 0,
     });
     article.save().then(insert =>{

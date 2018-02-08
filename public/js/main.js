@@ -124,8 +124,8 @@ const vm = new Vue({
             }
         },
         getUsers:function(){
-            this.$http.get('/api/getUsers').then(res=>{
-                if(!res) throw console.log(err);
+            this.$http.get('/api/getUsers?uid='+this.uid).then(res=>{
+                if(!res) throw console.log(res);
                 this.nick = res.body.data.nick;
                 this.phone = res.body.data.phone;
                 this.name = res.body.data.name.length >10 ? res.body.data.name.substr(0,10)+'...' : res.body.data.name;
@@ -156,6 +156,7 @@ const vm = new Vue({
         },
         changeUserBasicSubmitForm:function(){
             this.$http.post('/api/updateUserBasic',{
+                uid:this.uid,
                 nick:this.nick,
                 phone:this.phone,
                 email:this.email,
@@ -175,6 +176,7 @@ const vm = new Vue({
         },
         changeUserProfileSubmitForm:function(e){
             this.$http.post('/api/changeProfile',{
+                uid:this.uid,
                 sex:this.sex,
                 introduce:this.introduce,
                 website:this.website,
@@ -190,6 +192,7 @@ const vm = new Vue({
         },
         changeRewardSubmitForm:function(e){
             this.$http.post('/api/changeReward',{
+                uid:this.uid,
                 rewardStatus:this.rewardStatus,
                 rewardDesc:this.rewardDesc,
                 token:this.token
