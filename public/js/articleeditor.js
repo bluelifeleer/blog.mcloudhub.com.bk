@@ -3,7 +3,8 @@ const VM = new Vue({
     el:'#article-editor-app',
     data:{
         title:'无标题文档',
-        contents:'',
+        contents:'### 文章详情',
+        markdownText:'### 文章详情',
         previewHtml:'',
         tags:null,
         editors:2,
@@ -21,13 +22,18 @@ const VM = new Vue({
         uid:'',
         token:'',
         docName:'输入文集名称',
+        userName:'',
         docList:[],
         articleLsts:[],
         docInputBox:'none',
         doc_id:'',
         docActive:'document-active',
         nowArticleId:'',
-        showLoadBut:'none'
+        showLoadBut:'none',
+        docMenuShow:'none',
+        articleMenuShow:'none',
+        articleMenuDocShow:'none',
+        articleTitleIndex:0
     },
     methods:{
         init:function(){
@@ -95,6 +101,7 @@ const VM = new Vue({
                         console.log(this);
                     }
                 });
+                // _this.editormd.config("toolbarAutoFixed", false);
             });
         },
         initEditor:function(w,h){
@@ -126,6 +133,7 @@ const VM = new Vue({
             //     // console.log(html)
             // }
             this.wangedit.create();
+
         },
         getToken:function(){
             if(!this.token || this.token == ''){
@@ -146,6 +154,7 @@ const VM = new Vue({
             this.$http.get('/api/getUsers?uid='+this.uid).then(res=>{
                 if(!res) throw console.log(res);
                 this.uid = res.body.data._id;
+                this.userName = res.body.data.name;
                 this.editors = res.body.data.editors;
                 if(this.editors == 2){
                     this.markdownEditor = 'block';
@@ -163,18 +172,29 @@ const VM = new Vue({
             this.$http.get('/api/getDocLists?uid='+this.uid).then(res=>{
                 if(!res) throw console.log(res);
                 this.docList = res.body.data;
-                this.docList[0].active = true;
-                this.doc_id = res.body.data[0]._id;
-                this.getArticleLists();
+                if(this.docList.length > 0){
+                    this.docList[0].active = true;
+                    this.doc_id = res.body.data[0]._id;
+                    this.docName = res.body.data[0].name;
+                    this.getArticleLists();
+                }
             });
         },
         getArticleLists:function(){
             this.$http.get('/api/getArticleLists?doc_id='+this.doc_id).then(res=>{
                 if(!res) throw console.log(res);
                 this.articleLsts = res.body.data;
-                this.articleLsts[0].active = true;
-                this.nowArticleId = res.body.data[0]._id;
-                this.title = res.body.data[0].title;
+                if(this.articleLsts.length > 0){
+                    this.articleLsts[0].active = true;
+                    this.nowArticleId = res.body.data[0]._id;
+                    this.title = res.body.data[0].title;
+                    if(this.editors == 2){
+                        this.contents = res.body.data[0].markDownText;
+                    }else{
+                        this.contents = res.body.data[0].contents;
+                        this.wangedit.txt.html(this.contents);
+                    }
+                }
             });
         },
         getArticle:function(){
@@ -182,7 +202,13 @@ const VM = new Vue({
                 if(!res) throw console.log(res);
                 this.title = res.body.data.title;
                 this.nowArticleId = res.body.data._id;
-                this.contents = res.body.data.contents;
+                if(this.editors == 2){
+                    this.contents = res.body.data.markDownText;
+                    this.editormd.setMarkdown(this.contents);
+                }else{
+                    this.contents = res.body.data.contents;
+                    this.wangedit.txt.html(this.contents);
+                }
             });
         },
         uploadfile:function(e){
@@ -217,21 +243,65 @@ const VM = new Vue({
                 uid:this.uid,
                 name:this.docName
             }).then(res=>{
-                if(res) throw console.log(res);
-                console.log(res);
+                if(!res) throw console.log(res);
+                this.docInputBox='none';
+                this.getDocLists();
             });
         },
         cleanDocConfirm:function(e){
             this.docInputBox='none';
         },
-        documentSetting:function(e,id){
-            alert(id);
+        documentSetting:function(e,id,index){
+            if(this.docMenuShow == 'none'){
+                this.docMenuShow = 'block';
+            }else{
+                this.docMenuShow = 'none';
+            }
+            this.$refs.menu[index].style.display = this.docMenuShow;
+        },
+        editDocument:function(e,id,index){
+            if(this.docMenuShow == 'none'){
+                this.docMenuShow = 'block';
+            }else{
+                this.docMenuShow = 'none';
+            }
+            this.$refs.menu[index].style.display = this.docMenuShow;
+            this.$refs.showDocumentBox[index].style.display = 'none';
+            this.$refs.showDocumentInput[index].style.display = 'block';
+            this.$refs.showDocumentInput[index].focus();
+        },
+        psotDocumentNameEdit:function(e,id,index){
+            let value = this.$refs.showDocumentInput[index].value;
+            this.$refs.showDocumentBox[index].innerHTML = value;
+            this.$http.post('/api/updateDocumentName',{
+                uid:this.uid,
+                id:id,
+                token:this.token,
+                name:value
+            }).then(res=>{
+                // pass
+            });
+        },
+        documentInputBlur:function(e,id,index){
+            this.$refs.showDocumentBox[index].style.display = 'block';
+            this.$refs.showDocumentInput[index].style.display = 'none';
+            this.$refs.showDocumentBox[index].innerHTML = this.$refs.showDocumentInput[index].value;
+        },
+        deleteDocument:function(e,id,index){
+            this.$http.get('/api/deleteDoc?id='+id+'&uid='+this.uid+'&token='+this.token).then(res=>{
+                if(!res) throw console.log(res);
+                this.docMenuShow = 'none';
+                this.$refs.menu[index].style.display = this.docMenuShow;
+                this.getDocLists();
+            });
         },
         createArticle:function(e){
             this.showLoadBut = 'block';
             this.$http.post('/api/newArticle',{
                 uid:this.uid,
                 doc_id:this.doc_id,
+                doc_name:this.docName,
+                user_name:this.userName,
                 token:this.token
             }).then(res=>{
                 this.showLoadBut = 'none';
@@ -244,35 +314,84 @@ const VM = new Vue({
         saveArticle:function(e,id){
 
             // markdownToHTML
-            let contents = this.editors == 2 ? this.editormd.getHTML() :this.wangedit.txt.html();
-            alert(contents);
-            // this.$http.post('/api/saveArticle',{
-            //     id:id,
-            //     title:this.title,
-            //     contents:contents
-            // }).then(res=>{
-            //     console.log(res);
-            // });
+            if(this.editors == 2){
+                this.markdownText =this.editormd.getMarkdown();
+                this.contents = this.editormd.getHTML();
+            }else{
+                this.contents = this.wangedit.txt.html()
+            }
+
+            this.$http.post('/api/saveArticle',{
+                id:id,
+                title:this.title,
+                contents:this.contents,
+                markdownText:this.markdownText
+            }).then(res=>{
+                console.log(res);
+            });
         },
-        articleSetting:function(e,id){
-            alert(id);
+        articleSetting:function(e,id,index){
+            if(this.articleMenuShow == 'none'){
+                this.articleMenuShow = 'block';
+            }else{
+                this.articleMenuShow = 'none';
+            }
+            this.$refs.articleMenu[index].style.display = this.articleMenuShow;
         },
         selectDocumentButs:function(e,doc,i){
             this.docList.forEach(item=>{
                 Vue.set(item,'active',false);
             })
             this.doc_id = doc._id;
+            this.docName = doc.name;
             Vue.set(doc,'active',true);
             this.getArticleLists();
         },
-        selectArticleBut:function(e,article,i){
+        selectArticleBut:function(e,article,index){
             this.articleLsts.forEach(item=>{
                 Vue.set(item,'active',false);
             })
             this.nowArticleId = article._id;
             Vue.set(article,'active',true);
             this.title = article.title;
+            this.articleTitleIndex = index;
             this.getArticle();
+        },
+        releaseArticle:function(e,id,index){
+            this.$http.get('/api/releaseArticle?id='+id+'&uid='+this.uid+'&token='+this.token).then(res=>{
+                if(!res) throw console.log(res);
+                this.articleMenuShow = 'none';
+                this.$refs.articleMenu[index].style.display = this.articleMenuShow;
+                this.getArticleLists();
+            });
+        },
+        moveArticle:function(e,id,index){
+            if(this.articleMenuDocShow == 'none'){
+                this.articleMenuDocShow = 'block';
+            }else{
+                this.articleMenuDocShow = 'none';
+            }
+            this.$refs.articlMenuDocumentBlock.style.display = this.articleMenuDocShow;
+            this.$refs.articlMenuDocumentBlock.style.top = parseInt((68*(index+1))+72)+'px';
+        },
+        deleteArticle:function(e,id,index){
+            this.$http.get('/api/deleteArticle?id='+id+'&uid='+this.uid+'&token='+this.token).then(res=>{
+                if(!res) throw console.log(res);
+                this.articleMenuShow = 'none';
+                this.$refs.articleMenu[index].style.display = this.articleMenuShow;
+                this.getArticleLists();
+            });
+        },
+        changeArticleTitle:function(e){
+            this.$http.post('/api/changeAticleTitle',{
+                uid:this.uid,
+                token:this.token,
+                id:this.nowArticleId,
+                title:this.title,
+            }).then(res=>{
+                console.log(res)
+            });
+            this.$refs.articleTitle[this.articleTitleIndex].innerHTML = this.title;
         }
     }
 });

@@ -26,70 +26,27 @@
         <div id="body-content"><!--jumbotron-->
             <div class="body-layout-l">
                 <div class="article-list-groups">
-                    <div class="article-list-box">
-                        <div class="article-list-img-box"><img src="/public/images/f10.jpg" alt="" class="article-img"></div>
-                        <div class="article-list-describe-box">
-                            <div class="article-list-describe-author"><span class="article-tags"><a href="javascript:void(0);">article</a></span><span class="article-author"><a
-                                    href="javascript:void(0);">@amazeUI</a></span><span class="article-date"><a href="javascript:void(0);">2015/10/9</a></span></div>
-                            <h2 class="article-list-describe-title"><a href="javascript:void(0);">我本楚狂人，凤歌笑孔丘</a></h2>
-                            <p class="article-list-describe-text">我们一直在坚持着，不是为了改变这个世界，而是希望不被这个世界所改变。</p>
-                            <p class="ctr-buts-block">
-                                <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                                <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                                <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
-                            </p>
-                        </div>
-                        <div class="clear-both"></div>
-                    </div>
-                    <div class="article-list-box">
-                        <div class="article-list-img-box"><img src="/public/images/f10.jpg" alt="" class="article-img"></div>
-                        <div class="article-list-describe-box">
-                            <div class="article-list-describe-author"><span class="article-tags"><a href="javascript:void(0);">article</a></span><span class="article-author"><a
-                                    href="javascript:void(0);">@amazeUI</a></span><span class="article-date"><a href="javascript:void(0);">2015/10/9</a></span></div>
-                            <h2 class="article-list-describe-title"><a href="javascript:void(0);">我本楚狂人，凤歌笑孔丘</a></h2>
-                            <p class="article-list-describe-text">我们一直在坚持着，不是为了改变这个世界，而是希望不被这个世界所改变。</p>
-                            <p class="ctr-buts-block">
-                                <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                                <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                                <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
-                            </p>
-                        </div>
-                        <div class="clear-both"></div>
-                    </div>
-                    <div class="article-list-box">
-                        <div class="article-list-img-box"><img src="/public/images/f10.jpg" alt="" class="article-img"></div>
-                        <div class="article-list-describe-box">
-                            <div class="article-list-describe-author"><span class="article-tags"><a href="javascript:void(0);">article</a></span><span class="article-author"><a
-                                    href="javascript:void(0);">@amazeUI</a></span><span class="article-date"><a href="javascript:void(0);">2015/10/9</a></span></div>
-                            <h2 class="article-list-describe-title"><a href="javascript:void(0);">我本楚狂人，凤歌笑孔丘</a></h2>
-                            <p class="article-list-describe-text">我们一直在坚持着，不是为了改变这个世界，而是希望不被这个世界所改变。</p>
-                            <p class="ctr-buts-block">
-                                <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                                <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                                <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
-                            </p>
-                        </div>
-                        <div class="clear-both"></div>
-                    </div>
-                    <div class="article-list-box">
-                        <div class="article-list-img-box"><img src="/public/images/f10.jpg" alt="" class="article-img"></div>
-                        <div class="article-list-describe-box">
-                            <div class="article-list-describe-author"><span class="article-tags"><a href="javascript:void(0);">article</a></span><span class="article-author"><a
-                                    href="javascript:void(0);">@amazeUI</a></span><span class="article-date"><a href="javascript:void(0);">2015/10/9</a></span></div>
-                            <h2 class="article-list-describe-title"><a href="javascript:void(0);">我本楚狂人，凤歌笑孔丘</a></h2>
-                            <p class="article-list-describe-text">我们一直在坚持着，不是为了改变这个世界，而是希望不被这个世界所改变。</p>
-                            <p class="ctr-buts-block">
-                                <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                                <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                                <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
-                            </p>
-                        </div>
-                        <div class="clear-both"></div>
+                    <div class="article-list-box" v-for="(article,$index) in articleLists">
+                        <a target="_blank" v-bind:href="article.href">
+                            <div class="article-list-img-box"><img src="/public/images/f10.jpg" alt="" class="article-img"></div>
+                            <div class="article-list-describe-box">
+                                <div class="article-list-describe-author"><span class="article-tags"><a href="javascript:void(0);">${article.doc_name}</a></span><span class="article-author"><a
+                                        href="javascript:void(0);">@${article.author}</a></span><span class="article-date"><a href="javascript:void(0);">${article.add_date}</a></span></div>
+                                <h2 class="article-list-describe-title"><a href="javascript:void(0);">${article.title}</a></h2>
+                                <p class="article-list-describe-text">${article.contents}</p>
+                                <p class="ctr-buts-block">
+                                    <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
+                                    <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
+                                    <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
+                                </p>
+                            </div>
+                            <div class="clear-both"></div>
+                        </a>
                     </div>
                 </div>
             </div>
             <div class="body-layout-r">
-                {% if token && userInfo.uid %}
+                {% if token && uid %}
                 <div class="model-box">
                     <div class="model-tag-name">用户信息</div>
                     <div class="model-contents-box">
@@ -164,3 +121,7 @@
         </div>
     </section>
 {% endblock %}
+
+
+
+419483

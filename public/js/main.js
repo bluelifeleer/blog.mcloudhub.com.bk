@@ -39,7 +39,9 @@ const vm = new Vue({
         popupLayerHeight:'100%',
         popupLayerLeft:0,
         popupLayerTop:0,
-        popupLayerText:''
+        popupLayerText:'',
+        articleLists:[],
+        article:[]
     },
     methods:{
         init:function(){
@@ -52,6 +54,8 @@ const vm = new Vue({
             this.getTags();
             this.getSlides();
             this.slideAutoPlay();
+            this.getAllArticles();
+            this.getArticle();
         },
         switchSlide:function(e,direction){
             if(direction == 'next'){
@@ -113,6 +117,39 @@ const vm = new Vue({
                 this.slide_list = res.body.data;
                 this.slideAttr.length = res.body.data.length;
             });
+        },
+        getAllArticles:function(){
+            this.$http.get('/api/allArticles').then(all=>{
+                let tmp = [];
+                if(all.body.code && all.body.ok){
+                    tmp= all.body.data;
+                    tmp.forEach(item=>{
+                        item.href='/article/details?id='+item._id;
+                        let content = item.contents.replace(/<[^>]*>/g, "");
+                        item.contents = content.length > 30 ? content.substr(0,30)+'...': content;
+                    });
+                    this.articleLists = tmp;
+                }
+
+            });
+        },
+        getArticle:function(){
+            // alert(window.location.pathname);
+            if(window.location.pathname == '/article/details'){
+                let id = this.getQueryString('id');
+                this.$http.get('/api/getArticle?id='+id).then(article=>{
+                    console.log(article);
+                    if(!article) throw console.log(article);
+                    let articleArr =article.body.data;
+                    articleArr['wordNumbers'] =articleArr.contents.replace(/<[^>]*>/g, "").length;
+                    this.article = articleArr
+                });
+            }
+        },
+        getQueryString:function (name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+            var r = window.location.search.substr(1).match(reg);
+            return r!=null ? unescape(r[2]): null;
         },
         showAccountBox:function(){
             if(this.accountBox == 'none'){

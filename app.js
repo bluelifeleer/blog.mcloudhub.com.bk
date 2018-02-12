@@ -36,10 +36,10 @@ app.use(function(req, res, next) {
     req.cookies = new Cookies(req, res);
     req.userInfo = {};
     //将登录后的用户信息附加到request头信息中
-    if(req.cookies.get('user_info') && req.cookies.get('user_info') != ''){
+    if(req.cookies.get('uid') && req.cookies.get('uid') != ''){
         try{
             req.token = req.cookies.get('token') ? req.cookies.get('token') :'';
-            req.userInfo = JSON.parse(req.cookies.get('user_info'));
+            req.uid = req.cookies.get('uid');
         }catch (e) {
             console.log(e);
         }

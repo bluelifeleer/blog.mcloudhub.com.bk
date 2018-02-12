@@ -12,6 +12,7 @@ module.exports = new mongoose.Schema({
     wechat: String, //微信
     avatar: String, //头像
     email: String, //邮箱
+    github: String, //github授权帐号
     website: String, // 个人网站
     introduce: String, //个人介绍
     editors: Number, //常用编辑器

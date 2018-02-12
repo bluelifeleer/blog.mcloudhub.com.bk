@@ -26,7 +26,13 @@
     "type": "git",
     "url": "git@github.com:bluelifeleer/blog.git"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
+  },
+  "presets": [
+    "env"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

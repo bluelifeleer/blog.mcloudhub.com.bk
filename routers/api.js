@@ -125,7 +125,7 @@ router.get('/slides',(req, res, next)=>{
 
 router.get('/getUsers',(req, res, next)=>{
     let uid = req.query.uid;
-    Users.findOne({_id:uid}).then(usersInfo=>{
+    Users.findOne({_id:uid, isDel:0}).then(usersInfo=>{
         if(usersInfo){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -144,7 +144,7 @@ router.get('/getUsers',(req, res, next)=>{
 
 router.get('/getDocLists',(req, res, next)=>{
     let uid = req.query.uid;
-    Docs.find({uid:uid}).then(docs=>{
+    Docs.find({uid:uid,isDel:0}).then(docs=>{
         if(docs){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -161,11 +161,37 @@ router.get('/getDocLists',(req, res, next)=>{
     });
 });
 
+router.get('/allArticles',(req, res, next)=>{
+    let uid = '';
+    let all = false;
+    if(req.cookies.get('token') && req.cookies.get('uid')){
+        uid = req.cookies.get('uid');
+    }else{
+        all = true;
+    }
+    let where = all ? {}: {uid:uid};
+    Articles.find(where).then(alls=>{
+        if(alls){
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = alls;
+            res.json(responseData);
+        }else{
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+        }
+    });
+})
+
 router.get('/getArticleLists',(req, res, next)=>{
     let doc_id = req.query.doc_id;
-    console.log(doc_id);
     Articles.find({
         doc_id:doc_id,
+        isDel:0
     }).then(articles=>{
         // console.log(articles);
         if(articles){
@@ -244,18 +270,7 @@ router.post('/signin', (req, res, next) => {
                 responseData.msg = "success";
                 responseData.ok = true;
                 responseData.data = userInfo;
-                let cookiesData = {};
-                cookiesData.uid = userInfo._id;
-                cookiesData.type = userInfo.type;
-                if(userInfo.type == 3){
-                    cookiesData.email = userInfo.email;
-                }else if(userInfo.type == 2){
-                    cookiesData.phone = userInfo.phone;
-                }else{
-                    cookiesData.username = userInfo.name;
-                }
-
-                req.cookies.set('user_info',JSON.stringify(cookiesData));
+                req.cookies.set('uid',userInfo._id);
                 req.cookies.set('token',crt_token());
                 res.json(responseData);
                 return;
@@ -359,6 +374,14 @@ router.post('/signup',(req, res, next)=>{
             return newUsers.save();
         }
     }).then(inser => {
+        new Docs({
+            uid: inser._id,
+            name: '随笔',
+            photos: '',
+            describe: '',
+            add_date: new Date(),
+            isDel: 0,
+        }).save();
         if(inser){
             responseData.code = 1;
             responseData.ok = true;
@@ -377,7 +400,7 @@ router.post('/signup',(req, res, next)=>{
 
 router.get('/signout',(req,res,next)=>{
     req.cookies.set('token','');
-    req.cookies.set('user_info','');
+    req.cookies.set('uid','');
     req.token = '';
     req.userInfo = null;
     res.redirect(302,'/login');
@@ -462,6 +485,7 @@ router.post('/saveArticle',(req,res,next)=>{
     let token = req.body.token;
     let id = req.body.id;
     let contents = req.body.contents;
+    let markDownText = req.body.markdownText ? req.body.markdownText:null;
     let title = req.body.title;
     if(token == ''){
         responseData.code = 0;
@@ -469,7 +493,14 @@ router.post('/saveArticle',(req,res,next)=>{
         res.json(responseData);
         return;
     }
-    Articles.update({_id:id},{contents:contents,title:title},{multi:false},(err,docs)=>{
+    let article_date = {
+        contents:contents,
+        title:title
+    };
+    if(markDownText){
+        article_date.markDownText = markDownText;
+    }
+    Articles.update({_id:id},article_date,{multi:false},(err,docs)=>{
         if(err) throw console.log(err);
         responseData.code = 1;
         responseData.ok = true;
@@ -507,9 +538,32 @@ router.post('/newDocument',(req,res,next)=>{
     });
 });
 
+router.post('/updateDocumentName',(req,res,next)=>{
+    let uid = req.body.uid;
+    let id = req.body.id;
+    let token = req.body.token;
+    let name = req.body.name;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Docs.update({_id:id,uid:uid},{name:name},{multi:false},(err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文集名称修改成功';
+        responseData.data = {};
+        res.json(responseData);
+    })
+})
+
 router.post('/newArticle',(req,res,next)=>{
     let uid = req.body.uid;
     let doc_id = req.body.doc_id;
+    let doc_name = req.body.doc_name;
+    let user_name = req.body.user_name;
     let token = req.body.token;
     if(token == ''){
         responseData.code = 0;
@@ -520,6 +574,8 @@ router.post('/newArticle',(req,res,next)=>{
     let article = new Articles({
         uid: uid,
         doc_id:doc_id,  // 文章所属文档id
+        doc_name:doc_name, // 文集名称
+        author: user_name, //文章作者
         title: sillyDateTime.format(new Date(),'YYYY-MMM-DD'), // 文章标题
         describe: '', // 文章描述
         photos: '', // 文章图片
@@ -528,6 +584,7 @@ router.post('/newArticle',(req,res,next)=>{
         start: 0,
         fork: 0,
         add_date: sillyDateTime.format(new Date(),'YYYY-MMM-DD HH:mm:ss'),
+        isRelease: 0,
         isDel: 0,
     });
     article.save().then(insert =>{
@@ -535,6 +592,87 @@ router.post('/newArticle',(req,res,next)=>{
         responseData.ok = true;
         responseData.msg = '文章创建成功';
         responseData.data = {id:insert._id};
+        res.json(responseData);
+    });
+});
+
+router.get('/deleteDoc',(req,res,next)=>{
+    let uid = req.query.uid;
+    let id = req.query.id;
+    let token = req.query.token;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Docs.update({_id:id,uid:uid}, {isDel:1}, {multi:false}, (err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文集删除成功';
+        responseData.data = {};
+        res.json(responseData);
+    })
+});
+
+router.get('/releaseArticle',(req,res,next)=> {
+    let uid = req.query.uid;
+    let id = req.query.id;
+    let token = req.query.token;
+    if (token == '') {
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Articles.update({_id: id, uid: uid}, {isRelease: 1}, {multi: false}, (err, docs) => {
+        if (err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文章已发布';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.get('/deleteArticle',(req,res,next)=>{
+    let uid = req.query.uid;
+    let id = req.query.id;
+    let token = req.query.token;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Articles.update({_id:id,uid:uid}, {isDel:1}, {multi:false}, (err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文章删除成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.post('/changeAticleTitle',(req,res,next)=>{
+    let uid = req.body.uid;
+    let token = req.body.token;
+    let id = req.body.id;
+    let title = req.body.title;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Articles.update({_id:id,uid:uid}, {title:title}, {multi:false},(err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文章删除成功';
+        responseData.data = {};
         res.json(responseData);
     });
 });

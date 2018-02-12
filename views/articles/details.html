@@ -5,25 +5,25 @@
     <link rel="stylesheet" href="/public/css/article.css">
     <div class="article-details-block">
         <div class="article-details-title">
-            过年囤零食，20种必剁手的零食让你好吃到哭！
+            ${article.title}
         </div>
         <div class="article-details-author">
             <div class="author-avatar-block"><img src="/public/images/QQ20180131-224008@2x.png" alt="" class="article-author-avatar"></div>
             <div class="author-account-info-block">
                 <div class="author-account-info-top">
-                    <span class="article-authorn-name-box"><a href="" class="author-name">bluelife</a></span>
+                    <span class="article-authorn-name-box"><a href="" class="author-name">${article.author}</a></span>
                 </div>
                 <div class="author-account-info-bottom">
-                    <span class="article-date"><element>2018-01-20 12:00:02</element></span>
-                    <span class="article-wordage">字数<element>2426</element></span>
-                    <span class="article-view-count">阅读<element>16913</element></span>
-                    <span class="article-comment-count">评论<element>25</element></span>
-                    <span class="article-likes-count">喜欢<element>457</element></span>
+                    <span class="article-date"><element>${article.add_date}</element></span>
+                    <span class="article-wordage">字数<element>${article.wordNumbers}</element></span>
+                    <span class="article-view-count">阅读<element>${article.watch}</element></span>
+                    <span class="article-comment-count">评论<element>${article.issue}</element></span>
+                    <span class="article-likes-count">喜欢<element>${article.start}</element></span>
                 </div>
             </div>
         </div>
-        <div class="article-details-contents">
-            <p>每天被淘宝、天猫、京东各种广告轰炸，短信、APP消息全是广告。剁手菌掐指一算，马上要过年了，快递都要停运了！买点零食屯着过年才是正事...</p><p>随着经济的迅速发展，以往小时候吃的花生啊、瓜子啊、糖啊等过年零食再也不能满足我们了，我们要屯就屯最好吃的！什么美国的、日本的、香港的只要能买到的都要买来吃！！！</p><p>是不是很多小纠结患者，不知道买什么？剁手菌把自己的零食清单奉上，还是那句话，有好吃的一定要在下面评论告诉我奥！下面店铺都是我平时购买过觉得不错的，需要的话可以自行<b>淘宝搜索店铺</b>奥~就不要私信我啦~每次发个美食私信都回不过来啦！</p><p><b>1、大小酒铺</b></p><p>这款<b>甘帕斯特莫斯卡托</b>，粉色桃红的外表让我视线一直离不开，这么好看的酒我经常舍不得喝...不过喝起来是清爽甜美，余味还有蜜桃和草莓的味道停留在舌尖，好有初恋的感觉~还有她家的<b>佩拉萨甜红葡萄酒</b>，度数不高非常适合过年一家人当餐酒，是不是马上就摆脱了白酒啤酒，拍个照发个朋友圈立马有逼格了~哈哈哈。樱桃草莓的味道是我最喜欢的，对了对了，马上情人节了！！！男生们，机会来了，送这个酒，又好看又能喝，喝的微微醉，你懂得~</p>
+        <div class="article-details-contents" v-html="article.contents">
+
         </div>
         <div class="article-comments-block">
             <div class="send-comment-block">

@@ -4,15 +4,15 @@ const router = express.Router();
 router.get('/', (req, res, next) => {
     res.render('../views/index',{
         token:req.token,
-        userInfo:req.userInfo
+        uid:req.uid
     });
 });
 
 router.get('/editor',(req,res,next)=>{
-    if(req.token && req.userInfo.uid){
+    if(req.token && req.uid){
         res.render('../views/article_editor',{
             token:req.token,
-            userInfo:req.userInfo
+            uid:req.uid
         });
     }else{
         res.redirect(302,'/login');
