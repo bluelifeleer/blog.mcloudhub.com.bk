@@ -8,6 +8,7 @@ const https = require('https');
 const http2 = require('spdy');
 const fs = require('fs');
 const Cookies = require('cookies');
+// const Session = require('express-session');
 const crt_token = require(__dirname+'/libs/ctr_token');
 const swig = require('swig');
 const mongoose = require('mongoose');
@@ -31,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // 将提交的数据转成json,并且设置请求实体大小
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
 // 服务器启动时默认配置/动作
 app.use(function(req, res, next) {
     req.cookies = new Cookies(req, res);
@@ -63,6 +65,7 @@ app.use(function(req, res, next) {
     next();
 });
 
+
 //设置响应头
 // app.setHeader('content-type', 'text-css');
 //设置静态文件托管
@@ -72,11 +75,12 @@ app.use('/public', express.static(__dirname + '/public'));
 //     //  res.send('Hello Word')
 //     res.render('index', );
 // });
-app.use('/admin', require('./routers/admin'));
+// app.use('/admin', require('./routers/admin'));
 app.use('/api', require('./routers/api'));
 app.use('/', require('./routers/main'));
 app.use('/article',require('./routers/article'));
 app.use('/setting',require('./routers/setting'));
+app.use('/photos',require('./routers/photos'));
 //设置响应头
 //  app.setHeader('content-type','text-css');
 //  app.set('*/css',(req,res,next)=>{

@@ -41,7 +41,26 @@ const vm = new Vue({
         popupLayerTop:0,
         popupLayerText:'',
         articleLists:[],
-        article:[]
+        article:[],
+        articleComments:'填写您的评论....',
+        discuss:[],
+        imgRegexp: /<img [^>]*src=['"]([^'"]+)[^>]*>/gi,
+        hasImg:null,
+        collectionIconHtml:'<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>',
+        collectionIcon:'',
+        collectionName:'专题名称',
+        collectionDesc:'专题描述。。。',
+        collectionKeyWord:'',
+        collectionAdmins:[],
+        collectionPus:1,
+        collectionVerify:1,
+        adminArr: [],
+        collectionLists:[],
+        collHref : '',
+        collectionPopupLayer:'none',
+        collectionSearchKeyWord:'',
+        collection:{},
+        collSubscribe:false
     },
     methods:{
         init:function(){
@@ -56,6 +75,12 @@ const vm = new Vue({
             this.slideAutoPlay();
             this.getAllArticles();
             this.getArticle();
+            if(page_type == 'collections_list'){
+                this.getCollections();
+            }
+            if(page_type == 'collections_detailes'){
+                this.getCollectionById(coll_id);
+            }
         },
         switchSlide:function(e,direction){
             if(direction == 'next'){
@@ -120,17 +145,19 @@ const vm = new Vue({
         },
         getAllArticles:function(){
             this.$http.get('/api/allArticles').then(all=>{
-                let tmp = [];
+                let ArticleArrs = [];
                 if(all.body.code && all.body.ok){
-                    tmp= all.body.data;
-                    tmp.forEach(item=>{
+                    ArticleArrs= all.body.data;
+                    ArticleArrs.forEach(item=>{
                         item.href='/article/details?id='+item._id;
-                        let content = item.contents.replace(/<[^>]*>/g, "");
-                        item.contents = content.length > 30 ? content.substr(0,30)+'...': content;
-                    });
-                    this.articleLists = tmp;
-                }
+                        item.hasImg = item.contents.search(this.imgRegexp) > 0 ? true : false;
 
+                        item.imgHtml = item.hasImg ? item.contents.match(this.imgRegexp)[0]:'';
+                        let content = item.contents.replace(/<[^>]*>/g, "");
+                        item.contents = item.hasImg ? (content.length > 60 ? content.substr(0,60)+'...': content) : (content.length > 80 ? content.substr(0,80)+'...': content);
+                    });
+                    this.articleLists = ArticleArrs.reverse();
+                }
             });
         },
         getArticle:function(){
@@ -140,15 +167,20 @@ const vm = new Vue({
                 this.$http.get('/api/getArticle?id='+id).then(article=>{
                     console.log(article);
                     if(!article) throw console.log(article);
-                    let articleArr =article.body.data;
+                    let articleArr = article.body.data.article;
                     articleArr['wordNumbers'] =articleArr.contents.replace(/<[^>]*>/g, "").length;
-                    this.article = articleArr
+                    this.article = articleArr;
+                    let discussArr = article.body.data.discuss;
+                    discussArr.forEach(item=>{
+                        item.add_date = this.formate_date(item.add_date);
+                    })
+                    this.discuss = discussArr.reverse();
                 });
             }
         },
         getQueryString:function (name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
-            var r = window.location.search.substr(1).match(reg);
+            let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+            let r = window.location.search.substr(1).match(reg);
             return r!=null ? unescape(r[2]): null;
         },
         showAccountBox:function(){
@@ -254,6 +286,156 @@ const vm = new Vue({
                     this.popupLayerText = res.body.msg;
                 }
             });
+        },
+        commentFocus:function(e){
+            this.articleComments = this.articleComments =='填写您的评论....' ? '':this.articleComments;
+        },
+        commentBlur:function(e){
+            this.articleComments = this.articleComments ? this.articleComments : '填写您的评论....';
+        },
+        postCommentBut:function(e,id){
+            if(uid !== '' && token !== ''){
+                if(this.articleComments == '' || this.articleComments == '填写您的评论....'){
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = '请填写您的评论内容';
+                    return false;
+                }else{
+                    this.$http.post('/api/postDiscuss',{
+                        contents:this.articleComments,
+                        uid:this.uid,
+                        token:this.token,
+                        id:id
+                    }).then(res=>{
+                        if(res.body.code && res.body.ok){
+                            this.popupLayerBoxShow = 'block';
+                            this.popupLayerText = '评论成功';
+                        }
+                        this.getDiscuss(id);
+                    });
+                }
+
+            }else{
+                this.popupLayerBoxShow = 'block';
+                this.popupLayerText = '您尚未登录';
+                return false;
+            }
+        },
+        resetCommentBut:function(e){
+            this.articleComments = '填写您的评论....';
+        },
+        getDiscuss:function(id){
+            this.$http.get('/api/getDiscuss?id='+id+'&token='+this.token).then(discuss=>{
+                if(discuss.body.code && discuss.body.ok){
+                    let discussArr = discuss.body.data.reverse();
+                    discussArr.forEach(item=>{
+                        item.add_date = this.formate_date(item.add_date);
+                    })
+                    this.discuss = discussArr;
+
+                }else{
+                    this.discuss = [];
+                }
+            });
+        },
+        uploadCollectionIcon:function(e){
+            let _this = this;
+            let file = e.target.files[0];
+            let fileRender = new FileReader();
+            if(file){
+                fileRender.readAsDataURL(file);
+            }
+            fileRender.addEventListener('load',function(e){
+                _this.collectionIcon = e.target.result;
+                _this.collectionIconHtml = '<img src="'+e.target.result+'" />';
+            },false);
+        },
+        queryAdmins:function(e){
+            this.$http.get('/api/allUsers?keyword='+this.collectionKeyWord).then(users=>{
+                this.adminArr = users.body.data;
+            });
+        },
+        collectionSubmitForm:function(e){
+            this.$http.post('/api/collection/new',{
+                uid:this.uid,
+                token:this.token,
+                icon:this.collectionIcon,
+                name:this.collectionName,
+                describe:this.collectionDesc,
+                push:this.collectionPus,
+                verify:this.collectionVerify,
+                admins:this.collectionAdmins
+            }).then(res=>{
+                console.log(res);
+            });
+        },
+        getCollections:function(){
+            this.$http.get('/api/get_collections?uid='+this.uid+'&token='+this.token).then(res=>{
+                let collections = res.body.data;
+                collections.forEach(item=>{
+                    item.href='/account/collections/detailes?id='+item._id;
+                    item.describe = item.describe.length > 30 ? item.describe.substr(0,30)+'...': item.describe;
+                    item.subscribe.forEach(uids=>{
+                        if(uids.uid == this.uid){
+                            item.subscribed = true;
+                        }else{
+                            item.subscribed = false;
+                        }
+                    })
+                })
+                console.log(collections);
+                this.collectionLists = collections;
+            });
+        },
+        getCollectionById:function(id){
+            this.$http.get('/api/getCollectionById?id='+id+'&token='+this.token).then(coll=>{
+                if(coll.body.code && coll.body.ok){
+                    let collection = coll.body.data;
+                    collection.subscribe.forEach(item=>{
+                        if(item.uid == this.uid){
+                            this.collSubscribe = true;
+                        }
+                    })
+                    this.collection = collection;
+                }
+            });
+        },
+        followButs:function(e,id){
+            this.$http.get('/api/collectionFollow?uid='+this.uid+'&id='+id+'&token='+this.token).then();
+        },
+        collectionPush:function(e,id){
+            let winW = document.body.clientWidth || document.documentElement.clientWidth,
+                winH = document.body.clientHeight || document.documentElement.clientHeight;
+            this.collectionPopupLayer = 'block';
+            this.popupLayerLeft = parseInt((winW-580)/2)+'px';
+            this.popupLayerTop = 120+'px';
+        },
+        collectionSearchArticle:function(e){
+            alert(this.collectionSearchKeyWord);
+            this.$http.get('/api/allArticles?keyword='+this.collectionSearchKeyWord+'&token='+this.token).then(lists=>{
+                if(lists.body.code && lists.body.ok){
+                    let articleArr = lists.body.data;
+                    articleArr.forEach(item=>{
+                        item.add_date = this.formate_date(item.add_date);
+                    })
+                    this.articleLists = articleArr.reverse();
+                }else{
+                    this.articleLists = [];
+                }
+            });
+        },
+        closeCollectionPushPopupLayer:function(){
+            this.collectionPopupLayer = 'none';
+        },
+        pushActionBut:function(e,article_id,id){
+            this.$http.get('/api/articlePush?uid='+this.uid+'&article_id='+article_id+'&token='+this.token+'&id='+id).then(push=>{
+                this.collectionPopupLayer = 'none';
+                this.popupLayerBoxShow = 'block';
+                this.popupLayerText = push.body.msg;
+            });
+        },
+        formate_date:function(date){
+            let MyDate = new Date(date);
+            return MyDate.getFullYear()+'-'+((MyDate.getMonth()+1) <=9 ? '0'+(MyDate.getMonth()+1) : (MyDate.getMonth()+1))+'-'+MyDate.getDate()+' '+(MyDate.getHours() <=90 ? '0'+MyDate.getHours(): MyDate.getHours())+':'+(MyDate.getMinutes() <= 9 ? '0'+MyDate.getMinutes():MyDate.getMinutes())+':'+(MyDate.getSeconds() <= 9? '0'+MyDate.getSeconds() : MyDate.getSeconds());
         }
     }
 });

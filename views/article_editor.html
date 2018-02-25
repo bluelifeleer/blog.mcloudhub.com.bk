@@ -89,7 +89,7 @@
             <div class="article-editor-block">
                 <div class="article-editor-title">
                     <input type="text" name="article-title" id="article-title" value="" v-model="title" v-on:keyUp="changeArticleTitle($event)">
-                    <span class="save-tip-box">已保存</span>
+                    <span class="save-tip-box" v-bind:style="{display:saveTip}">已保存</span>
                     <a href="javascript:void(0);" class="send-article-but" title="发布文章" v-on:click="saveArticle($event,nowArticleId)"><i class="icon iconfont">&#xe662;</i></a>
                 </div>
                 <div class="article-editor-contents-block">

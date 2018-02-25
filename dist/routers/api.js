@@ -1,19 +1,26 @@
 'use strict';
 
+var fs = require('fs');
 var express = require('express');
 var md5 = require('md5');
 var sillyDateTime = require('silly-datetime');
+var multer = require('multer');
+var Geetest = require('gt3-sdk');
 var salt = require('../libs/salt');
 var crt_token = require('../libs/ctr_token');
 var router = express.Router();
 var Users = require('../models/Users_model');
 var Docs = require('../models/Document_model');
 var Articles = require('../models/Articles_model');
+var Discuss = require('../models/Discuss_model');
 var Tags = require('../models/Tags_model');
 var Slide = require('../models/Slide_model');
-var Geetest = require('gt3-sdk');
+var Photos = require('../models/Photos_model');
+var Collections = require('../models/Collections_model');
 var emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
 var phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
+var uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
+var NowDate = new Date();
 
 var responseData = {};
 
@@ -144,6 +151,30 @@ router.get('/getUsers', function (req, res, next) {
     });
 });
 
+router.get('/allUsers', function (req, res, next) {
+    var keyWord = req.query.keyword;
+    var reg = new RegExp(keyWord, 'si'); //不区分大小写
+    Users.find({
+        // name:{$regex : /keyWord/,$options: 'si'}
+        $or: [//多条件，数组
+        { name: { $regex: reg } }]
+    }).then(function (users) {
+        if (users) {
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = users;
+            res.json(responseData);
+        } else {
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+        }
+    });
+});
+
 router.get('/getDocLists', function (req, res, next) {
     var uid = req.query.uid;
     Docs.find({ uid: uid, isDel: 0 }).then(function (docs) {
@@ -171,7 +202,7 @@ router.get('/allArticles', function (req, res, next) {
     } else {
         all = true;
     }
-    var where = all ? {} : { uid: uid };
+    var where = all ? { isDel: 0 } : { uid: uid, isDel: 0 };
     Articles.find(where).then(function (alls) {
         if (alls) {
             responseData.code = 1;
@@ -216,11 +247,23 @@ router.get('/getArticle', function (req, res, next) {
     var id = req.query.id;
     Articles.findOne({ _id: id }).then(function (article) {
         if (article) {
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = article;
-            res.json(responseData);
+            if (!req.cookies.get(id)) {
+                //增加阅读数
+                article.watch++;
+                article.save();
+                req.cookies.set(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
+            }
+
+            Discuss.find({ article_id: article._id }).then(function (discuss) {
+                responseData.code = 1;
+                responseData.msg = 'success';
+                responseData.ok = true;
+                responseData.data = {
+                    'article': article,
+                    'discuss': discuss
+                };
+                res.json(responseData);
+            });
         } else {
             responseData.code = 0;
             responseData.msg = 'error';
@@ -272,8 +315,8 @@ router.post('/signin', function (req, res, next) {
                 responseData.msg = "success";
                 responseData.ok = true;
                 responseData.data = userInfo;
-                req.cookies.set('uid', userInfo._id);
-                req.cookies.set('token', crt_token());
+                req.cookies.set('uid', userInfo._id, { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
+                req.cookies.set('token', crt_token(), { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
                 res.json(responseData);
                 return;
             } else {
@@ -676,6 +719,242 @@ router.post('/changeAticleTitle', function (req, res, next) {
         responseData.msg = '文章删除成功';
         responseData.data = {};
         res.json(responseData);
+    });
+});
+
+router.post('/postDiscuss', function (req, res, next) {
+    var id = req.body.id;
+    var contents = req.body.contents;
+    var uid = req.body.uid;
+    var token = req.body.token;
+    if (token == '') {
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
+        responseData.code = 0;
+        responseData.msg = '您尚未登录';
+        res.json(responseData);
+        return;
+    }
+    Articles.findOne({ _id: id }).then(function (article) {
+        var data = {
+            uid: uid, //评论的用户id
+            article_id: article._id, //评论的文章id
+            article_uid: article.uid, //评论的文章的用户id
+            contents: contents, //评论的内容
+            add_date: new Date(), //评论时间
+            isDel: 0
+        };
+        new Discuss(data).save();
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '评论成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.get('/getDiscuss', function (req, res, next) {
+    var id = req.query.id;
+    var token = req.query.token;
+    Discuss.find({ article_id: id }).then(function (discuss) {
+        if (!discuss) throw console.log(discuss);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = 'SUCCESS';
+        responseData.data = discuss;
+        res.json(responseData);
+    });
+});
+
+router.post('/uploader', uoloader.single('editormd-image-file'), function (req, res, next) {
+    // console.log(req.file);
+    var ext = req.file.mimetype.split('/')[1];
+    var filename = sillyDateTime.format(new Date(), 'YYYYMMMDDHHmmss') + '_' + crt_token() + '.' + ext;
+    var now_timer = sillyDateTime.format(new Date(), 'YYYYMMMDD');
+    var dirname = '/Users/bluelife/www/node/blog/public/images/uploads/' + now_timer + '/';
+
+    fs.exists(dirname, function (exists) {
+        //如果目录不存在创建目录
+        if (!exists) {
+            fs.mkdir(dirname, function (err) {
+                if (!err) throw console.log(err);
+            });
+        }
+        fs.writeFile(dirname + filename, req.file.buffer, function (err) {
+            if (!err) {
+                new Photos({
+                    originalname: req.file.originalname,
+                    filename: filename,
+                    path: dirname,
+                    fullpath: dirname + filename,
+                    encoding: req.file.encoding,
+                    mimetype: req.file.mimetype,
+                    size: req.file.size,
+                    add_date: new Date(),
+                    isDel: 0
+                }).save().then(function (insert) {
+                    if (!insert) throw console.log(insert);
+                    res.json({
+                        message: '图片上传成功',
+                        url: 'https://blog.mcloudhub.com/public/images/uploads/' + now_timer + '/' + filename,
+                        success: 1
+                    });
+                });
+            }
+        });
+    });
+});
+
+router.post('/collection/new', function (req, res, next) {
+    var uid = req.body.uid;
+    var token = req.body.token;
+    var icon = req.body.icon;
+    var name = req.body.name;
+    var describe = req.body.describe;
+    var push = req.body.push;
+    var admins = req.body.admins;
+    var verify = req.body.verify;
+    if (token == '') {
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    var collections = new Collections({
+        uid: uid,
+        name: name, // 集合名称
+        type: 1, // 集合类型
+        icon: icon, // 集合图标
+        describe: describe, // 集合描述
+        add_date: new Date(), // 集合添加时间,
+        admins: admins, // 其他管理员
+        push: push, // 是否允许投稿
+        follow: 0, //关注数
+        subscribe: [],
+        include: 0, //收录文章数
+        article_ids: [],
+        verify: verify, // 是否需要审核
+        isDel: 0
+    });
+    collections.save().then(function (coll) {
+        if (!coll) throw console.log(coll);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文集添加成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.get('/get_collections', function (req, res, next) {
+    var uid = req.query.uid;
+    var token = req.query.token;
+    var where = uid === void 0 ? { isDel: 0, uid: uid } : { isDel: 0 };
+    Collections.find(where).then(function (colls) {
+        if (!colls) throw console.log(colls);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = 'SUCCESS';
+        responseData.data = colls;
+        res.json(responseData);
+    });
+});
+
+router.get('/getCollectionById', function (req, res, next) {
+    var id = req.query.id;
+    var token = req.query.token;
+    Collections.findOne({ _id: id }).then(function (coll) {
+        if (!coll) throw console.log(coll);
+        var result = {};
+        var articlesArr = [];
+        if (coll.article_ids.length > 0) {
+            coll.article_ids.forEach(function (ids) {
+                Articles.findOne({ _id: ids.id }).then(function (article) {
+                    articlesArr.push(article);
+                });
+            });
+        }
+        result.articles = articlesArr;
+        result.icon = coll.icon;
+        result.follow = coll.follow;
+        result.describe = coll.describe;
+        result.include = coll.include;
+        result.name = coll.name;
+        result.push = coll.push;
+        result.subscribe = coll.subscribe;
+        result.admins = coll.admins;
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = 'SUCCESS';
+        responseData.data = result;
+        res.json(responseData);
+    });
+});
+
+router.get('/collectionFollow', function (req, res, next) {
+    var uid = req.query.uid;
+    var id = req.query.id;
+    var token = req.query.token;
+    if (token == '') {
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Collections.findOne({ _id: id }).then(function (coll) {
+        coll.follow++;
+        coll.subscribe.push({ uid: uid });
+        coll.save();
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '关注成功';
+        res.json(responseData);
+    });
+});
+
+router.get('/articlePush', function (req, res, next) {
+    var uid = req.query.uid;
+    var id = req.query.id;
+    var article_id = req.query.article_id;
+    var token = req.query.token;
+    if (token == '') {
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Collections.findOne({ _id: id }).then(function (coll) {
+        coll.include++;
+        if (coll.article_ids.length > 0) {
+            coll.article_ids.forEach(function (ids) {
+                if (ids.id == article_id) {
+                    responseData.code = 0;
+                    responseData.ok = false;
+                    responseData.msg = '此文章已投稿，请另选一篇文章再投。';
+                    res.json(responseData);
+                } else {
+                    coll.article_ids.push({ id: article_id });
+                    coll.save();
+                    responseData.code = 1;
+                    responseData.ok = true;
+                    responseData.msg = '投稿成功';
+                    res.json(responseData);
+                }
+                return;
+            });
+        } else {
+            coll.article_ids.push({ id: article_id });
+            coll.save();
+            responseData.code = 1;
+            responseData.ok = true;
+            responseData.msg = '投稿成功';
+            res.json(responseData);
+            return;
+        }
     });
 });
 

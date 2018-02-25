@@ -26,22 +26,35 @@
         <div id="body-content"><!--jumbotron-->
             <div class="body-layout-l">
                 <div class="article-list-groups">
-                    <div class="article-list-box" v-for="(article,$index) in articleLists">
-                        <a target="_blank" v-bind:href="article.href">
-                            <div class="article-list-img-box"><img src="/public/images/f10.jpg" alt="" class="article-img"></div>
-                            <div class="article-list-describe-box">
-                                <div class="article-list-describe-author"><span class="article-tags"><a href="javascript:void(0);">${article.doc_name}</a></span><span class="article-author"><a
-                                        href="javascript:void(0);">@${article.author}</a></span><span class="article-date"><a href="javascript:void(0);">${article.add_date}</a></span></div>
-                                <h2 class="article-list-describe-title"><a href="javascript:void(0);">${article.title}</a></h2>
-                                <p class="article-list-describe-text">${article.contents}</p>
-                                <p class="ctr-buts-block">
-                                    <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                                    <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                                    <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
-                                </p>
-                            </div>
-                            <div class="clear-both"></div>
-                        </a>
+                    <div class="article-list-box" v-for="(article,$index) in articleLists" v-bind:class="{'has-img':article.hasImg}">
+                        <div class="article-list" v-if="article.hasImg">
+                            <a target="_blank" v-bind:href="article.href">
+                                <div class="article-list-img-box" v-html="article.imgHtml"></div>
+                                <div class="article-list-describe-box">
+                                    <div class="article-list-describe-author"><span class="article-tags">${article.doc_name}</span><span class="article-author">@${article.author}</span><span class="article-date">${article.add_date}</span></div>
+                                    <h2 class="article-list-describe-title">${article.title}</h2>
+                                    <p class="article-list-describe-text">${article.contents}</p>
+                            </a>
+                                    <p class="ctr-buts-block">
+                                        <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
+                                        <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
+                                        <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
+                                    </p>
+                                </div>
+                                <div class="clear-both"></div>
+                        </div>
+                        <div class="article-list" v-else>
+                            <a target="_blank" v-bind:href="article.href">
+                                <div class="article-title"><span href="javascript:void(0);">${article.title}</span></div>
+                                <div class="article-author"><span class="article-tags">${article.doc_name}</span><span class="article-author">@${article.author}</span><span class="article-date">${article.add_date}</span></div>
+                                <div class="article-contents">${article.contents}</div>
+                            </a>
+                            <p class="ctr-buts-block">
+                                <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
+                                <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
+                                <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,7 +134,3 @@
         </div>
     </section>
 {% endblock %}
-
-
-
-419483

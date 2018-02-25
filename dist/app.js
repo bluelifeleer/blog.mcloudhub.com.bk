@@ -10,6 +10,7 @@ var https = require('https');
 var http2 = require('spdy');
 var fs = require('fs');
 var Cookies = require('cookies');
+// const Session = require('express-session');
 var crt_token = require(__dirname + '/libs/ctr_token');
 var swig = require('swig');
 var mongoose = require('mongoose');
@@ -74,7 +75,7 @@ app.use('/public', express.static(__dirname + '/public'));
 //     //  res.send('Hello Word')
 //     res.render('index', );
 // });
-app.use('/admin', require('./routers/admin'));
+// app.use('/admin', require('./routers/admin'));
 app.use('/api', require('./routers/api'));
 app.use('/', require('./routers/main'));
 app.use('/article', require('./routers/article'));

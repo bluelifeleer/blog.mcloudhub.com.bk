@@ -30,55 +30,29 @@
                 <div class="comments-send-author-block">
                     <div class="comment-author-avatar-box"><a href="" class=""><img src="/public/images/QQ20180131-224008@2x.png" alt="" class="comment-avatar-img" title="bluelife"></a></div>
                     <div class="comment-textarea-block">
-                        <textarea name="" id="" cols="30" rows="10" class="comment-contents-box">填写您的评论</textarea>
+                        <textarea name="" id="" cols="30" rows="10" class="comment-contents-box" v-model="articleComments" v-on:focus="commentFocus($event)" v-on:blur="commentBlur($event)">填写您的评论</textarea>
                     </div>
                 </div>
                 <div class="comment-buts-box">
-                    <a href="javascript:void(0);" class="comments-send-but">发送</a>
-                    <a href="javascript:void(0);" class="comments-clean-but">取消</a>
+                    <a href="javascript:void(0);" class="comments-send-but" v-on:click="postCommentBut($event,article._id)">提交</a>
+                    <a href="javascript:void(0);" class="comments-clean-but" v-on:click="resetCommentBut($event)">取消</a>
                 </div>
             </div>
-            <div class="comments-list-block">
-                <div class="comments-list-box">
+            <div class="comments-list-block" v-if="discuss.length > 0">
+                <div class="comments-list-box" v-for="(item,$index) in discuss">
                     <div class="comments-author-block">
                         <div class="comments-author-avatar-box"><img src="/public/images/QQ20180131-224008@2x.png" alt="" class="comment-avatar-list-img"></div>
                         <div class="comments-author-info-block">
                             <div class="comment-author-name">bluelife</div>
-                            <div class="comment-author-athor">2018-01-20 12:30:45</div>
+                            <div class="comment-author-athor">${item.add_date}</div>
                         </div>
                     </div>
-                    <div class="comments-content-block"><p>喜欢，要过年啦，正好需要拔拔草~去看看酒先~</p></div>
+                    <div class="comments-content-block"><p>${item.contents}</p></div>
                 </div>
-                <div class="comments-list-box">
-                    <div class="comments-author-block">
-                        <div class="comments-author-avatar-box"><img src="/public/images/QQ20180131-224008@2x.png" alt="" class="comment-avatar-list-img"></div>
-                        <div class="comments-author-info-block">
-                            <div class="comment-author-name">bluelife</div>
-                            <div class="comment-author-athor">2018-01-20 12:30:45</div>
-                        </div>
-                    </div>
-                    <div class="comments-content-block"><p>网上购物记得用花生日记，淘宝天猫优惠券集中营，下载邀请码 heuyavo</p></div>
-                </div>
-                <div class="comments-list-box">
-                    <div class="comments-author-block">
-                        <div class="comments-author-avatar-box"><img src="/public/images/QQ20180131-224008@2x.png" alt="" class="comment-avatar-list-img"></div>
-                        <div class="comments-author-info-block">
-                            <div class="comment-author-name">bluelife</div>
-                            <div class="comment-author-athor">2018-01-20 12:30:45</div>
-                        </div>
-                    </div>
-                    <div class="comments-content-block"><p>哇哦，贫穷限制了我的想象力●﹏●</p></div>
-                </div>
-                <div class="comments-list-box">
-                    <div class="comments-author-block">
-                        <div class="comments-author-avatar-box"><img src="/public/images/QQ20180131-224008@2x.png" alt="" class="comment-avatar-list-img"></div>
-                        <div class="comments-author-info-block">
-                            <div class="comment-author-name">bluelife</div>
-                            <div class="comment-author-athor">2018-01-20 12:30:45</div>
-                        </div>
-                    </div>
-                    <div class="comments-content-block"><p>非常给力的干货，准备入手几款。
-                        提一个建议，带上价位。</p></div>
+            </div>
+            <div class="comments-list-block" v-else>
+                <div class="comments-list-box" >
+                    <div class="comments-content-block"><p>暂无评论</p></div>
                 </div>
             </div>
         </div>

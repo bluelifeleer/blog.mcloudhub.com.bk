@@ -1,17 +1,24 @@
+const fs = require('fs');
 const express = require('express');
 const md5 = require('md5');
 const sillyDateTime = require('silly-datetime');
+const multer  = require('multer');
+const Geetest = require('gt3-sdk');
 const salt = require('../libs/salt');
 const crt_token = require('../libs/ctr_token');
 const router = express.Router();
 const Users = require('../models/Users_model');
 const Docs = require('../models/Document_model');
 const Articles = require('../models/Articles_model');
+const Discuss = require('../models/Discuss_model');
 const Tags = require('../models/Tags_model');
 const Slide = require('../models/Slide_model');
-const Geetest = require('gt3-sdk');
+const Photos = require('../models/Photos_model');
+const Collections = require('../models/Collections_model');
 const emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
 const phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
+const uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
+const NowDate = new Date();
 
 let responseData = {};
 
@@ -142,6 +149,31 @@ router.get('/getUsers',(req, res, next)=>{
     });
 });
 
+router.get('/allUsers',(req,res,next)=>{
+    let keyWord = req.query.keyword;
+    const reg = new RegExp(keyWord, 'si') //不区分大小写
+    Users.find({
+        // name:{$regex : /keyWord/,$options: 'si'}
+        $or : [ //多条件，数组
+            {name : {$regex : reg}}
+        ]
+    }).then(users=>{
+        if(users){
+            responseData.code = 1;
+            responseData.msg = 'success';
+            responseData.ok = true;
+            responseData.data = users;
+            res.json(responseData);
+        }else{
+            responseData.code = 0;
+            responseData.msg = 'error';
+            responseData.ok = false;
+            responseData.data = {};
+            res.json(responseData);
+        }
+    });
+})
+
 router.get('/getDocLists',(req, res, next)=>{
     let uid = req.query.uid;
     Docs.find({uid:uid,isDel:0}).then(docs=>{
@@ -169,7 +201,7 @@ router.get('/allArticles',(req, res, next)=>{
     }else{
         all = true;
     }
-    let where = all ? {}: {uid:uid};
+    let where = all ? {isDel:0}: {uid:uid,isDel:0};
     Articles.find(where).then(alls=>{
         if(alls){
             responseData.code = 1;
@@ -214,11 +246,24 @@ router.get('/getArticle',(req, res, next)=>{
     let id = req.query.id;
     Articles.findOne({_id:id}).then(article=>{
         if(article){
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = article;
-            res.json(responseData);
+            if(!req.cookies.get(id)){
+                //增加阅读数
+                article.watch++;
+                article.save();
+                req.cookies.set(id,'on',{maxAge:1000*3600*10,expires:1000*3600*10});
+            }
+
+            Discuss.find({article_id:article._id}).then(discuss=>{
+                responseData.code = 1;
+                responseData.msg = 'success';
+                responseData.ok = true;
+                responseData.data = {
+                    'article' : article,
+                    'discuss' : discuss
+                };
+                res.json(responseData);
+            });
+
         }else{
             responseData.code = 0;
             responseData.msg = 'error';
@@ -270,8 +315,8 @@ router.post('/signin', (req, res, next) => {
                 responseData.msg = "success";
                 responseData.ok = true;
                 responseData.data = userInfo;
-                req.cookies.set('uid',userInfo._id);
-                req.cookies.set('token',crt_token());
+                req.cookies.set('uid',userInfo._id,{maxAge:1000*3600*10,expires:1000*3600*10});
+                req.cookies.set('token',crt_token(),{maxAge:1000*3600*10,expires:1000*3600*10});
                 res.json(responseData);
                 return;
             }else{
@@ -674,6 +719,241 @@ router.post('/changeAticleTitle',(req,res,next)=>{
         responseData.msg = '文章删除成功';
         responseData.data = {};
         res.json(responseData);
+    });
+});
+
+router.post('/postDiscuss',(req,res,next)=>{
+    let id = req.body.id;
+    let contents = req.body.contents;
+    let uid = req.body.uid;
+    let token = req.body.token;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    if(req.cookies.get('uid') == '' && req.cookies.get('token') == ''){
+        responseData.code = 0;
+        responseData.msg = '您尚未登录';
+        res.json(responseData);
+        return;
+    }
+    Articles.findOne({_id:id}).then(article=>{
+        let data = {
+            uid: uid,    //评论的用户id
+            article_id: article._id, //评论的文章id
+            article_uid: article.uid, //评论的文章的用户id
+            contents: contents,   //评论的内容
+            add_date: new Date(),     //评论时间
+            isDel: 0,
+        };
+        new Discuss(data).save();
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '评论成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.get('/getDiscuss',(req,res,next)=>{
+    let id=req.query.id;
+    let token = req.query.token;
+    Discuss.find({article_id:id}).then(discuss=>{
+        if(!discuss) throw console.log(discuss);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = 'SUCCESS';
+        responseData.data = discuss;
+        res.json(responseData);
+    });
+})
+
+router.post('/uploader',uoloader.single('editormd-image-file'),(req,res,next)=>{
+    // console.log(req.file);
+    let ext = req.file.mimetype.split('/')[1];
+    let filename = sillyDateTime.format(new Date(),'YYYYMMMDDHHmmss')+'_'+crt_token()+'.'+ext;
+    let now_timer = sillyDateTime.format(new Date(),'YYYYMMMDD');
+    let dirname = '/Users/bluelife/www/node/blog/public/images/uploads/'+now_timer+'/';
+
+    fs.exists(dirname,exists=>{ //如果目录不存在创建目录
+        if(!exists){
+            fs.mkdir(dirname,err=>{
+                if(!err) throw console.log(err);
+            });
+        }
+        fs.writeFile(dirname+filename,req.file.buffer,err=>{
+            if(!err){
+                new Photos({
+                    originalname:req.file.originalname,
+                    filename: filename,
+                    path: dirname,
+                    fullpath: dirname+filename,
+                    encoding: req.file.encoding,
+                    mimetype: req.file.mimetype,
+                    size: req.file.size,
+                    add_date: new Date(),
+                    isDel: 0
+                }).save().then(insert=>{
+                    if(!insert) throw console.log(insert);
+                    res.json({
+                        message:'图片上传成功',
+                        url:'https://blog.mcloudhub.com/public/images/uploads/'+now_timer+'/'+filename,
+                        success:1
+                    });
+                });
+            }
+        });
+    });
+});
+
+router.post('/collection/new',(req,res,next)=>{
+    let uid = req.body.uid;
+    let token = req.body.token;
+    let icon = req.body.icon;
+    let name = req.body.name;
+    let describe = req.body.describe;
+    let push = req.body.push;
+    let admins = req.body.admins;
+    let verify = req.body.verify;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    let collections = new Collections({
+        uid: uid,
+        name: name,           // 集合名称
+        type: 1,           // 集合类型
+        icon: icon,           // 集合图标
+        describe: describe,       // 集合描述
+        add_date : new Date(),        // 集合添加时间,
+        admins: admins,         // 其他管理员
+        push: push,           // 是否允许投稿
+        follow:0,               //关注数
+        subscribe:[],
+        include:0,              //收录文章数
+        article_ids:[],
+        verify: verify,          // 是否需要审核
+        isDel : 0
+    });
+    collections.save().then(coll=>{
+        if(!coll) throw console.log(coll);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '文集添加成功';
+        responseData.data = {};
+        res.json(responseData);
+    });
+});
+
+router.get('/get_collections',(req,res,next)=>{
+    let uid = req.query.uid;
+    let token = req.query.token;
+    let where = uid === void(0) ? {isDel:0,uid:uid} : {isDel:0};
+    Collections.find(where).then(colls=>{
+        if(!colls) throw console.log(colls);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = 'SUCCESS';
+        responseData.data = colls;
+        res.json(responseData);
+    });
+});
+
+router.get('/getCollectionById',(req,res,next)=>{
+    let id = req.query.id;
+    let token = req.query.token;
+    Collections.findOne({_id:id}).then(coll=>{
+        if(!coll) throw console.log(coll);
+        let result = {};
+        var articlesArr = [];
+        if(coll.article_ids.length > 0){
+            coll.article_ids.forEach(ids=>{
+                Articles.findOne({_id:ids.id}).then(article=>{
+                    articlesArr.push(article);
+                });
+            })
+        }
+        result.articles = articlesArr;
+        result.icon = coll.icon;
+        result.follow = coll.follow;
+        result.describe = coll.describe;
+        result.include = coll.include;
+        result.name = coll.name;
+        result.push = coll.push;
+        result.subscribe = coll.subscribe;
+        result.admins = coll.admins;
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = 'SUCCESS';
+        responseData.data = result;
+        res.json(responseData);
+    });
+});
+
+router.get('/collectionFollow',(req,res,next)=>{
+    let uid = req.query.uid;
+    let id = req.query.id;
+    let token = req.query.token;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Collections.findOne({_id:id}).then(coll=>{
+        coll.follow++;
+        coll.subscribe.push({uid:uid});
+        coll.save();
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '关注成功';
+        res.json(responseData);
+    });
+});
+
+router.get('/articlePush',(req,res,next)=>{
+    let uid = req.query.uid;
+    let id = req.query.id;
+    let article_id = req.query.article_id;
+    let token = req.query.token;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    Collections.findOne({_id:id}).then(coll=>{
+        coll.include++;
+        if(coll.article_ids.length > 0){
+            coll.article_ids.forEach(ids=>{
+                if(ids.id == article_id){
+                    responseData.code = 0;
+                    responseData.ok = false;
+                    responseData.msg = '此文章已投稿，请另选一篇文章再投。';
+                    res.json(responseData);
+                }else{
+                    coll.article_ids.push({id:article_id});
+                    coll.save();
+                    responseData.code = 1;
+                    responseData.ok = true;
+                    responseData.msg = '投稿成功';
+                    res.json(responseData);
+                }
+                return;
+            })
+        }else{
+            coll.article_ids.push({id:article_id});
+            coll.save();
+            responseData.code = 1;
+            responseData.ok = true;
+            responseData.msg = '投稿成功';
+            res.json(responseData);
+            return;
+        }
     });
 });
 

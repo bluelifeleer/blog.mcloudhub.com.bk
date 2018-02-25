@@ -27,7 +27,7 @@ var vm = new Vue({
         value: 1024,
         index: 0,
         cursor: null
-    }), _defineProperty(_data, 'accountSymbol', '&#xe68f;'), _defineProperty(_data, 'accountBox', 'none'), _defineProperty(_data, 'popupLayerBoxShow', 'none'), _defineProperty(_data, 'popupLayerWidth', '100%'), _defineProperty(_data, 'popupLayerHeight', '100%'), _defineProperty(_data, 'popupLayerLeft', 0), _defineProperty(_data, 'popupLayerTop', 0), _defineProperty(_data, 'popupLayerText', ''), _defineProperty(_data, 'articleLists', []), _defineProperty(_data, 'article', []), _data),
+    }), _defineProperty(_data, 'accountSymbol', '&#xe68f;'), _defineProperty(_data, 'accountBox', 'none'), _defineProperty(_data, 'popupLayerBoxShow', 'none'), _defineProperty(_data, 'popupLayerWidth', '100%'), _defineProperty(_data, 'popupLayerHeight', '100%'), _defineProperty(_data, 'popupLayerLeft', 0), _defineProperty(_data, 'popupLayerTop', 0), _defineProperty(_data, 'popupLayerText', ''), _defineProperty(_data, 'articleLists', []), _defineProperty(_data, 'article', []), _defineProperty(_data, 'articleComments', '填写您的评论....'), _defineProperty(_data, 'discuss', []), _defineProperty(_data, 'imgRegexp', /<img [^>]*src=['"]([^'"]+)[^>]*>/gi), _defineProperty(_data, 'hasImg', null), _defineProperty(_data, 'collectionIconHtml', '<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>'), _defineProperty(_data, 'collectionIcon', ''), _defineProperty(_data, 'collectionName', '专题名称'), _defineProperty(_data, 'collectionDesc', '专题描述。。。'), _defineProperty(_data, 'collectionKeyWord', ''), _defineProperty(_data, 'collectionAdmins', []), _defineProperty(_data, 'collectionPus', 1), _defineProperty(_data, 'collectionVerify', 1), _defineProperty(_data, 'adminArr', []), _defineProperty(_data, 'collectionLists', []), _defineProperty(_data, 'collHref', ''), _defineProperty(_data, 'collectionPopupLayer', 'none'), _defineProperty(_data, 'collectionSearchKeyWord', ''), _defineProperty(_data, 'collection', {}), _defineProperty(_data, 'collSubscribe', false), _data),
     methods: {
         init: function init() {
             console.log();
@@ -41,6 +41,12 @@ var vm = new Vue({
             this.slideAutoPlay();
             this.getAllArticles();
             this.getArticle();
+            if (page_type == 'collections_list') {
+                this.getCollections();
+            }
+            if (page_type == 'collections_detailes') {
+                this.getCollectionById(coll_id);
+            }
         },
         switchSlide: function switchSlide(e, direction) {
             if (direction == 'next') {
@@ -113,15 +119,18 @@ var vm = new Vue({
             var _this5 = this;
 
             this.$http.get('/api/allArticles').then(function (all) {
-                var tmp = [];
+                var ArticleArrs = [];
                 if (all.body.code && all.body.ok) {
-                    tmp = all.body.data;
-                    tmp.forEach(function (item) {
+                    ArticleArrs = all.body.data;
+                    ArticleArrs.forEach(function (item) {
                         item.href = '/article/details?id=' + item._id;
+                        item.hasImg = item.contents.search(_this5.imgRegexp) > 0 ? true : false;
+
+                        item.imgHtml = item.hasImg ? item.contents.match(_this5.imgRegexp)[0] : '';
                         var content = item.contents.replace(/<[^>]*>/g, "");
-                        item.contents = content.length > 30 ? content.substr(0, 30) + '...' : content;
+                        item.contents = item.hasImg ? content.length > 60 ? content.substr(0, 60) + '...' : content : content.length > 80 ? content.substr(0, 80) + '...' : content;
                     });
-                    _this5.articleLists = tmp;
+                    _this5.articleLists = ArticleArrs.reverse();
                 }
             });
         },
@@ -134,9 +143,14 @@ var vm = new Vue({
                 this.$http.get('/api/getArticle?id=' + id).then(function (article) {
                     console.log(article);
                     if (!article) throw console.log(article);
-                    var articleArr = article.body.data;
+                    var articleArr = article.body.data.article;
                     articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
                     _this6.article = articleArr;
+                    var discussArr = article.body.data.discuss;
+                    discussArr.forEach(function (item) {
+                        item.add_date = _this6.formate_date(item.add_date);
+                    });
+                    _this6.discuss = discussArr.reverse();
                 });
             }
         },
@@ -258,6 +272,168 @@ var vm = new Vue({
                     _this11.popupLayerText = res.body.msg;
                 }
             });
+        },
+        commentFocus: function commentFocus(e) {
+            this.articleComments = this.articleComments == '填写您的评论....' ? '' : this.articleComments;
+        },
+        commentBlur: function commentBlur(e) {
+            this.articleComments = this.articleComments ? this.articleComments : '填写您的评论....';
+        },
+        postCommentBut: function postCommentBut(e, id) {
+            var _this12 = this;
+
+            if (uid !== '' && token !== '') {
+                if (this.articleComments == '' || this.articleComments == '填写您的评论....') {
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = '请填写您的评论内容';
+                    return false;
+                } else {
+                    this.$http.post('/api/postDiscuss', {
+                        contents: this.articleComments,
+                        uid: this.uid,
+                        token: this.token,
+                        id: id
+                    }).then(function (res) {
+                        if (res.body.code && res.body.ok) {
+                            _this12.popupLayerBoxShow = 'block';
+                            _this12.popupLayerText = '评论成功';
+                        }
+                        _this12.getDiscuss(id);
+                    });
+                }
+            } else {
+                this.popupLayerBoxShow = 'block';
+                this.popupLayerText = '您尚未登录';
+                return false;
+            }
+        },
+        resetCommentBut: function resetCommentBut(e) {
+            this.articleComments = '填写您的评论....';
+        },
+        getDiscuss: function getDiscuss(id) {
+            var _this13 = this;
+
+            this.$http.get('/api/getDiscuss?id=' + id + '&token=' + this.token).then(function (discuss) {
+                if (discuss.body.code && discuss.body.ok) {
+                    var discussArr = discuss.body.data.reverse();
+                    discussArr.forEach(function (item) {
+                        item.add_date = _this13.formate_date(item.add_date);
+                    });
+                    _this13.discuss = discussArr;
+                } else {
+                    _this13.discuss = [];
+                }
+            });
+        },
+        uploadCollectionIcon: function uploadCollectionIcon(e) {
+            var _this = this;
+            var file = e.target.files[0];
+            var fileRender = new FileReader();
+            if (file) {
+                fileRender.readAsDataURL(file);
+            }
+            fileRender.addEventListener('load', function (e) {
+                _this.collectionIcon = e.target.result;
+                _this.collectionIconHtml = '<img src="' + e.target.result + '" />';
+            }, false);
+        },
+        queryAdmins: function queryAdmins(e) {
+            var _this14 = this;
+
+            this.$http.get('/api/allUsers?keyword=' + this.collectionKeyWord).then(function (users) {
+                _this14.adminArr = users.body.data;
+            });
+        },
+        collectionSubmitForm: function collectionSubmitForm(e) {
+            this.$http.post('/api/collection/new', {
+                uid: this.uid,
+                token: this.token,
+                icon: this.collectionIcon,
+                name: this.collectionName,
+                describe: this.collectionDesc,
+                push: this.collectionPus,
+                verify: this.collectionVerify,
+                admins: this.collectionAdmins
+            }).then(function (res) {
+                console.log(res);
+            });
+        },
+        getCollections: function getCollections() {
+            var _this15 = this;
+
+            this.$http.get('/api/get_collections?uid=' + this.uid + '&token=' + this.token).then(function (res) {
+                var collections = res.body.data;
+                collections.forEach(function (item) {
+                    item.href = '/account/collections/detailes?id=' + item._id;
+                    item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
+                    item.subscribe.forEach(function (uids) {
+                        if (uids.uid == _this15.uid) {
+                            item.subscribed = true;
+                        } else {
+                            item.subscribed = false;
+                        }
+                    });
+                });
+                console.log(collections);
+                _this15.collectionLists = collections;
+            });
+        },
+        getCollectionById: function getCollectionById(id) {
+            var _this16 = this;
+
+            this.$http.get('/api/getCollectionById?id=' + id + '&token=' + this.token).then(function (coll) {
+                if (coll.body.code && coll.body.ok) {
+                    var collection = coll.body.data;
+                    collection.subscribe.forEach(function (item) {
+                        if (item.uid == _this16.uid) {
+                            _this16.collSubscribe = true;
+                        }
+                    });
+                    _this16.collection = collection;
+                }
+            });
+        },
+        followButs: function followButs(e, id) {
+            this.$http.get('/api/collectionFollow?uid=' + this.uid + '&id=' + id + '&token=' + this.token).then();
+        },
+        collectionPush: function collectionPush(e, id) {
+            var winW = document.body.clientWidth || document.documentElement.clientWidth,
+                winH = document.body.clientHeight || document.documentElement.clientHeight;
+            this.collectionPopupLayer = 'block';
+            this.popupLayerLeft = parseInt((winW - 580) / 2) + 'px';
+            this.popupLayerTop = 120 + 'px';
+        },
+        collectionSearchArticle: function collectionSearchArticle(e) {
+            var _this17 = this;
+
+            alert(this.collectionSearchKeyWord);
+            this.$http.get('/api/allArticles?keyword=' + this.collectionSearchKeyWord + '&token=' + this.token).then(function (lists) {
+                if (lists.body.code && lists.body.ok) {
+                    var articleArr = lists.body.data;
+                    articleArr.forEach(function (item) {
+                        item.add_date = _this17.formate_date(item.add_date);
+                    });
+                    _this17.articleLists = articleArr.reverse();
+                } else {
+                    _this17.articleLists = [];
+                }
+            });
+        },
+        closeCollectionPushPopupLayer: function closeCollectionPushPopupLayer() {
+            this.collectionPopupLayer = 'none';
+        },
+        pushActionBut: function pushActionBut(e, article_id, id) {
+            var _this18 = this;
+
+            this.$http.get('/api/articlePush?uid=' + this.uid + '&article_id=' + article_id + '&token=' + this.token + '&id=' + id).then(function (push) {
+                _this18.collectionPopupLayer = 'none';
+                _this18.popupLayerBoxShow = 'block';
+                _this18.popupLayerText = push.body.msg;
+            });
+        },
+        formate_date: function formate_date(date) {
+            var MyDate = new Date(date);
+            return MyDate.getFullYear() + '-' + (MyDate.getMonth() + 1 <= 9 ? '0' + (MyDate.getMonth() + 1) : MyDate.getMonth() + 1) + '-' + MyDate.getDate() + ' ' + (MyDate.getHours() <= 90 ? '0' + MyDate.getHours() : MyDate.getHours()) + ':' + (MyDate.getMinutes() <= 9 ? '0' + MyDate.getMinutes() : MyDate.getMinutes()) + ':' + (MyDate.getSeconds() <= 9 ? '0' + MyDate.getSeconds() : MyDate.getSeconds());
         }
     }
 });

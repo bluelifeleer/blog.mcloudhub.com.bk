@@ -1,0 +1,37 @@
+.collections-new-block-box{width:750px;margin:0 auto;padding-top:30px;}
+.collections-rows-box{width:100%;height:50px;margin:20px 0 0 0;}
+.collections-lables{float:left;width:20%;height:50px;color:#969696;font-size:16px;line-height:50px;}
+.collections-lables img{display:block;width:100px;height:100px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;}
+.collections-inputs{float:left;width:80%;height:50px;position: relative;}
+.collections-icon{display:block;width:100px;height:100px;background:#ffe5e0;text-align:center;line-height:100px;margin:10px 0;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;}
+.icontext{font-size:50px;font-weight: bold;color:#e78170;}
+#collections-uoload-but{display:block;width:120px;height:40px;opacity: 0;
+    -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);position:absolute;left:20px;top:40px;z-index:10;}
+.collections-upload-marke{display:block;width:120px;height:40px;text-align:center;line-height:40px;position:absolute;left:20px;top:40px;color:#66bc47;border:1px solid #91d179;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;z-index:9;}
+#collection-name,#collection-admins{width:540px;height:38px;border:1px solid #c8c8c8;margin:5px;background:hsla(0,0%,71%,.1);padding:0 10px;color:#969696;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;}
+#collection-descs{width:540px;height:138px;border:1px solid #c8c8c8;margin:5px;background:hsla(0,0%,71%,.1);padding:10px 10px;resize:none;color:#969696;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;}
+#collection-pus,#collection-verify{margin:18px 10px 0 20px;}
+.admins-list-layer{width:220px;height:auto;position:absolute;left:155px;top:43px;z-index:99;background:#fff;}
+.admin-lists-box{width:100%;height:40px;line-height: 40px;padding:0 0 0 20%;}
+.admin-lists-box:hover{cursor:pointer;background:hsla(0,0%,71%,.1);}
+#form-submit{diplay:block;width:120px;height:40px;line-height:40px;text-align:center;border:1px solid #42c02e;color:#FFF;background:#42c02e;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;}
+#form-submit:hover{cursor:pointer;}

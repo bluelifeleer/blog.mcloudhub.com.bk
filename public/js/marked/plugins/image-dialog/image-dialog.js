@@ -165,6 +165,7 @@
                               if (json.success === 1)
                               {
                                   dialog.find("[data-url]").val(json.url);
+                                  dialog.find("[data-link]").val(json.url);
                               }
                               else
                               {

@@ -86,3 +86,16 @@
 
     app.use(bodyParser.json({limit: '50mb'}));
     app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
+
+#### 文件上传功能：
+    文件上传要使用express的中间件multer
+    multer简介：
+        Multer 是一个 node.js 中间件，用于处理 multipart/form-data 类型的表单数据，它主要用于上传文件。它是写在 busboy 之上非常高效。Multer 会添加一个 body 对象 以及 file 或 files 对象 到 express 的 request 对象中。 body 对象包含表单的文本域信息，file 或 files 对象包含对象表单上传的文件信息。
+
+        npm install --save multer
+
+
+
+        注意: Multer 不会处理任何非 multipart/form-data 类型的表单数据。
+        如果不指定dest or storage上传的文件将存储在buffer中

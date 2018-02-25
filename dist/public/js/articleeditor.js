@@ -35,7 +35,8 @@ var VM = new Vue({
         docMenuShow: 'none',
         articleMenuShow: 'none',
         articleMenuDocShow: 'none',
-        articleTitleIndex: 0
+        articleTitleIndex: 0,
+        saveTip: 'none'
     },
     methods: {
         init: function init() {
@@ -85,23 +86,20 @@ var VM = new Vue({
                     dialogMaskOpacity: 0.4, //设置透明遮罩层的透明度，全局通用，默认值为0.1
                     dialogMaskBgColor: "#000", //设置透明遮罩层的背景颜色，全局通用，默认为#fff
                     //
-                    // codeFold: true,
+                    codeFold: true,
                     //
-                    // imageUpload: true,
-                    // imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                    // imageUploadURL: "/smart-api/upload/editormdPic/",
-                    // onload: function() {
-                    //     //console.log('onload', this);
-                    //     //this.fullscreen();
-                    //     //this.unwatch();
-                    //     //this.watch().fullscreen();
-                    //     //this.width("100%");
-                    //     //this.height(480);
-                    //     //this.resize("100%", 640);
-                    // },
-                    onchange: function onchange() {
-                        console.log(this);
-                    }
+                    imageUpload: true,
+                    imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                    imageUploadURL: "/api/uploader",
+                    onload: function onload() {
+                        //this.fullscreen();
+                        //this.unwatch();
+                        //this.watch().fullscreen();
+                        //this.width("100%");
+                        //this.height(480);
+                        //this.resize("100%", 640);
+                    },
+                    onchange: function onchange() {}
                 });
                 // _this.editormd.config("toolbarAutoFixed", false);
             });
@@ -212,13 +210,13 @@ var VM = new Vue({
 
             this.$http.get('/api/getArticle?id=' + this.nowArticleId).then(function (res) {
                 if (!res) throw console.log(res);
-                _this7.title = res.body.data.title;
-                _this7.nowArticleId = res.body.data._id;
+                _this7.title = res.body.data.article.title;
+                _this7.nowArticleId = res.body.data.article._id;
                 if (_this7.editors == 2) {
-                    _this7.contents = res.body.data.markDownText;
+                    _this7.contents = res.body.data.article.markDownText;
                     _this7.editormd.setMarkdown(_this7.contents);
                 } else {
-                    _this7.contents = res.body.data.contents;
+                    _this7.contents = res.body.data.article.contents;
                     _this7.wangedit.txt.html(_this7.contents);
                 }
             });
@@ -330,6 +328,7 @@ var VM = new Vue({
             });
         },
         saveArticle: function saveArticle(e, id) {
+            var _this11 = this;
 
             // markdownToHTML
             if (this.editors == 2) {
@@ -345,7 +344,7 @@ var VM = new Vue({
                 contents: this.contents,
                 markdownText: this.markdownText
             }).then(function (res) {
-                console.log(res);
+                _this11.showSaveTip();
             });
         },
         articleSetting: function articleSetting(e, id, index) {
@@ -376,13 +375,13 @@ var VM = new Vue({
             this.getArticle();
         },
         releaseArticle: function releaseArticle(e, id, index) {
-            var _this11 = this;
+            var _this12 = this;
 
             this.$http.get('/api/releaseArticle?id=' + id + '&uid=' + this.uid + '&token=' + this.token).then(function (res) {
                 if (!res) throw console.log(res);
-                _this11.articleMenuShow = 'none';
-                _this11.$refs.articleMenu[index].style.display = _this11.articleMenuShow;
-                _this11.getArticleLists();
+                _this12.articleMenuShow = 'none';
+                _this12.$refs.articleMenu[index].style.display = _this12.articleMenuShow;
+                _this12.getArticleLists();
             });
         },
         moveArticle: function moveArticle(e, id, index) {
@@ -395,25 +394,34 @@ var VM = new Vue({
             this.$refs.articlMenuDocumentBlock.style.top = parseInt(68 * (index + 1) + 72) + 'px';
         },
         deleteArticle: function deleteArticle(e, id, index) {
-            var _this12 = this;
+            var _this13 = this;
 
             this.$http.get('/api/deleteArticle?id=' + id + '&uid=' + this.uid + '&token=' + this.token).then(function (res) {
                 if (!res) throw console.log(res);
-                _this12.articleMenuShow = 'none';
-                _this12.$refs.articleMenu[index].style.display = _this12.articleMenuShow;
-                _this12.getArticleLists();
+                _this13.articleMenuShow = 'none';
+                _this13.$refs.articleMenu[index].style.display = _this13.articleMenuShow;
+                _this13.getArticleLists();
             });
         },
         changeArticleTitle: function changeArticleTitle(e) {
+            var _this14 = this;
+
             this.$http.post('/api/changeAticleTitle', {
                 uid: this.uid,
                 token: this.token,
                 id: this.nowArticleId,
                 title: this.title
             }).then(function (res) {
-                console.log(res);
+                _this14.showSaveTip();
             });
             this.$refs.articleTitle[this.articleTitleIndex].innerHTML = this.title;
+        },
+        showSaveTip: function showSaveTip() {
+            this.saveTip = 'block';
+            var _this = this;
+            setTimeout(function () {
+                _this.saveTip = 'none';
+            }, 200);
         }
     }
 });
