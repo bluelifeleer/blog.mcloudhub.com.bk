@@ -2,6 +2,7 @@
  * 项目入口
  */
 const express = require('express');
+const vhost = require('vhost');
 const http = require('http');
 const https = require('https');
 //引入http2模块
@@ -16,16 +17,18 @@ const bodyParser = require('body-parser');
 const app = express();
 //是否启动记录访问日志
 const start_log = false;
-const options = {
+let options = {
     key: fs.readFileSync(__dirname+'/ssl/214483626110776.key'),
     cert: fs.readFileSync(__dirname+'/ssl/214483626110776.pem')
 }
+
 //设置模板引擎
 app.engine('html', swig.renderFile);
 //  设置模板路径
 app.set('views', './views');
 // 注册模板
 app.set('view engine', 'html');
+// 将模板缓存设置false
 swig.setDefaults({ cache: false });
 // extends设置true表示接收的数据是数组，false表示是字符串
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -65,6 +68,14 @@ app.use(function(req, res, next) {
     next();
 });
 
+app.use(vhost('images.mcloudhub.com',(req,res,next)=>{
+    // options = {
+    //     key: fs.readFileSync(__dirname+'/ssl/214517687450776.key'),
+    //     cert: fs.readFileSync(__dirname+'/ssl/214517687450776.pem')
+    // }
+    app.use('/public', express.static(__dirname + '/public'));
+    next();
+}));
 
 //设置响应头
 // app.setHeader('content-type', 'text-css');
@@ -92,12 +103,11 @@ mongoose.connect('mongodb://localhost:27017/blog', (err, res) => {
         console.log(err);
     } else {
         console.log('mongodb connect is OK !!');
-        // 数据库连接成功后监听8080商品
+        // 数据库连接成功后监听80/443端口
         // app.listen(80);
         http.createServer(app).listen(80);
         // https.createServer(options, app).listen(443);
         http2.createServer(options, app).listen(443);
     }
-
 });
 // app.listen(8080);

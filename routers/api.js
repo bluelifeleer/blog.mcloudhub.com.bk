@@ -196,13 +196,15 @@ router.get('/getDocLists',(req, res, next)=>{
 router.get('/allArticles',(req, res, next)=>{
     let uid = '';
     let all = false;
+    let offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    let num = req.query.num ? parseInt(req.query.num) : 10;
     if(req.cookies.get('token') && req.cookies.get('uid')){
         uid = req.cookies.get('uid');
     }else{
         all = true;
     }
     let where = all ? {isDel:0}: {uid:uid,isDel:0};
-    Articles.find(where).then(alls=>{
+    Articles.find(where).skip((offset == 0 ? offset : (offset-1))).limit(num).then(alls=>{
         if(alls){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -840,20 +842,30 @@ router.post('/collection/new',(req,res,next)=>{
         isDel : 0
     });
     collections.save().then(coll=>{
-        if(!coll) throw console.log(coll);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文集添加成功';
-        responseData.data = {};
-        res.json(responseData);
+        if(!coll) {
+            responseData.code = 0;
+            responseData.ok = false;
+            responseData.msg = '文集添加失败';
+            responseData.data = {};
+            res.json(responseData);
+        }else{
+            responseData.code = 1;
+            responseData.ok = true;
+            responseData.msg = '文集添加成功';
+            responseData.data = coll;
+            res.json(responseData);
+        }
+
     });
 });
 
 router.get('/get_collections',(req,res,next)=>{
     let uid = req.query.uid;
     let token = req.query.token;
+    let offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    let num = req.query.num ? parseInt(req.query.num) : 10;
     let where = uid === void(0) ? {isDel:0,uid:uid} : {isDel:0};
-    Collections.find(where).then(colls=>{
+    Collections.find(where).skip((offset == 0 ? offset :(offset-1))*num).limit(num).then(colls=>{
         if(!colls) throw console.log(colls);
         responseData.code = 1;
         responseData.ok = true;
@@ -955,6 +967,11 @@ router.get('/articlePush',(req,res,next)=>{
             return;
         }
     });
+});
+
+
+router.get('/zhi',(req,res,next)=>{
+    res.json(req.query);
 });
 
 module.exports = router;

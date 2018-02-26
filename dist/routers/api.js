@@ -197,13 +197,15 @@ router.get('/getDocLists', function (req, res, next) {
 router.get('/allArticles', function (req, res, next) {
     var uid = '';
     var all = false;
+    var offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    var num = req.query.num ? parseInt(req.query.num) : 10;
     if (req.cookies.get('token') && req.cookies.get('uid')) {
         uid = req.cookies.get('uid');
     } else {
         all = true;
     }
     var where = all ? { isDel: 0 } : { uid: uid, isDel: 0 };
-    Articles.find(where).then(function (alls) {
+    Articles.find(where).skip(offset == 0 ? offset : offset - 1).limit(num).then(function (alls) {
         if (alls) {
             responseData.code = 1;
             responseData.msg = 'success';
@@ -841,20 +843,29 @@ router.post('/collection/new', function (req, res, next) {
         isDel: 0
     });
     collections.save().then(function (coll) {
-        if (!coll) throw console.log(coll);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文集添加成功';
-        responseData.data = {};
-        res.json(responseData);
+        if (!coll) {
+            responseData.code = 0;
+            responseData.ok = false;
+            responseData.msg = '文集添加失败';
+            responseData.data = {};
+            res.json(responseData);
+        } else {
+            responseData.code = 1;
+            responseData.ok = true;
+            responseData.msg = '文集添加成功';
+            responseData.data = coll;
+            res.json(responseData);
+        }
     });
 });
 
 router.get('/get_collections', function (req, res, next) {
     var uid = req.query.uid;
     var token = req.query.token;
+    var offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    var num = req.query.num ? parseInt(req.query.num) : 10;
     var where = uid === void 0 ? { isDel: 0, uid: uid } : { isDel: 0 };
-    Collections.find(where).then(function (colls) {
+    Collections.find(where).skip((offset == 0 ? offset : offset - 1) * num).limit(num).then(function (colls) {
         if (!colls) throw console.log(colls);
         responseData.code = 1;
         responseData.ok = true;
@@ -956,6 +967,10 @@ router.get('/articlePush', function (req, res, next) {
             return;
         }
     });
+});
+
+router.get('/zhi', function (req, res, next) {
+    res.json(req.query);
 });
 
 module.exports = router;

@@ -4,6 +4,7 @@
  * 项目入口
  */
 var express = require('express');
+var vhost = require('vhost');
 var http = require('http');
 var https = require('https');
 //引入http2模块
@@ -21,18 +22,21 @@ var start_log = false;
 var options = {
     key: fs.readFileSync(__dirname + '/ssl/214483626110776.key'),
     cert: fs.readFileSync(__dirname + '/ssl/214483626110776.pem')
+
     //设置模板引擎
 };app.engine('html', swig.renderFile);
 //  设置模板路径
 app.set('views', './views');
 // 注册模板
 app.set('view engine', 'html');
+// 将模板缓存设置false
 swig.setDefaults({ cache: false });
 // extends设置true表示接收的数据是数组，false表示是字符串
 app.use(bodyParser.urlencoded({ extended: true }));
 // 将提交的数据转成json,并且设置请求实体大小
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 // 服务器启动时默认配置/动作
 app.use(function (req, res, next) {
     req.cookies = new Cookies(req, res);
@@ -66,6 +70,15 @@ app.use(function (req, res, next) {
     next();
 });
 
+app.use(vhost('images.mcloudhub.com', function (req, res, next) {
+    // options = {
+    //     key: fs.readFileSync(__dirname+'/ssl/214517687450776.key'),
+    //     cert: fs.readFileSync(__dirname+'/ssl/214517687450776.pem')
+    // }
+    app.use('/public', express.static(__dirname + '/public'));
+    next();
+}));
+
 //设置响应头
 // app.setHeader('content-type', 'text-css');
 //设置静态文件托管
@@ -80,6 +93,7 @@ app.use('/api', require('./routers/api'));
 app.use('/', require('./routers/main'));
 app.use('/article', require('./routers/article'));
 app.use('/setting', require('./routers/setting'));
+app.use('/photos', require('./routers/photos'));
 //设置响应头
 //  app.setHeader('content-type','text-css');
 //  app.set('*/css',(req,res,next)=>{
@@ -91,7 +105,7 @@ mongoose.connect('mongodb://localhost:27017/blog', function (err, res) {
         console.log(err);
     } else {
         console.log('mongodb connect is OK !!');
-        // 数据库连接成功后监听8080商品
+        // 数据库连接成功后监听80/443端口
         // app.listen(80);
         http.createServer(app).listen(80);
         // https.createServer(options, app).listen(443);

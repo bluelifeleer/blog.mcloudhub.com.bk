@@ -2,6 +2,8 @@ const vm = new Vue({
     delimiters: ['${', '}'],
     el: '#app',
     data: {
+        winW: document.body.clientWidth || document.documentElement.clientWidth,
+        winH: document.body.clientHeight || document.documentElement.clientHeight,
         token:'',
         name:'',
         password:'',
@@ -60,7 +62,8 @@ const vm = new Vue({
         collectionPopupLayer:'none',
         collectionSearchKeyWord:'',
         collection:{},
-        collSubscribe:false
+        collSubscribe:false,
+        collOffset:1
     },
     methods:{
         init:function(){
@@ -73,10 +76,12 @@ const vm = new Vue({
             this.getTags();
             this.getSlides();
             this.slideAutoPlay();
-            this.getAllArticles();
+            this.getAllArticles(0,10);
             this.getArticle();
             if(page_type == 'collections_list'){
-                this.getCollections();
+                this.getCollections(0,9);
+            }else{
+                this.getCollections(0,7);
             }
             if(page_type == 'collections_detailes'){
                 this.getCollectionById(coll_id);
@@ -143,8 +148,8 @@ const vm = new Vue({
                 this.slideAttr.length = res.body.data.length;
             });
         },
-        getAllArticles:function(){
-            this.$http.get('/api/allArticles').then(all=>{
+        getAllArticles:function(offset,num){
+            this.$http.get('/api/allArticles?offset='+offset+'&num='+num).then(all=>{
                 let ArticleArrs = [];
                 if(all.body.code && all.body.ok){
                     ArticleArrs= all.body.data;
@@ -298,6 +303,8 @@ const vm = new Vue({
                 if(this.articleComments == '' || this.articleComments == '填写您的评论....'){
                     this.popupLayerBoxShow = 'block';
                     this.popupLayerText = '请填写您的评论内容';
+                    this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                    this.popupLayerTop = '200px';
                     return false;
                 }else{
                     this.$http.post('/api/postDiscuss',{
@@ -309,6 +316,8 @@ const vm = new Vue({
                         if(res.body.code && res.body.ok){
                             this.popupLayerBoxShow = 'block';
                             this.popupLayerText = '评论成功';
+                            this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                            this.popupLayerTop = '200px';
                         }
                         this.getDiscuss(id);
                     });
@@ -317,6 +326,8 @@ const vm = new Vue({
             }else{
                 this.popupLayerBoxShow = 'block';
                 this.popupLayerText = '您尚未登录';
+                this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                this.popupLayerTop = '200px';
                 return false;
             }
         },
@@ -355,24 +366,37 @@ const vm = new Vue({
             });
         },
         collectionSubmitForm:function(e){
+            let descArr = this.collectionDesc.split('\n');
+            let tmp = '';
+            descArr.forEach(desc=>{
+                tmp+='<p>'+desc+'</p>';
+            })
             this.$http.post('/api/collection/new',{
                 uid:this.uid,
                 token:this.token,
                 icon:this.collectionIcon,
                 name:this.collectionName,
-                describe:this.collectionDesc,
+                describe:tmp,
                 push:this.collectionPus,
                 verify:this.collectionVerify,
                 admins:this.collectionAdmins
             }).then(res=>{
-                console.log(res);
+                if(res.body.code && res.body.ok){
+                    window.location.href='/account/collections/detailes?id='+res.body.data._id;
+                }else{
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = res.body.msg;
+                    this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                    this.popupLayerTop = '200px';
+                }
             });
         },
-        getCollections:function(){
-            this.$http.get('/api/get_collections?uid='+this.uid+'&token='+this.token).then(res=>{
+        getCollections:function(offset,num){
+            this.$http.get('/api/get_collections?uid='+this.uid+'&token='+this.token+'&offset='+offset+'&num='+num).then(res=>{
                 let collections = res.body.data;
                 collections.forEach(item=>{
                     item.href='/account/collections/detailes?id='+item._id;
+                    item.describe = item.describe.replace(/<[^>]*>/g, "");
                     item.describe = item.describe.length > 30 ? item.describe.substr(0,30)+'...': item.describe;
                     item.subscribe.forEach(uids=>{
                         if(uids.uid == this.uid){
@@ -382,7 +406,6 @@ const vm = new Vue({
                         }
                     })
                 })
-                console.log(collections);
                 this.collectionLists = collections;
             });
         },
@@ -403,14 +426,11 @@ const vm = new Vue({
             this.$http.get('/api/collectionFollow?uid='+this.uid+'&id='+id+'&token='+this.token).then();
         },
         collectionPush:function(e,id){
-            let winW = document.body.clientWidth || document.documentElement.clientWidth,
-                winH = document.body.clientHeight || document.documentElement.clientHeight;
             this.collectionPopupLayer = 'block';
-            this.popupLayerLeft = parseInt((winW-580)/2)+'px';
+            this.popupLayerLeft = parseInt((this.winW-580)/2)+'px';
             this.popupLayerTop = 120+'px';
         },
         collectionSearchArticle:function(e){
-            alert(this.collectionSearchKeyWord);
             this.$http.get('/api/allArticles?keyword='+this.collectionSearchKeyWord+'&token='+this.token).then(lists=>{
                 if(lists.body.code && lists.body.ok){
                     let articleArr = lists.body.data;
@@ -431,6 +451,27 @@ const vm = new Vue({
                 this.collectionPopupLayer = 'none';
                 this.popupLayerBoxShow = 'block';
                 this.popupLayerText = push.body.msg;
+            });
+        },
+        moreCollections:function(e){
+            this.collOffset++;
+            this.$http.get('/api/get_collections?uid='+this.uid+'&token='+this.token+'&offset='+this.collOffset+'&num=9').then(res=>{
+                let collections = res.body.data;
+                if(collections.length > 0){
+                    collections.forEach(item=>{
+                        item.href='/account/collections/detailes?id='+item._id;
+                        item.describe = item.describe.replace(/<[^>]*>/g, "");
+                        item.describe = item.describe.length > 30 ? item.describe.substr(0,30)+'...': item.describe;
+                        item.subscribe.forEach(uids=>{
+                            if(uids.uid == this.uid){
+                                item.subscribed = true;
+                            }else{
+                                item.subscribed = false;
+                            }
+                        })
+                        this.collectionLists.push(item);
+                    })
+                }
             });
         },
         formate_date:function(date){

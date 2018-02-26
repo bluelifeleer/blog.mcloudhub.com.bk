@@ -1,7 +1,7 @@
 .collections-list-body-block{width:970px;height:auto;margin:0 auto;padding:20px 0 0 0;}
 .collection-headers-block{width:100%;height:100px;background:url('/public/images/recommend-collection-58f8968955ecbeb8f8f3b4cd95ec76be.png') no-repeat 0 0;background-size:100%;}
-.collections-list-group-block{width:100%;height:auto;margin:60px 0 0 0;}
-.collections-list-box{float:left;width:296px;height:280px;background:hsla(0,0%,71%,.1);position:relative;margin:0 0 0 20px;border:1px solid #e6e6e6;padding:0 2%;
+.collections-list-group-block{width:100%;height:auto;margin:40px 0 0 0;overflow:hidden;padding:40px 0 0 0;}
+.collections-list-box{float:left;width:296px;height:280px;background:hsla(0,0%,71%,.1);position:relative;margin:0 0 80px 20px;border:1px solid #e6e6e6;padding:0 2%;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;}
@@ -26,3 +26,8 @@
     -moz-border-radius: 30px;
     border-radius: 30px;}
 .show-msg{width:100%;height:auto;text-align:center;line-height:40px;}
+.more-collections-block{width:100%;height:40px;}
+.more-collections-buts{display:block;width:38.2%;height:40px;line-height:40px;text-align:center;margin:0 auto;margin-bottom:20px;background:#a5a5a5;color:#FFF !important;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;}

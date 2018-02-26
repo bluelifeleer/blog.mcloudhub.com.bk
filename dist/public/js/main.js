@@ -8,6 +8,8 @@ var vm = new Vue({
     delimiters: ['${', '}'],
     el: '#app',
     data: (_data = {
+        winW: document.body.clientWidth || document.documentElement.clientWidth,
+        winH: document.body.clientHeight || document.documentElement.clientHeight,
         token: '',
         name: '',
         password: '',
@@ -27,7 +29,7 @@ var vm = new Vue({
         value: 1024,
         index: 0,
         cursor: null
-    }), _defineProperty(_data, 'accountSymbol', '&#xe68f;'), _defineProperty(_data, 'accountBox', 'none'), _defineProperty(_data, 'popupLayerBoxShow', 'none'), _defineProperty(_data, 'popupLayerWidth', '100%'), _defineProperty(_data, 'popupLayerHeight', '100%'), _defineProperty(_data, 'popupLayerLeft', 0), _defineProperty(_data, 'popupLayerTop', 0), _defineProperty(_data, 'popupLayerText', ''), _defineProperty(_data, 'articleLists', []), _defineProperty(_data, 'article', []), _defineProperty(_data, 'articleComments', '填写您的评论....'), _defineProperty(_data, 'discuss', []), _defineProperty(_data, 'imgRegexp', /<img [^>]*src=['"]([^'"]+)[^>]*>/gi), _defineProperty(_data, 'hasImg', null), _defineProperty(_data, 'collectionIconHtml', '<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>'), _defineProperty(_data, 'collectionIcon', ''), _defineProperty(_data, 'collectionName', '专题名称'), _defineProperty(_data, 'collectionDesc', '专题描述。。。'), _defineProperty(_data, 'collectionKeyWord', ''), _defineProperty(_data, 'collectionAdmins', []), _defineProperty(_data, 'collectionPus', 1), _defineProperty(_data, 'collectionVerify', 1), _defineProperty(_data, 'adminArr', []), _defineProperty(_data, 'collectionLists', []), _defineProperty(_data, 'collHref', ''), _defineProperty(_data, 'collectionPopupLayer', 'none'), _defineProperty(_data, 'collectionSearchKeyWord', ''), _defineProperty(_data, 'collection', {}), _defineProperty(_data, 'collSubscribe', false), _data),
+    }), _defineProperty(_data, 'accountSymbol', '&#xe68f;'), _defineProperty(_data, 'accountBox', 'none'), _defineProperty(_data, 'popupLayerBoxShow', 'none'), _defineProperty(_data, 'popupLayerWidth', '100%'), _defineProperty(_data, 'popupLayerHeight', '100%'), _defineProperty(_data, 'popupLayerLeft', 0), _defineProperty(_data, 'popupLayerTop', 0), _defineProperty(_data, 'popupLayerText', ''), _defineProperty(_data, 'articleLists', []), _defineProperty(_data, 'article', []), _defineProperty(_data, 'articleComments', '填写您的评论....'), _defineProperty(_data, 'discuss', []), _defineProperty(_data, 'imgRegexp', /<img [^>]*src=['"]([^'"]+)[^>]*>/gi), _defineProperty(_data, 'hasImg', null), _defineProperty(_data, 'collectionIconHtml', '<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>'), _defineProperty(_data, 'collectionIcon', ''), _defineProperty(_data, 'collectionName', '专题名称'), _defineProperty(_data, 'collectionDesc', '专题描述。。。'), _defineProperty(_data, 'collectionKeyWord', ''), _defineProperty(_data, 'collectionAdmins', []), _defineProperty(_data, 'collectionPus', 1), _defineProperty(_data, 'collectionVerify', 1), _defineProperty(_data, 'adminArr', []), _defineProperty(_data, 'collectionLists', []), _defineProperty(_data, 'collHref', ''), _defineProperty(_data, 'collectionPopupLayer', 'none'), _defineProperty(_data, 'collectionSearchKeyWord', ''), _defineProperty(_data, 'collection', {}), _defineProperty(_data, 'collSubscribe', false), _defineProperty(_data, 'collOffset', 1), _data),
     methods: {
         init: function init() {
             console.log();
@@ -39,10 +41,12 @@ var vm = new Vue({
             this.getTags();
             this.getSlides();
             this.slideAutoPlay();
-            this.getAllArticles();
+            this.getAllArticles(0, 10);
             this.getArticle();
             if (page_type == 'collections_list') {
-                this.getCollections();
+                this.getCollections(0, 9);
+            } else {
+                this.getCollections(0, 7);
             }
             if (page_type == 'collections_detailes') {
                 this.getCollectionById(coll_id);
@@ -115,10 +119,10 @@ var vm = new Vue({
                 _this4.slideAttr.length = res.body.data.length;
             });
         },
-        getAllArticles: function getAllArticles() {
+        getAllArticles: function getAllArticles(offset, num) {
             var _this5 = this;
 
-            this.$http.get('/api/allArticles').then(function (all) {
+            this.$http.get('/api/allArticles?offset=' + offset + '&num=' + num).then(function (all) {
                 var ArticleArrs = [];
                 if (all.body.code && all.body.ok) {
                     ArticleArrs = all.body.data;
@@ -286,6 +290,8 @@ var vm = new Vue({
                 if (this.articleComments == '' || this.articleComments == '填写您的评论....') {
                     this.popupLayerBoxShow = 'block';
                     this.popupLayerText = '请填写您的评论内容';
+                    this.popupLayerLeft = parseInt((this.winW - 500) / 2) + 'px';
+                    this.popupLayerTop = '200px';
                     return false;
                 } else {
                     this.$http.post('/api/postDiscuss', {
@@ -297,6 +303,8 @@ var vm = new Vue({
                         if (res.body.code && res.body.ok) {
                             _this12.popupLayerBoxShow = 'block';
                             _this12.popupLayerText = '评论成功';
+                            _this12.popupLayerLeft = parseInt((_this12.winW - 500) / 2) + 'px';
+                            _this12.popupLayerTop = '200px';
                         }
                         _this12.getDiscuss(id);
                     });
@@ -304,6 +312,8 @@ var vm = new Vue({
             } else {
                 this.popupLayerBoxShow = 'block';
                 this.popupLayerText = '您尚未登录';
+                this.popupLayerLeft = parseInt((this.winW - 500) / 2) + 'px';
+                this.popupLayerTop = '200px';
                 return false;
             }
         },
@@ -345,51 +355,65 @@ var vm = new Vue({
             });
         },
         collectionSubmitForm: function collectionSubmitForm(e) {
+            var _this15 = this;
+
+            var descArr = this.collectionDesc.split('\n');
+            var tmp = '';
+            descArr.forEach(function (desc) {
+                tmp += '<p>' + desc + '</p>';
+            });
             this.$http.post('/api/collection/new', {
                 uid: this.uid,
                 token: this.token,
                 icon: this.collectionIcon,
                 name: this.collectionName,
-                describe: this.collectionDesc,
+                describe: tmp,
                 push: this.collectionPus,
                 verify: this.collectionVerify,
                 admins: this.collectionAdmins
             }).then(function (res) {
-                console.log(res);
+                if (res.body.code && res.body.ok) {
+                    window.location.href = '/account/collections/detailes?id=' + res.body.data._id;
+                } else {
+                    _this15.popupLayerBoxShow = 'block';
+                    _this15.popupLayerText = res.body.msg;
+                    _this15.popupLayerLeft = parseInt((_this15.winW - 500) / 2) + 'px';
+                    _this15.popupLayerTop = '200px';
+                }
             });
         },
-        getCollections: function getCollections() {
-            var _this15 = this;
+        getCollections: function getCollections(offset, num) {
+            var _this16 = this;
 
-            this.$http.get('/api/get_collections?uid=' + this.uid + '&token=' + this.token).then(function (res) {
+            this.$http.get('/api/get_collections?uid=' + this.uid + '&token=' + this.token + '&offset=' + offset + '&num=' + num).then(function (res) {
                 var collections = res.body.data;
                 collections.forEach(function (item) {
                     item.href = '/account/collections/detailes?id=' + item._id;
+                    item.describe = item.describe.replace(/<[^>]*>/g, "");
                     item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
                     item.subscribe.forEach(function (uids) {
-                        if (uids.uid == _this15.uid) {
+                        if (uids.uid == _this16.uid) {
                             item.subscribed = true;
                         } else {
                             item.subscribed = false;
                         }
                     });
                 });
-                console.log(collections);
-                _this15.collectionLists = collections;
+                _this16.collectionLists = collections;
             });
         },
         getCollectionById: function getCollectionById(id) {
-            var _this16 = this;
+            var _this17 = this;
 
             this.$http.get('/api/getCollectionById?id=' + id + '&token=' + this.token).then(function (coll) {
                 if (coll.body.code && coll.body.ok) {
                     var collection = coll.body.data;
                     collection.subscribe.forEach(function (item) {
-                        if (item.uid == _this16.uid) {
-                            _this16.collSubscribe = true;
+                        if (item.uid == _this17.uid) {
+                            _this17.collSubscribe = true;
                         }
                     });
-                    _this16.collection = collection;
+                    _this17.collection = collection;
                 }
             });
         },
@@ -397,25 +421,22 @@ var vm = new Vue({
             this.$http.get('/api/collectionFollow?uid=' + this.uid + '&id=' + id + '&token=' + this.token).then();
         },
         collectionPush: function collectionPush(e, id) {
-            var winW = document.body.clientWidth || document.documentElement.clientWidth,
-                winH = document.body.clientHeight || document.documentElement.clientHeight;
             this.collectionPopupLayer = 'block';
-            this.popupLayerLeft = parseInt((winW - 580) / 2) + 'px';
+            this.popupLayerLeft = parseInt((this.winW - 580) / 2) + 'px';
             this.popupLayerTop = 120 + 'px';
         },
         collectionSearchArticle: function collectionSearchArticle(e) {
-            var _this17 = this;
+            var _this18 = this;
 
-            alert(this.collectionSearchKeyWord);
             this.$http.get('/api/allArticles?keyword=' + this.collectionSearchKeyWord + '&token=' + this.token).then(function (lists) {
                 if (lists.body.code && lists.body.ok) {
                     var articleArr = lists.body.data;
                     articleArr.forEach(function (item) {
-                        item.add_date = _this17.formate_date(item.add_date);
+                        item.add_date = _this18.formate_date(item.add_date);
                     });
-                    _this17.articleLists = articleArr.reverse();
+                    _this18.articleLists = articleArr.reverse();
                 } else {
-                    _this17.articleLists = [];
+                    _this18.articleLists = [];
                 }
             });
         },
@@ -423,12 +444,35 @@ var vm = new Vue({
             this.collectionPopupLayer = 'none';
         },
         pushActionBut: function pushActionBut(e, article_id, id) {
-            var _this18 = this;
+            var _this19 = this;
 
             this.$http.get('/api/articlePush?uid=' + this.uid + '&article_id=' + article_id + '&token=' + this.token + '&id=' + id).then(function (push) {
-                _this18.collectionPopupLayer = 'none';
-                _this18.popupLayerBoxShow = 'block';
-                _this18.popupLayerText = push.body.msg;
+                _this19.collectionPopupLayer = 'none';
+                _this19.popupLayerBoxShow = 'block';
+                _this19.popupLayerText = push.body.msg;
+            });
+        },
+        moreCollections: function moreCollections(e) {
+            var _this20 = this;
+
+            this.collOffset++;
+            this.$http.get('/api/get_collections?uid=' + this.uid + '&token=' + this.token + '&offset=' + this.collOffset + '&num=9').then(function (res) {
+                var collections = res.body.data;
+                if (collections.length > 0) {
+                    collections.forEach(function (item) {
+                        item.href = '/account/collections/detailes?id=' + item._id;
+                        item.describe = item.describe.replace(/<[^>]*>/g, "");
+                        item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
+                        item.subscribe.forEach(function (uids) {
+                            if (uids.uid == _this20.uid) {
+                                item.subscribed = true;
+                            } else {
+                                item.subscribed = false;
+                            }
+                        });
+                        _this20.collectionLists.push(item);
+                    });
+                }
             });
         },
         formate_date: function formate_date(date) {
