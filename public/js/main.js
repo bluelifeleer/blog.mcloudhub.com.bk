@@ -244,6 +244,8 @@ const vm = new Vue({
                 console.log(res);
                 if(res.body.code && res.body.ok){
                     this.popupLayerBoxShow = 'block';
+                    this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                    this.popupLayerTop = '200px';
                     this.popupLayerText = res.body.msg;
                 }
             });
@@ -260,6 +262,8 @@ const vm = new Vue({
                 console.log(res);
                 if(res.body.code && res.body.ok){
                     this.popupLayerBoxShow = 'block';
+                    this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                    this.popupLayerTop = '200px';
                     this.popupLayerText = res.body.msg;
                 }
             });
@@ -275,6 +279,8 @@ const vm = new Vue({
                 console.log(res);
                 if(res.body.code && res.body.ok){
                     this.popupLayerBoxShow = 'block';
+                    this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                    this.popupLayerTop = '200px';
                     this.popupLayerText = res.body.msg;
                 }
             });
@@ -283,11 +289,20 @@ const vm = new Vue({
             this.popupLayerBoxShow = 'none';
         },
         downloadAllArticles:function(){
-            this.$http.get('/api/downloadAllArticles').then(res=>{
+            let a = document.createElement('a');
+            a.setAttribute('style','display:none;');
+            a.setAttribute('target','_blank');
+            document.body.appendChild(a);
+            this.$http.get('/api/downloadAllArticles?uid='+this.uid+'&token='+this.token).then(res=>{
                 if(!res) throw console.log(res);
-                console.log(res);
                 if(res.body.code && res.body.ok){
+                    a.setAttribute('href',res.body.data.tar_path);
+                    a.click();
+                    a.parentNode.removeChild(a);
+                    // window.open(res.body.data.tar_path,'_blank');
                     this.popupLayerBoxShow = 'block';
+                    this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                    this.popupLayerTop = '200px';
                     this.popupLayerText = res.body.msg;
                 }
             });

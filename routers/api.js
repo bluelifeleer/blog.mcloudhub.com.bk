@@ -1,3 +1,4 @@
+const { exec } = require('child_process');
 const fs = require('fs');
 const express = require('express');
 const md5 = require('md5');
@@ -19,6 +20,7 @@ const emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+
 const phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
 const uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
 const NowDate = new Date();
+const downloadBasecDir = '/Users/bluelife/www/node/blog/download/';
 
 let responseData = {};
 
@@ -558,11 +560,48 @@ router.post('/saveArticle',(req,res,next)=>{
 });
 
 router.get('/downloadAllArticles',(req,res,next)=>{
-    responseData.code = 1;
-    responseData.ok = true;
-    responseData.msg = '所有文章打包下载完成';
-    responseData.data = {};
-    res.json(responseData);
+    let uid = req.query.uid ? req.query.uid : req.cookies.get('uid');
+    let token = req.query.token;
+    if(uid == ''){
+        responseData.code = 0;
+        responseData.ok = false;
+        responseData.msg = '未登陆';
+        responseData.data = {};
+        res.json(responseData);
+        return;
+    }
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    let allArticles = Articles.find({uid:uid}).then(articles=>{
+        return articles;
+    });
+    let dirname = downloadBasecDir+'/'+uid;
+    fs.exists(dirname,exists=> { //如果目录不存在创建目录
+        if (!exists) {
+            fs.mkdir(dirname, err => {
+                if (err) throw console.log(err);
+            });
+        }
+        allArticles.then(all=>{
+            all.forEach(article=>{
+                fs.writeFile('/Users/bluelife/www/node/blog/download/'+uid+'/'+article.title+'.md',article.markDownText,'utf8',err=>{
+                    if (err) throw err;
+                });
+            });
+            exec('tar -czf '+dirname+'.tar.gz'+' '+dirname,{encoding:'utf8',maxBuffer:parseInt(200*1024)},(error,stdout,stderr)=>{
+                if(error) throw error;
+                responseData.code = 1;
+                responseData.ok = true;
+                responseData.msg = '所有文章打包下载完成';
+                responseData.data = {tar_path:'http://blog.mcloudhub.com/download/'+uid+'.tar.gz'};
+                res.json(responseData);
+            });
+        });
+    });
 })
 
 router.post('/newDocument',(req,res,next)=>{
