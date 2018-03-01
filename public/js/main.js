@@ -14,9 +14,7 @@ const vm = new Vue({
         email:'',
         qq:'',
         wechat:'',
-        introduce:'',
         website:'',
-        introduce:'',
         editors:'',
         avatar:'/public/images/QQ20180131-224008@2x.png',
         sex:3,
@@ -63,7 +61,14 @@ const vm = new Vue({
         collectionSearchKeyWord:'',
         collection:{},
         collSubscribe:false,
-        collOffset:1
+        collOffset:1,
+        newIncludeArticleLists:[],
+        switchButSelected:true,
+        swtichFlagShow:'none',
+        swtichFlagLeft:0,
+        showAccountIntroduceEditForm:'none',
+        showAccountIntroduceText:'block',
+        documentLists:null
     },
     methods:{
         init:function(){
@@ -85,6 +90,9 @@ const vm = new Vue({
             }
             if(page_type == 'collections_detailes'){
                 this.getCollectionById(coll_id);
+            }
+            if(page_type == 'account'){
+                this.getDocuments();
             }
         },
         switchSlide:function(e,direction){
@@ -146,6 +154,24 @@ const vm = new Vue({
             this.$http.get('/api/slides').then(res=>{
                 this.slide_list = res.body.data;
                 this.slideAttr.length = res.body.data.length;
+            });
+        },
+        getDocuments:function(){
+            this.$http.get('/api/getDocLists').then(doc=>{
+                if(doc.body.code && doc.body.ok){
+                    if(doc.body.data.length > 0){
+                        let docs = doc.body.data;
+                        docs.forEach(item=>{
+                            item.href = '/account/dcs?id'+item._id;
+                        })
+                        this.documentLists = docs;
+                    }else{
+                        this.documentLists = null;
+                    }
+                    
+                }else{
+                    this.documentLists = null;
+                }
             });
         },
         getAllArticles:function(offset,num){
@@ -428,14 +454,70 @@ const vm = new Vue({
             this.$http.get('/api/getCollectionById?id='+id+'&token='+this.token).then(coll=>{
                 if(coll.body.code && coll.body.ok){
                     let collection = coll.body.data;
+                    collection.articles = [];
+                    collection.article_ids.forEach(ids=>{
+                        this.$http.get('/api/getArticle?id='+ids.id).then(article=>{
+                            let articleContents = article.body.data.article
+                            articleContents.href='/article/details?id='+articleContents._id;
+                            articleContents.hasImg = articleContents.contents.search(this.imgRegexp) > 0 ? true : false;
+
+                            articleContents.imgHtml = articleContents.hasImg ? articleContents.contents.match(this.imgRegexp)[0]:'';
+                            let content = articleContents.contents.replace(/<[^>]*>/g, "");
+                            articleContents.contents = articleContents.hasImg ? (content.length > 60 ? content.substr(0,60)+'...': content) : (content.length > 80 ? content.substr(0,80)+'...': content);
+                            collection.articles.push(articleContents);
+                        });
+                    });
                     collection.subscribe.forEach(item=>{
                         if(item.uid == this.uid){
                             this.collSubscribe = true;
                         }
                     })
+                    // console.log(this.$refs.switchButs);
+                    this.swtichFlagShow = 'block';
+                    this.swtichFlagLeft = this.$refs.switchButsNew.offsetLeft + 'px';
+                    this.$refs.switchContentsNew.style='display:block';
+                    this.$refs.switchContentsDiscuss.style='display:none';
+                    this.$refs.switchContentsHot.style='display:none';
                     this.collection = collection;
+                    this.newIncludeArticleLists = collection.articles;
+
                 }
             });
+        },
+        switchButOver:function(type){
+            switch(type){
+                case 'discuss':
+                    this.swtichFlagLeft = this.$refs.switchButsDiscuss.offsetLeft + 'px';
+                    break;
+                case 'hot':
+                    this.swtichFlagLeft = this.$refs.switchButsHot.offsetLeft + 'px';
+                    break;
+                default:
+                    this.swtichFlagLeft = this.$refs.switchButsNew.offsetLeft + 'px';
+                    break;
+            }
+        },
+        switchButs:function(e,type){
+            switch(type){
+                case 'discuss':
+                    this.swtichFlagLeft = this.$refs.switchButsDiscuss.offsetLeft + 'px';
+                    this.$refs.switchContentsNew.style='display:none';
+                    this.$refs.switchContentsDiscuss.style='display:block';
+                    this.$refs.switchContentsHot.style='display:none';
+                    break;
+                case 'hot':
+                    this.swtichFlagLeft = this.$refs.switchButsHot.offsetLeft + 'px';
+                    this.$refs.switchContentsNew.style='display:none';
+                    this.$refs.switchContentsDiscuss.style='display:none';
+                    this.$refs.switchContentsHot.style='display:block';
+                    break;
+                default:
+                    this.swtichFlagLeft = this.$refs.switchButsNew.offsetLeft + 'px';
+                    this.$refs.switchContentsNew.style='display:block';
+                    this.$refs.switchContentsDiscuss.style='display:none';
+                    this.$refs.switchContentsHot.style='display:none';
+                    break;
+            }
         },
         followButs:function(e,id){
             this.$http.get('/api/collectionFollow?uid='+this.uid+'&id='+id+'&token='+this.token).then();
@@ -488,6 +570,36 @@ const vm = new Vue({
                     })
                 }
             });
+        },
+        accountIntroduceEditBut:function(e){
+            this.showAccountIntroduceEditForm = 'block';
+            this.showAccountIntroduceText = 'none';
+        },
+        accountIntroduceFromSaveBut:function(e){
+            this.$http.post('/api/updateIntroduce',{
+                uid:this.uid,
+                token:this.token,
+                introduce:this.introduce
+            }).then(res=>{
+                if(res.body.code && res.body.ok){
+                    this.introduce = this.introduce;
+                    this.showAccountIntroduceEditForm = 'none';
+                    this.showAccountIntroduceText = 'block';
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = res.body.msg;
+                    this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                    this.popupLayerTop = '200px';
+                }else{
+                    this.popupLayerBoxShow = 'block';
+                    this.popupLayerText = '个人介绍修改失败';
+                    this.popupLayerLeft = parseInt((this.winW-500)/2)+'px';
+                    this.popupLayerTop = '200px';
+                }
+            });
+        },
+        accountIntroduceFromResetBut:function(){
+            this.showAccountIntroduceEditForm = 'none';
+            this.showAccountIntroduceText = 'block';
         },
         formate_date:function(date){
             let MyDate = new Date(date);

@@ -21,7 +21,6 @@ const phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$
 const uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
 const NowDate = new Date();
 const downloadBasecDir = '/Users/bluelife/www/node/blog/download/';
-
 let responseData = {};
 
 router.use(function(req, res, next) {
@@ -177,8 +176,9 @@ router.get('/allUsers',(req,res,next)=>{
 })
 
 router.get('/getDocLists',(req, res, next)=>{
-    let uid = req.query.uid;
-    Docs.find({uid:uid,isDel:0}).then(docs=>{
+    let uid = req.query.uid ? req.query.uid :(req.cookies.get('uid') ? req.cookies.get('uid'): '');
+    let where = uid ? {uid:uid,isDel:0} : {isDel:0};
+    Docs.find(where).then(docs=>{
         if(docs){
             responseData.code = 1;
             responseData.msg = 'success';
@@ -473,6 +473,12 @@ router.post('/updateUserBasic',(req,res,next)=>{
         res.json(responseData);
         return;
     }
+    if(req.cookies.get('uid') == '' && req.cookies.get('token') == ''){
+        responseData.code = 0;
+        responseData.msg = '未登陆';
+        res.json(responseData);
+        return;
+    }
     Users.update({_id:uid},updateUserBasic,{multi:false},(err,docs)=>{
         if(err) throw console.log(err);
         responseData.code = 1;
@@ -497,6 +503,12 @@ router.post('/changeProfile',(req,res,next)=>{
         res.json(responseData);
         return;
     }
+    if(req.cookies.get('uid') == '' && req.cookies.get('token') == ''){
+        responseData.code = 0;
+        responseData.msg = '未登陆';
+        res.json(responseData);
+        return;
+    }
     Users.update({_id:uid},updateProfile,{multi:false},(err,docs)=>{
         if(err) throw console.log(err);
         responseData.code = 1;
@@ -517,6 +529,12 @@ router.post('/changeReward',(req,res,next)=>{
     if(token == ''){
         responseData.code = 0;
         responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    if(req.cookies.get('uid') == '' && req.cookies.get('token') == ''){
+        responseData.code = 0;
+        responseData.msg = '未登陆';
         res.json(responseData);
         return;
     }
@@ -917,30 +935,13 @@ router.get('/get_collections',(req,res,next)=>{
 router.get('/getCollectionById',(req,res,next)=>{
     let id = req.query.id;
     let token = req.query.token;
+    let articleArr = [];
     Collections.findOne({_id:id}).then(coll=>{
         if(!coll) throw console.log(coll);
-        let result = {};
-        var articlesArr = [];
-        if(coll.article_ids.length > 0){
-            coll.article_ids.forEach(ids=>{
-                Articles.findOne({_id:ids.id}).then(article=>{
-                    articlesArr.push(article);
-                });
-            })
-        }
-        result.articles = articlesArr;
-        result.icon = coll.icon;
-        result.follow = coll.follow;
-        result.describe = coll.describe;
-        result.include = coll.include;
-        result.name = coll.name;
-        result.push = coll.push;
-        result.subscribe = coll.subscribe;
-        result.admins = coll.admins;
         responseData.code = 1;
         responseData.ok = true;
         responseData.msg = 'SUCCESS';
-        responseData.data = result;
+        responseData.data = coll;
         res.json(responseData);
     });
 });
@@ -1005,6 +1006,32 @@ router.get('/articlePush',(req,res,next)=>{
             res.json(responseData);
             return;
         }
+    });
+});
+
+router.post('/updateIntroduce',(req,res,next)=>{
+    let uid = req.body.uid;
+    let token = req.body.token;
+    let introduce = req.body.introduce;
+    if(token == ''){
+        responseData.code = 0;
+        responseData.msg = '非法请求';
+        res.json(responseData);
+        return;
+    }
+    if(req.cookies.get('uid') == '' && req.cookies.get('token') == ''){
+        responseData.code = 0;
+        responseData.msg = '未登陆';
+        res.json(responseData);
+        return;
+    }
+    Users.update({_id:uid},{introduce:introduce},{multi:false},(err,docs)=>{
+        if(err) throw console.log(err);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = '用户个人介绍修改成功';
+        responseData.data = {};
+        res.json(responseData);
     });
 });
 

@@ -1,8 +1,5 @@
 'use strict';
 
-var _require = require('child_process'),
-    exec = _require.exec;
-
 var fs = require('fs');
 var express = require('express');
 var md5 = require('md5');
@@ -24,7 +21,7 @@ var emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.)
 var phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
 var uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
 var NowDate = new Date();
-var downloadBasecDir = '/Users/bluelife/www/node/blog/download/';
+
 var responseData = {};
 
 router.use(function (req, res, next) {
@@ -179,9 +176,8 @@ router.get('/allUsers', function (req, res, next) {
 });
 
 router.get('/getDocLists', function (req, res, next) {
-    var uid = req.query.uid ? req.query.uid : req.cookies.get('uid') ? req.cookies.get('uid') : '';
-    var where = uid ? { uid: uid, isDel: 0 } : { isDel: 0 };
-    Docs.find(where).then(function (docs) {
+    var uid = req.query.uid;
+    Docs.find({ uid: uid, isDel: 0 }).then(function (docs) {
         if (docs) {
             responseData.code = 1;
             responseData.msg = 'success';
@@ -475,12 +471,6 @@ router.post('/updateUserBasic', function (req, res, next) {
         res.json(responseData);
         return;
     }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '未登陆';
-        res.json(responseData);
-        return;
-    }
     Users.update({ _id: uid }, updateUserBasic, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
         responseData.code = 1;
@@ -505,12 +495,6 @@ router.post('/changeProfile', function (req, res, next) {
         res.json(responseData);
         return;
     }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '未登陆';
-        res.json(responseData);
-        return;
-    }
     Users.update({ _id: uid }, updateProfile, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
         responseData.code = 1;
@@ -531,12 +515,6 @@ router.post('/changeReward', function (req, res, next) {
     if (token == '') {
         responseData.code = 0;
         responseData.msg = '非法请求';
-        res.json(responseData);
-        return;
-    }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '未登陆';
         res.json(responseData);
         return;
     }
@@ -580,49 +558,11 @@ router.post('/saveArticle', function (req, res, next) {
 });
 
 router.get('/downloadAllArticles', function (req, res, next) {
-    var uid = req.query.uid ? req.query.uid : req.cookies.get('uid');
-    var token = req.query.token;
-    if (uid == '') {
-        responseData.code = 0;
-        responseData.ok = false;
-        responseData.msg = '未登陆';
-        responseData.data = {};
-        res.json(responseData);
-        return;
-    }
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
-        return;
-    }
-    var allArticles = Articles.find({ uid: uid }).then(function (articles) {
-        return articles;
-    });
-    var dirname = downloadBasecDir + '/' + uid;
-    fs.exists(dirname, function (exists) {
-        //如果目录不存在创建目录
-        if (!exists) {
-            fs.mkdir(dirname, function (err) {
-                if (err) throw console.log(err);
-            });
-        }
-        allArticles.then(function (all) {
-            all.forEach(function (article) {
-                fs.writeFile('/Users/bluelife/www/node/blog/download/' + uid + '/' + article.title + '.md', article.markDownText, 'utf8', function (err) {
-                    if (err) throw err;
-                });
-            });
-            exec('tar -czf ' + dirname + '.tar.gz' + ' ' + dirname, { encoding: 'utf8', maxBuffer: parseInt(200 * 1024) }, function (error, stdout, stderr) {
-                if (error) throw error;
-                responseData.code = 1;
-                responseData.ok = true;
-                responseData.msg = '所有文章打包下载完成';
-                responseData.data = { tar_path: 'http://blog.mcloudhub.com/download/' + uid + '.tar.gz' };
-                res.json(responseData);
-            });
-        });
-    });
+    responseData.code = 1;
+    responseData.ok = true;
+    responseData.msg = '所有文章打包下载完成';
+    responseData.data = {};
+    res.json(responseData);
 });
 
 router.post('/newDocument', function (req, res, next) {
@@ -938,13 +878,30 @@ router.get('/get_collections', function (req, res, next) {
 router.get('/getCollectionById', function (req, res, next) {
     var id = req.query.id;
     var token = req.query.token;
-    var articleArr = [];
     Collections.findOne({ _id: id }).then(function (coll) {
         if (!coll) throw console.log(coll);
+        var result = {};
+        var articlesArr = [];
+        if (coll.article_ids.length > 0) {
+            coll.article_ids.forEach(function (ids) {
+                Articles.findOne({ _id: ids.id }).then(function (article) {
+                    articlesArr.push(article);
+                });
+            });
+        }
+        result.articles = articlesArr;
+        result.icon = coll.icon;
+        result.follow = coll.follow;
+        result.describe = coll.describe;
+        result.include = coll.include;
+        result.name = coll.name;
+        result.push = coll.push;
+        result.subscribe = coll.subscribe;
+        result.admins = coll.admins;
         responseData.code = 1;
         responseData.ok = true;
         responseData.msg = 'SUCCESS';
-        responseData.data = coll;
+        responseData.data = result;
         res.json(responseData);
     });
 });
@@ -1012,35 +969,10 @@ router.get('/articlePush', function (req, res, next) {
     });
 });
 
-router.post('/updateIntroduce', function (req, res, next) {
-    var uid = req.body.uid;
-    var token = req.body.token;
-    var introduce = req.body.introduce;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
-        return;
-    }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '未登陆';
-        res.json(responseData);
-        return;
-    }
-    Users.update({ _id: uid }, { introduce: introduce }, { multi: false }, function (err, docs) {
-        if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '用户个人介绍修改成功';
-        responseData.data = {};
-        res.json(responseData);
-    });
-});
-
 router.get('/zhi', function (req, res, next) {
     res.json(req.query);
 });
 
 module.exports = router;
+//# sourceMappingURL=api.js.map
 //# sourceMappingURL=api.js.map

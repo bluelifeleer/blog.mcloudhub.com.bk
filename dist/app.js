@@ -83,6 +83,7 @@ app.use(vhost('images.mcloudhub.com', function (req, res, next) {
 // app.setHeader('content-type', 'text-css');
 //设置静态文件托管
 app.use('/public', express.static(__dirname + '/public'));
+app.use('/download', express.static(__dirname + '/download'));
 //  app.use();
 // app.get('/', (req, res, next) => {
 //     //  res.send('Hello Word')

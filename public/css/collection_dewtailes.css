@@ -1,5 +1,5 @@
 .collections-detailes-body-block{width:990px;height:auto;margin:0 auto;}
-.collections-detailes-layout-left{float:left;width:70%;height:auto;}
+.collections-detailes-layout-left{float:left;width:73%;height:auto;}
 .collections-detailes-headers-block{width:100%;height:80px;margin:20px 0 0 0;}
 .collections-icon-box{float:left;width:16%;height:80px;}
 .collections-icon-box img{display:block;width:80px;height:80px;
@@ -23,9 +23,11 @@
     -moz-border-radius: 20px;
     border-radius: 20px;}
 .collections-detailes-contents-block{width:100%;height:auto;margin:20px 0 0 0;}
-.collections-switch-buts-box{width:100%;height:50px;border-bottom: 1px solid #f0f0f0;}
+.collections-switch-buts-box{width:100%;height:50px;border-bottom: 1px solid #f0f0f0;margin:0 0 20px 0;position:relative}
+.switch-flag-box{display:none;width:20%;height:3px;background:#c1c1c1;position:absolute;left:0;top:47px;}
+.collections-switch-list-box{display:none;}
 .collections-switch-buts{display:block;float:left;width:20%;height:50px;line-height: 50px;text-align:center;color:#969696 !important;font-weight:bold;font-size:15px;}
-.collections-detailes-layout-right{float:left;width:28%;height:auto;margin:0 0 0 2%;}
+.collections-detailes-layout-right{float:left;width:25%;height:auto;margin:0 0 0 2%;}
 .collections-detailes-models{width:100%;height:auto;border-bottom:1px solid #f0f0f0;}
 .collections-detailes-models-header{width:100%;height:30px;color:#969696;margin:20px 0 0 0;}
 .collections-detailes-models-contents{width:100%;height:auto;}

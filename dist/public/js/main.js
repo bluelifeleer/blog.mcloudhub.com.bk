@@ -20,16 +20,19 @@ var vm = new Vue({
         email: '',
         qq: '',
         wechat: '',
-        introduce: '',
-        website: ''
-    }, _defineProperty(_data, 'introduce', ''), _defineProperty(_data, 'editors', ''), _defineProperty(_data, 'avatar', '/public/images/QQ20180131-224008@2x.png'), _defineProperty(_data, 'sex', 3), _defineProperty(_data, 'introduce', ''), _defineProperty(_data, 'website', 'http://|https://'), _defineProperty(_data, 'rewardStatus', 2), _defineProperty(_data, 'rewardDesc', '赞赏描述'), _defineProperty(_data, 'slide_list', {}), _defineProperty(_data, 'tags_list', {}), _defineProperty(_data, 'slideAttr', {
+        website: '',
+        editors: '',
+        avatar: '/public/images/QQ20180131-224008@2x.png',
+        sex: 3,
+        introduce: ''
+    }, _defineProperty(_data, 'website', 'http://|https://'), _defineProperty(_data, 'rewardStatus', 2), _defineProperty(_data, 'rewardDesc', '赞赏描述'), _defineProperty(_data, 'slide_list', {}), _defineProperty(_data, 'tags_list', {}), _defineProperty(_data, 'slideAttr', {
         timer: null,
         left: 0,
         length: 0,
         value: 1024,
         index: 0,
         cursor: null
-    }), _defineProperty(_data, 'accountSymbol', '&#xe68f;'), _defineProperty(_data, 'accountBox', 'none'), _defineProperty(_data, 'popupLayerBoxShow', 'none'), _defineProperty(_data, 'popupLayerWidth', '100%'), _defineProperty(_data, 'popupLayerHeight', '100%'), _defineProperty(_data, 'popupLayerLeft', 0), _defineProperty(_data, 'popupLayerTop', 0), _defineProperty(_data, 'popupLayerText', ''), _defineProperty(_data, 'articleLists', []), _defineProperty(_data, 'article', []), _defineProperty(_data, 'articleComments', '填写您的评论....'), _defineProperty(_data, 'discuss', []), _defineProperty(_data, 'imgRegexp', /<img [^>]*src=['"]([^'"]+)[^>]*>/gi), _defineProperty(_data, 'hasImg', null), _defineProperty(_data, 'collectionIconHtml', '<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>'), _defineProperty(_data, 'collectionIcon', ''), _defineProperty(_data, 'collectionName', '专题名称'), _defineProperty(_data, 'collectionDesc', '专题描述。。。'), _defineProperty(_data, 'collectionKeyWord', ''), _defineProperty(_data, 'collectionAdmins', []), _defineProperty(_data, 'collectionPus', 1), _defineProperty(_data, 'collectionVerify', 1), _defineProperty(_data, 'adminArr', []), _defineProperty(_data, 'collectionLists', []), _defineProperty(_data, 'collHref', ''), _defineProperty(_data, 'collectionPopupLayer', 'none'), _defineProperty(_data, 'collectionSearchKeyWord', ''), _defineProperty(_data, 'collection', {}), _defineProperty(_data, 'collSubscribe', false), _defineProperty(_data, 'collOffset', 1), _data),
+    }), _defineProperty(_data, 'accountSymbol', '&#xe68f;'), _defineProperty(_data, 'accountBox', 'none'), _defineProperty(_data, 'popupLayerBoxShow', 'none'), _defineProperty(_data, 'popupLayerWidth', '100%'), _defineProperty(_data, 'popupLayerHeight', '100%'), _defineProperty(_data, 'popupLayerLeft', 0), _defineProperty(_data, 'popupLayerTop', 0), _defineProperty(_data, 'popupLayerText', ''), _defineProperty(_data, 'articleLists', []), _defineProperty(_data, 'article', []), _defineProperty(_data, 'articleComments', '填写您的评论....'), _defineProperty(_data, 'discuss', []), _defineProperty(_data, 'imgRegexp', /<img [^>]*src=['"]([^'"]+)[^>]*>/gi), _defineProperty(_data, 'hasImg', null), _defineProperty(_data, 'collectionIconHtml', '<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>'), _defineProperty(_data, 'collectionIcon', ''), _defineProperty(_data, 'collectionName', '专题名称'), _defineProperty(_data, 'collectionDesc', '专题描述。。。'), _defineProperty(_data, 'collectionKeyWord', ''), _defineProperty(_data, 'collectionAdmins', []), _defineProperty(_data, 'collectionPus', 1), _defineProperty(_data, 'collectionVerify', 1), _defineProperty(_data, 'adminArr', []), _defineProperty(_data, 'collectionLists', []), _defineProperty(_data, 'collHref', ''), _defineProperty(_data, 'collectionPopupLayer', 'none'), _defineProperty(_data, 'collectionSearchKeyWord', ''), _defineProperty(_data, 'collection', {}), _defineProperty(_data, 'collSubscribe', false), _defineProperty(_data, 'collOffset', 1), _defineProperty(_data, 'newIncludeArticleLists', []), _defineProperty(_data, 'switchButSelected', true), _defineProperty(_data, 'swtichFlagShow', 'none'), _defineProperty(_data, 'swtichFlagLeft', 0), _defineProperty(_data, 'showAccountIntroduceEditForm', 'none'), _defineProperty(_data, 'showAccountIntroduceText', 'block'), _defineProperty(_data, 'documentLists', null), _data),
     methods: {
         init: function init() {
             console.log();
@@ -50,6 +53,9 @@ var vm = new Vue({
             }
             if (page_type == 'collections_detailes') {
                 this.getCollectionById(coll_id);
+            }
+            if (page_type == 'account') {
+                this.getDocuments();
             }
         },
         switchSlide: function switchSlide(e, direction) {
@@ -119,8 +125,27 @@ var vm = new Vue({
                 _this4.slideAttr.length = res.body.data.length;
             });
         },
-        getAllArticles: function getAllArticles(offset, num) {
+        getDocuments: function getDocuments() {
             var _this5 = this;
+
+            this.$http.get('/api/getDocLists').then(function (doc) {
+                if (doc.body.code && doc.body.ok) {
+                    if (doc.body.data.length > 0) {
+                        var docs = doc.body.data;
+                        docs.forEach(function (item) {
+                            item.href = '/account/dcs?id' + item._id;
+                        });
+                        _this5.documentLists = docs;
+                    } else {
+                        _this5.documentLists = null;
+                    }
+                } else {
+                    _this5.documentLists = null;
+                }
+            });
+        },
+        getAllArticles: function getAllArticles(offset, num) {
+            var _this6 = this;
 
             this.$http.get('/api/allArticles?offset=' + offset + '&num=' + num).then(function (all) {
                 var ArticleArrs = [];
@@ -128,18 +153,18 @@ var vm = new Vue({
                     ArticleArrs = all.body.data;
                     ArticleArrs.forEach(function (item) {
                         item.href = '/article/details?id=' + item._id;
-                        item.hasImg = item.contents.search(_this5.imgRegexp) > 0 ? true : false;
+                        item.hasImg = item.contents.search(_this6.imgRegexp) > 0 ? true : false;
 
-                        item.imgHtml = item.hasImg ? item.contents.match(_this5.imgRegexp)[0] : '';
+                        item.imgHtml = item.hasImg ? item.contents.match(_this6.imgRegexp)[0] : '';
                         var content = item.contents.replace(/<[^>]*>/g, "");
                         item.contents = item.hasImg ? content.length > 60 ? content.substr(0, 60) + '...' : content : content.length > 80 ? content.substr(0, 80) + '...' : content;
                     });
-                    _this5.articleLists = ArticleArrs.reverse();
+                    _this6.articleLists = ArticleArrs.reverse();
                 }
             });
         },
         getArticle: function getArticle() {
-            var _this6 = this;
+            var _this7 = this;
 
             // alert(window.location.pathname);
             if (window.location.pathname == '/article/details') {
@@ -149,12 +174,12 @@ var vm = new Vue({
                     if (!article) throw console.log(article);
                     var articleArr = article.body.data.article;
                     articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
-                    _this6.article = articleArr;
+                    _this7.article = articleArr;
                     var discussArr = article.body.data.discuss;
                     discussArr.forEach(function (item) {
-                        item.add_date = _this6.formate_date(item.add_date);
+                        item.add_date = _this7.formate_date(item.add_date);
                     });
-                    _this6.discuss = discussArr.reverse();
+                    _this7.discuss = discussArr.reverse();
                 });
             }
         },
@@ -173,24 +198,24 @@ var vm = new Vue({
             }
         },
         getUsers: function getUsers() {
-            var _this7 = this;
+            var _this8 = this;
 
             this.$http.get('/api/getUsers?uid=' + this.uid).then(function (res) {
                 if (!res) throw console.log(res);
-                _this7.nick = res.body.data.nick;
-                _this7.phone = res.body.data.phone;
-                _this7.name = res.body.data.name.length > 10 ? res.body.data.name.substr(0, 10) + '...' : res.body.data.name;
-                _this7.fullname = res.body.data.name;
-                _this7.email = res.body.data.email;
-                _this7.qq = res.body.data.qq;
-                _this7.wechat = res.body.data.wechat;
-                _this7.editors = res.body.data.editors;
-                _this7.avatar = res.body.data.avatar ? res.body.data.avatar : _this7.avatar;
-                _this7.sex = res.body.data.sex;
-                _this7.introduce = res.body.data.introduce;
-                _this7.website = res.body.data.website;
-                _this7.rewardStatus = res.body.data.rewardStatus ? res.body.data.rewardStatus : _this7.rewardStatus;
-                _this7.rewardDesc = res.body.data.rewardDesc;
+                _this8.nick = res.body.data.nick;
+                _this8.phone = res.body.data.phone;
+                _this8.name = res.body.data.name.length > 10 ? res.body.data.name.substr(0, 10) + '...' : res.body.data.name;
+                _this8.fullname = res.body.data.name;
+                _this8.email = res.body.data.email;
+                _this8.qq = res.body.data.qq;
+                _this8.wechat = res.body.data.wechat;
+                _this8.editors = res.body.data.editors;
+                _this8.avatar = res.body.data.avatar ? res.body.data.avatar : _this8.avatar;
+                _this8.sex = res.body.data.sex;
+                _this8.introduce = res.body.data.introduce;
+                _this8.website = res.body.data.website;
+                _this8.rewardStatus = res.body.data.rewardStatus ? res.body.data.rewardStatus : _this8.rewardStatus;
+                _this8.rewardDesc = res.body.data.rewardDesc;
             });
         },
         changeAvatar: function changeAvatar(e) {
@@ -206,7 +231,7 @@ var vm = new Vue({
             Reader.readAsDataURL(file);
         },
         changeUserBasicSubmitForm: function changeUserBasicSubmitForm() {
-            var _this8 = this;
+            var _this9 = this;
 
             this.$http.post('/api/updateUserBasic', {
                 uid: this.uid,
@@ -222,13 +247,15 @@ var vm = new Vue({
                 if (!res) throw console.log(res);
                 console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this8.popupLayerBoxShow = 'block';
-                    _this8.popupLayerText = res.body.msg;
+                    _this9.popupLayerBoxShow = 'block';
+                    _this9.popupLayerLeft = parseInt((_this9.winW - 500) / 2) + 'px';
+                    _this9.popupLayerTop = '200px';
+                    _this9.popupLayerText = res.body.msg;
                 }
             });
         },
         changeUserProfileSubmitForm: function changeUserProfileSubmitForm(e) {
-            var _this9 = this;
+            var _this10 = this;
 
             this.$http.post('/api/changeProfile', {
                 uid: this.uid,
@@ -240,13 +267,15 @@ var vm = new Vue({
                 if (!res) throw console.log(res);
                 console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this9.popupLayerBoxShow = 'block';
-                    _this9.popupLayerText = res.body.msg;
+                    _this10.popupLayerBoxShow = 'block';
+                    _this10.popupLayerLeft = parseInt((_this10.winW - 500) / 2) + 'px';
+                    _this10.popupLayerTop = '200px';
+                    _this10.popupLayerText = res.body.msg;
                 }
             });
         },
         changeRewardSubmitForm: function changeRewardSubmitForm(e) {
-            var _this10 = this;
+            var _this11 = this;
 
             this.$http.post('/api/changeReward', {
                 uid: this.uid,
@@ -257,8 +286,10 @@ var vm = new Vue({
                 if (!res) throw console.log(res);
                 console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this10.popupLayerBoxShow = 'block';
-                    _this10.popupLayerText = res.body.msg;
+                    _this11.popupLayerBoxShow = 'block';
+                    _this11.popupLayerLeft = parseInt((_this11.winW - 500) / 2) + 'px';
+                    _this11.popupLayerTop = '200px';
+                    _this11.popupLayerText = res.body.msg;
                 }
             });
         },
@@ -266,14 +297,23 @@ var vm = new Vue({
             this.popupLayerBoxShow = 'none';
         },
         downloadAllArticles: function downloadAllArticles() {
-            var _this11 = this;
+            var _this12 = this;
 
-            this.$http.get('/api/downloadAllArticles').then(function (res) {
+            var a = document.createElement('a');
+            a.setAttribute('style', 'display:none;');
+            a.setAttribute('target', '_blank');
+            document.body.appendChild(a);
+            this.$http.get('/api/downloadAllArticles?uid=' + this.uid + '&token=' + this.token).then(function (res) {
                 if (!res) throw console.log(res);
-                console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this11.popupLayerBoxShow = 'block';
-                    _this11.popupLayerText = res.body.msg;
+                    a.setAttribute('href', res.body.data.tar_path);
+                    a.click();
+                    a.parentNode.removeChild(a);
+                    // window.open(res.body.data.tar_path,'_blank');
+                    _this12.popupLayerBoxShow = 'block';
+                    _this12.popupLayerLeft = parseInt((_this12.winW - 500) / 2) + 'px';
+                    _this12.popupLayerTop = '200px';
+                    _this12.popupLayerText = res.body.msg;
                 }
             });
         },
@@ -284,7 +324,7 @@ var vm = new Vue({
             this.articleComments = this.articleComments ? this.articleComments : '填写您的评论....';
         },
         postCommentBut: function postCommentBut(e, id) {
-            var _this12 = this;
+            var _this13 = this;
 
             if (uid !== '' && token !== '') {
                 if (this.articleComments == '' || this.articleComments == '填写您的评论....') {
@@ -301,12 +341,12 @@ var vm = new Vue({
                         id: id
                     }).then(function (res) {
                         if (res.body.code && res.body.ok) {
-                            _this12.popupLayerBoxShow = 'block';
-                            _this12.popupLayerText = '评论成功';
-                            _this12.popupLayerLeft = parseInt((_this12.winW - 500) / 2) + 'px';
-                            _this12.popupLayerTop = '200px';
+                            _this13.popupLayerBoxShow = 'block';
+                            _this13.popupLayerText = '评论成功';
+                            _this13.popupLayerLeft = parseInt((_this13.winW - 500) / 2) + 'px';
+                            _this13.popupLayerTop = '200px';
                         }
-                        _this12.getDiscuss(id);
+                        _this13.getDiscuss(id);
                     });
                 }
             } else {
@@ -321,17 +361,17 @@ var vm = new Vue({
             this.articleComments = '填写您的评论....';
         },
         getDiscuss: function getDiscuss(id) {
-            var _this13 = this;
+            var _this14 = this;
 
             this.$http.get('/api/getDiscuss?id=' + id + '&token=' + this.token).then(function (discuss) {
                 if (discuss.body.code && discuss.body.ok) {
                     var discussArr = discuss.body.data.reverse();
                     discussArr.forEach(function (item) {
-                        item.add_date = _this13.formate_date(item.add_date);
+                        item.add_date = _this14.formate_date(item.add_date);
                     });
-                    _this13.discuss = discussArr;
+                    _this14.discuss = discussArr;
                 } else {
-                    _this13.discuss = [];
+                    _this14.discuss = [];
                 }
             });
         },
@@ -348,14 +388,14 @@ var vm = new Vue({
             }, false);
         },
         queryAdmins: function queryAdmins(e) {
-            var _this14 = this;
+            var _this15 = this;
 
             this.$http.get('/api/allUsers?keyword=' + this.collectionKeyWord).then(function (users) {
-                _this14.adminArr = users.body.data;
+                _this15.adminArr = users.body.data;
             });
         },
         collectionSubmitForm: function collectionSubmitForm(e) {
-            var _this15 = this;
+            var _this16 = this;
 
             var descArr = this.collectionDesc.split('\n');
             var tmp = '';
@@ -375,15 +415,15 @@ var vm = new Vue({
                 if (res.body.code && res.body.ok) {
                     window.location.href = '/account/collections/detailes?id=' + res.body.data._id;
                 } else {
-                    _this15.popupLayerBoxShow = 'block';
-                    _this15.popupLayerText = res.body.msg;
-                    _this15.popupLayerLeft = parseInt((_this15.winW - 500) / 2) + 'px';
-                    _this15.popupLayerTop = '200px';
+                    _this16.popupLayerBoxShow = 'block';
+                    _this16.popupLayerText = res.body.msg;
+                    _this16.popupLayerLeft = parseInt((_this16.winW - 500) / 2) + 'px';
+                    _this16.popupLayerTop = '200px';
                 }
             });
         },
         getCollections: function getCollections(offset, num) {
-            var _this16 = this;
+            var _this17 = this;
 
             this.$http.get('/api/get_collections?uid=' + this.uid + '&token=' + this.token + '&offset=' + offset + '&num=' + num).then(function (res) {
                 var collections = res.body.data;
@@ -392,30 +432,85 @@ var vm = new Vue({
                     item.describe = item.describe.replace(/<[^>]*>/g, "");
                     item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
                     item.subscribe.forEach(function (uids) {
-                        if (uids.uid == _this16.uid) {
+                        if (uids.uid == _this17.uid) {
                             item.subscribed = true;
                         } else {
                             item.subscribed = false;
                         }
                     });
                 });
-                _this16.collectionLists = collections;
+                _this17.collectionLists = collections;
             });
         },
         getCollectionById: function getCollectionById(id) {
-            var _this17 = this;
+            var _this18 = this;
 
             this.$http.get('/api/getCollectionById?id=' + id + '&token=' + this.token).then(function (coll) {
                 if (coll.body.code && coll.body.ok) {
                     var collection = coll.body.data;
+                    collection.articles = [];
+                    collection.article_ids.forEach(function (ids) {
+                        _this18.$http.get('/api/getArticle?id=' + ids.id).then(function (article) {
+                            var articleContents = article.body.data.article;
+                            articleContents.href = '/article/details?id=' + articleContents._id;
+                            articleContents.hasImg = articleContents.contents.search(_this18.imgRegexp) > 0 ? true : false;
+
+                            articleContents.imgHtml = articleContents.hasImg ? articleContents.contents.match(_this18.imgRegexp)[0] : '';
+                            var content = articleContents.contents.replace(/<[^>]*>/g, "");
+                            articleContents.contents = articleContents.hasImg ? content.length > 60 ? content.substr(0, 60) + '...' : content : content.length > 80 ? content.substr(0, 80) + '...' : content;
+                            collection.articles.push(articleContents);
+                        });
+                    });
                     collection.subscribe.forEach(function (item) {
-                        if (item.uid == _this17.uid) {
-                            _this17.collSubscribe = true;
+                        if (item.uid == _this18.uid) {
+                            _this18.collSubscribe = true;
                         }
                     });
-                    _this17.collection = collection;
+                    // console.log(this.$refs.switchButs);
+                    _this18.swtichFlagShow = 'block';
+                    _this18.swtichFlagLeft = _this18.$refs.switchButsNew.offsetLeft + 'px';
+                    _this18.$refs.switchContentsNew.style = 'display:block';
+                    _this18.$refs.switchContentsDiscuss.style = 'display:none';
+                    _this18.$refs.switchContentsHot.style = 'display:none';
+                    _this18.collection = collection;
+                    _this18.newIncludeArticleLists = collection.articles;
                 }
             });
+        },
+        switchButOver: function switchButOver(type) {
+            switch (type) {
+                case 'discuss':
+                    this.swtichFlagLeft = this.$refs.switchButsDiscuss.offsetLeft + 'px';
+                    break;
+                case 'hot':
+                    this.swtichFlagLeft = this.$refs.switchButsHot.offsetLeft + 'px';
+                    break;
+                default:
+                    this.swtichFlagLeft = this.$refs.switchButsNew.offsetLeft + 'px';
+                    break;
+            }
+        },
+        switchButs: function switchButs(e, type) {
+            switch (type) {
+                case 'discuss':
+                    this.swtichFlagLeft = this.$refs.switchButsDiscuss.offsetLeft + 'px';
+                    this.$refs.switchContentsNew.style = 'display:none';
+                    this.$refs.switchContentsDiscuss.style = 'display:block';
+                    this.$refs.switchContentsHot.style = 'display:none';
+                    break;
+                case 'hot':
+                    this.swtichFlagLeft = this.$refs.switchButsHot.offsetLeft + 'px';
+                    this.$refs.switchContentsNew.style = 'display:none';
+                    this.$refs.switchContentsDiscuss.style = 'display:none';
+                    this.$refs.switchContentsHot.style = 'display:block';
+                    break;
+                default:
+                    this.swtichFlagLeft = this.$refs.switchButsNew.offsetLeft + 'px';
+                    this.$refs.switchContentsNew.style = 'display:block';
+                    this.$refs.switchContentsDiscuss.style = 'display:none';
+                    this.$refs.switchContentsHot.style = 'display:none';
+                    break;
+            }
         },
         followButs: function followButs(e, id) {
             this.$http.get('/api/collectionFollow?uid=' + this.uid + '&id=' + id + '&token=' + this.token).then();
@@ -426,17 +521,17 @@ var vm = new Vue({
             this.popupLayerTop = 120 + 'px';
         },
         collectionSearchArticle: function collectionSearchArticle(e) {
-            var _this18 = this;
+            var _this19 = this;
 
             this.$http.get('/api/allArticles?keyword=' + this.collectionSearchKeyWord + '&token=' + this.token).then(function (lists) {
                 if (lists.body.code && lists.body.ok) {
                     var articleArr = lists.body.data;
                     articleArr.forEach(function (item) {
-                        item.add_date = _this18.formate_date(item.add_date);
+                        item.add_date = _this19.formate_date(item.add_date);
                     });
-                    _this18.articleLists = articleArr.reverse();
+                    _this19.articleLists = articleArr.reverse();
                 } else {
-                    _this18.articleLists = [];
+                    _this19.articleLists = [];
                 }
             });
         },
@@ -444,16 +539,16 @@ var vm = new Vue({
             this.collectionPopupLayer = 'none';
         },
         pushActionBut: function pushActionBut(e, article_id, id) {
-            var _this19 = this;
+            var _this20 = this;
 
             this.$http.get('/api/articlePush?uid=' + this.uid + '&article_id=' + article_id + '&token=' + this.token + '&id=' + id).then(function (push) {
-                _this19.collectionPopupLayer = 'none';
-                _this19.popupLayerBoxShow = 'block';
-                _this19.popupLayerText = push.body.msg;
+                _this20.collectionPopupLayer = 'none';
+                _this20.popupLayerBoxShow = 'block';
+                _this20.popupLayerText = push.body.msg;
             });
         },
         moreCollections: function moreCollections(e) {
-            var _this20 = this;
+            var _this21 = this;
 
             this.collOffset++;
             this.$http.get('/api/get_collections?uid=' + this.uid + '&token=' + this.token + '&offset=' + this.collOffset + '&num=9').then(function (res) {
@@ -464,16 +559,48 @@ var vm = new Vue({
                         item.describe = item.describe.replace(/<[^>]*>/g, "");
                         item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
                         item.subscribe.forEach(function (uids) {
-                            if (uids.uid == _this20.uid) {
+                            if (uids.uid == _this21.uid) {
                                 item.subscribed = true;
                             } else {
                                 item.subscribed = false;
                             }
                         });
-                        _this20.collectionLists.push(item);
+                        _this21.collectionLists.push(item);
                     });
                 }
             });
+        },
+        accountIntroduceEditBut: function accountIntroduceEditBut(e) {
+            this.showAccountIntroduceEditForm = 'block';
+            this.showAccountIntroduceText = 'none';
+        },
+        accountIntroduceFromSaveBut: function accountIntroduceFromSaveBut(e) {
+            var _this22 = this;
+
+            this.$http.post('/api/updateIntroduce', {
+                uid: this.uid,
+                token: this.token,
+                introduce: this.introduce
+            }).then(function (res) {
+                if (res.body.code && res.body.ok) {
+                    _this22.introduce = _this22.introduce;
+                    _this22.showAccountIntroduceEditForm = 'none';
+                    _this22.showAccountIntroduceText = 'block';
+                    _this22.popupLayerBoxShow = 'block';
+                    _this22.popupLayerText = res.body.msg;
+                    _this22.popupLayerLeft = parseInt((_this22.winW - 500) / 2) + 'px';
+                    _this22.popupLayerTop = '200px';
+                } else {
+                    _this22.popupLayerBoxShow = 'block';
+                    _this22.popupLayerText = '个人介绍修改失败';
+                    _this22.popupLayerLeft = parseInt((_this22.winW - 500) / 2) + 'px';
+                    _this22.popupLayerTop = '200px';
+                }
+            });
+        },
+        accountIntroduceFromResetBut: function accountIntroduceFromResetBut() {
+            this.showAccountIntroduceEditForm = 'none';
+            this.showAccountIntroduceText = 'block';
         },
         formate_date: function formate_date(date) {
             var MyDate = new Date(date);

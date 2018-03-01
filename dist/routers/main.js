@@ -38,7 +38,7 @@ router.get('/upfile', function (req, res, next) {
 
 router.get('/account', function (req, res, next) {
     if (req.token && req.uid) {
-        res.render('../views/account', {
+        res.render('../views/account/account', {
             token: req.token,
             uid: req.uid,
             page_type: 'account',
@@ -78,6 +78,16 @@ router.get('/account/collections/detailes', function (req, res, next) {
         uid: req.uid,
         coll_id: req.query.id,
         title: '专题详情'
+    });
+});
+
+router.get('/account/dcs', function (req, res, next) {
+    res.render('../views/account/document/detailes', {
+        token: req.token,
+        page_type: 'document_detailes',
+        uid: req.uid,
+        coll_id: req.query.id,
+        title: '文集详情'
     });
 });
 
