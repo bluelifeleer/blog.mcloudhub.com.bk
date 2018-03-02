@@ -107,3 +107,18 @@
 3：将保存的.md的文件整个文件夹打包（用到了系统处事的tar命令，用node的子进程[child_process]执行打包操作）
 4：将打包后的文件提供下载的http连接
 5：由于浏览器默认对除html等广西形式的文件都是执行下载操作，所以使用js执行重新打开一个窗口（window.open()）操作达到下载目的，但是由于浏览器对于非用户手动打开的窗口有默认阻止行为，所以使用到创建一个a标签，添加到dom树中，当返回下载路径时设置a标签的href属性，并触发click动作，模拟用户点击a连接的操作，最后删除a标签。
+
+#### morgan
+> 在最新版的express 4.* 中loger变成了morgan
+> 安装：
+
+    npm install morgan --save
+
+参考连接：[https://www.npmjs.com/package/morgan](https://www.npmjs.com/package/morgan "https://www.npmjs.com/package/morgan")
+
+#### 使用motgan必须依赖rotating-file-stream中间件，用来通过指定的参数生成一个文件流
+> 安装：
+
+    npm install rotating-file-stream --save
+
+参考连接：[https://www.npmjs.com/package/rotating-file-stream](https://www.npmjs.com/package/rotating-file-stream "https://www.npmjs.com/package/rotating-file-stream")
