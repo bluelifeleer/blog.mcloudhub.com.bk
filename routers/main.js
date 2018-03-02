@@ -36,15 +36,24 @@ router.get('/upfile',(req,res,next)=>{
 })
 
 router.get('/account',(req,res,next)=>{
-    if(req.token && req.uid){
+    if(req.query.uid){
         res.render('../views/account/account',{
             token:req.token,
-            uid:req.uid,
+            uid:req.uid ? req.uid:req.query.uid,
             page_type: 'account',
             title:'我的主页'
         });
     }else{
-        res.redirect(302,'/login');
+        if(req.token && req.uid){
+            res.render('../views/account/account',{
+                token:req.token,
+                uid:req.uid,
+                page_type: 'account',
+                title:'我的主页'
+            });
+        }else{
+            res.redirect(302,'/login');
+        }
     }
 })
 

@@ -1035,6 +1035,21 @@ router.post('/updateIntroduce',(req,res,next)=>{
     });
 });
 
+router.get('/getDoc',(req,res,next)=>{
+    let uid = req.query.uid ? req.query.uid:'';
+    let token = req.query.token?req.query.token:'';
+    let id = req.query.id?req.query.id:'';
+    let where = uid ? {_id:id,uid:uid,isDel:0}: {_id:id,isDel:0};
+    Docs.findOne(where).then(doc=>{
+        if(!doc) throw console.log(doc);
+        responseData.code = 1;
+        responseData.ok = true;
+        responseData.msg = 'SUCCESS';
+        responseData.data = doc;
+        res.json(responseData);
+    });
+})
+
 
 router.get('/zhi',(req,res,next)=>{
     res.json(req.query);

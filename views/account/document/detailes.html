@@ -8,8 +8,8 @@
             <div class="collections-detailes-headers-block">
                 <div class="collections-icon-box"><img src="/public/images/avatar-notebook-default-640f7dde88592bdf6417d8ce1902636e.png"  alt=""></div>
                 <div class="collections-title-box">
-                    <p class="collections-title">${collection.name}</p>
-                    <p class="collections-info">收录了<span>${collection.include}</span>篇文章 · <span>${collection.follow}</span>人关注</p>
+                    <p class="collections-title">${doc.name}</p>
+                    <p class="collections-info">收录了<span>0</span>篇文章 · <span>0</span>人关注</p>
                 </div>
             </div>
             <div class="collections-detailes-contents-block">
@@ -62,7 +62,11 @@
         <div class="collections-detailes-layout-right">
             <div class="collections-detailes-models">
                 <div class="collections-detailes-models-header">文集作者</div>
-                <div class="collections-detailes-models-contents" v-html="collection.describe">
+                <div class="collections-detailes-models-contents">
+                    <a class="doc-author-link-label" v-bind:href="accountHref">
+                        <span class="doc-author-icon-box"><img v-bind:src="avatar" alt=""></span>
+                        <span class="doc-author-name-box">${name}</span>
+                    </a>
                     <!--<p>${collection.describe}</p>-->
                     <!--<p>欢迎关注公众号简宝玉( 公众号ID : jianshu4321 )后台回复“指南”获取玩转简书绝密珍贵资料汇总；有问题，找宝玉。简宝玉同志会专程为你答疑解惑关于简书的一切。</p>-->
                     <!--<p>和简书一起探索电影世界，欢迎订阅官方公众号：简书电影（jianshuyingyin）</p>-->

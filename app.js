@@ -1,7 +1,11 @@
 /*
  * 项目入口
  */
+const os = require('os');
+const path = require('path');
 const express = require('express');
+const morgan = require('morgan');
+const rfs = require('rotating-file-stream');
 const vhost = require('vhost');
 const http = require('http');
 const https = require('https');
@@ -14,6 +18,7 @@ const crt_token = require(__dirname+'/libs/ctr_token');
 const swig = require('swig');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const sillyDateTime = require('silly-datetime');
 const app = express();
 //是否启动记录访问日志
 const start_log = false;
@@ -49,24 +54,39 @@ app.use(function(req, res, next) {
             console.log(e);
         }
     }
-    if(start_log){
-        let arr = [],i='';
-        arr.push('url='+req.url);
-        arr.push('path='+req.path);
-        arr.push('statusCode='+req.statusCode);
-        arr.push('statusMessage='+req.statusMessage);
-        arr.push('httpVersion='+req.httpVersion);
-        let headers = req.headers;
-        for(i in headers){
-            arr.push(i+'='+headers[i]);
-        }
-        //将访问日志写入日志文件中
-        fs.appendFile(__dirname+'/logs/server.log',arr.join(' ')+'\n','utf8',(err)=>{
-            if (err) throw err;
-        });
-    }
+    // 将系统类型添加到cookies和请求头中;
+    // os.platform return now node runing systems : darwin=>MAC win32=>windows
+    req.cookies.set('os',os.platform);
+    req.os = os.platform;
+    // if(start_log){
+    //     let arr = [],i='';
+    //     arr.push('url='+req.url);
+    //     arr.push('path='+req.path);
+    //     arr.push('statusCode='+req.statusCode);
+    //     arr.push('statusMessage='+req.statusMessage);
+    //     arr.push('httpVersion='+req.httpVersion);
+    //     let headers = req.headers;
+    //     for(i in headers){
+    //         arr.push(i+'='+headers[i]);
+    //     }
+    //     //将访问日志写入日志文件中
+    //     fs.appendFile(__dirname+'/logs/server.log',arr.join(' ')+'\n','utf8',(err)=>{
+    //         if (err) throw err;
+    //     });
+    // }
     next();
 });
+
+const logDirectory = path.join(__dirname, 'logs');
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);  // 日志目录不存在创建目录
+const logerFile = 'access_'+sillyDateTime.format(new Date(),'YYYY_MMM_DD')+'.log';
+const accessLogStream = rfs(logerFile, {
+  interval: '1d', // 日志切割间隔为1天，以s,m,h,d为单位
+  path: logDirectory,   // 日志保存路径，
+  size: '1M',        // 单个日志文件的大小，以B,K,M,G为单位
+  compress: true       // 压缩日志
+});
+app.use(morgan('combined',{stream: accessLogStream}));
 
 app.use(vhost('images.mcloudhub.com',(req,res,next)=>{
     // options = {
@@ -103,7 +123,6 @@ mongoose.connect('mongodb://localhost:27017/blog', (err, res) => {
     if (err) {
         console.log(err);
     } else {
-        console.log('mongodb connect is OK !!');
         // 数据库连接成功后监听80/443端口
         // app.listen(80);
         http.createServer(app).listen(80);

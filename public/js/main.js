@@ -22,6 +22,7 @@ const vm = new Vue({
         website:'http://|https://',
         rewardStatus:2,
         rewardDesc:'赞赏描述',
+        accountHref:'',
         slide_list:{},
         tags_list:{},
         slideAttr:{
@@ -68,7 +69,8 @@ const vm = new Vue({
         swtichFlagLeft:0,
         showAccountIntroduceEditForm:'none',
         showAccountIntroduceText:'block',
-        documentLists:null
+        documentLists:null,
+        doc:{}
     },
     methods:{
         init:function(){
@@ -93,6 +95,9 @@ const vm = new Vue({
             }
             if(page_type == 'account'){
                 this.getDocuments();
+            }
+            if(page_type == 'document_detailes'){
+                this.getDoc();
             }
         },
         switchSlide:function(e,direction){
@@ -162,7 +167,7 @@ const vm = new Vue({
                     if(doc.body.data.length > 0){
                         let docs = doc.body.data;
                         docs.forEach(item=>{
-                            item.href = '/account/dcs?id'+item._id;
+                            item.href = '/account/dcs?id='+item._id;
                         })
                         this.documentLists = docs;
                     }else{
@@ -171,6 +176,16 @@ const vm = new Vue({
                     
                 }else{
                     this.documentLists = null;
+                }
+            });
+        },
+        getDoc:function(){
+            let id = this.getQueryString('id');
+            this.$http.get('/api/getDoc?uid='+this.uid+'&token='+this.token+'&id='+id).then(doc=>{
+                if(doc.body.code && doc.body.ok){
+                    this.doc = doc.body.data;
+                }else{
+                    this.doc = {};
                 }
             });
         },
@@ -240,6 +255,7 @@ const vm = new Vue({
                 this.website = res.body.data.website;
                 this.rewardStatus = res.body.data.rewardStatus ? res.body.data.rewardStatus :this.rewardStatus;
                 this.rewardDesc = res.body.data.rewardDesc;
+                this.accountHref = '/account?uid='+res.body.data._id;
             });
         },
         changeAvatar:function(e){
