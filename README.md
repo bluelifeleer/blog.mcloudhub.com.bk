@@ -178,3 +178,30 @@ var ignoreMethods = opts.ignoreMethods === undefined
 ```
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST'] }));
 ```
+
+#### 修改项目目录结构更适合一般框架结构
+
+#### 修改api接口使用每个接口支持多个文档关联查询，主要使用到mongoose的populate方法
+
+```
+  object.findById(id).populate([
+    {
+      path:'',
+      select:''
+    },{
+      path:'',
+      select:''
+      // populate:[
+      //   {
+      //     path:'',
+      //     select:''
+      //   },{
+      //     path:'',
+      //     select:''
+      //   }
+      // ]
+    }
+  ]).exec().then(res=>{
+    console.log(res)
+  });
+```
