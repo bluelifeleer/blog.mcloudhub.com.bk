@@ -5,77 +5,93 @@ var ctr_token = require('../libs/ctr_token');
 var router = express.Router();
 router.get('/', function (req, res, next) {
     res.render('../views/index', {
-        token: req.token,
-        uid: req.uid,
+        platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
+        uid: req.session.uid || req.cookies.uid,
         page_type: 'index',
         title: '博客'
     });
 });
 
 router.get('/editor', function (req, res, next) {
-    if (req.token && req.uid) {
+    var redirect_uri = req.protocol + '://' + req.get('host') + req.originalUrl;
+    if (req.session.uid && req.cookies.uid) {
         res.render('../views/article_editor', {
-            token: req.token,
-            uid: req.uid,
+            platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
+            uid: req.session.uid || req.cookies.uid,
             page_type: 'editor'
         });
     } else {
-        res.redirect(302, '/login');
+        res.redirect(302, '/login?redirect_uri=' + redirect_uri);
     }
 });
 
 router.get('/upfile', function (req, res, next) {
-    if (req.token && req.uid) {
+    var redirect_uri = req.protocol + '://' + req.get('host') + req.originalUrl;
+    if (req.session.uid && req.cookies.uid) {
         res.render('../views/upfile', {
-            token: req.token,
-            uid: req.uid,
+            platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
+            uid: req.session.uid || req.cookies.uid,
             page_type: 'upfile'
         });
     } else {
-        res.redirect(302, '/login');
+        res.redirect(302, '/login?redirect_uri=' + redirect_uri);
     }
 });
 
 router.get('/account', function (req, res, next) {
-    if (req.token && req.uid) {
-        res.render('../views/account/account', {
-            token: req.token,
-            uid: req.uid,
-            page_type: 'account',
-            title: '我的主页'
-        });
-    } else {
-        res.redirect(302, '/login');
-    }
+    res.render('../views/account/account', {
+        platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
+        uid: req.session.uid || req.cookies.uid,
+        quid: req.query.uid ? req.query.uid : req.session.uid || req.cookies.uid,
+        page_type: 'account',
+        title: '我的主页'
+    });
 });
 
 router.get('/account/collections/lists', function (req, res, next) {
     res.render('../views/account/collections/lists', {
-        token: req.token,
+        platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
         page_type: 'collections_list',
-        uid: req.uid,
+        uid: req.session.uid && req.cookies.uid,
         title: '专题列表'
     });
 });
 
 router.get('/account/collections/new', function (req, res, next) {
-    if (req.token && req.uid) {
+    var redirect_uri = req.protocol + '://' + req.get('host') + req.originalUrl;
+    if (req.session.uid && req.cookies.uid) {
         res.render('../views/account/collections/new', {
-            token: req.token,
             page_type: 'collections_new',
-            uid: req.uid,
-            title: '专题列表'
+            platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
+            uid: req.session.uid || req.cookies.uid,
+            title: '新增专题'
         });
     } else {
-        res.redirect(302, '/login');
+        res.redirect(302, '/login?redirect_uri=' + redirect_uri);
+    }
+});
+
+router.get('/account/collections/edit', function (req, res, next) {
+    var redirect_uri = req.protocol + '://' + req.get('host') + req.originalUrl;
+    var coll_id = req.query.id ? req.query.id : '';
+    if (req.session.uid && req.cookies.uid) {
+        res.render('../views/account/collections/new', {
+            page_type: 'collections_edit',
+            platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
+            uid: req.session.uid || req.cookies.uid,
+            title: '修改专题',
+            coll_id: coll_id
+        });
+    } else {
+        res.redirect(302, '/login?redirect_uri=' + redirect_uri);
     }
 });
 
 router.get('/account/collections/detailes', function (req, res, next) {
     res.render('../views/account/collections/detailes', {
-        token: req.token,
+        platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
         page_type: 'collections_detailes',
-        uid: req.uid,
+        uid: req.session.uid || req.cookies.uid,
         coll_id: req.query.id,
         title: '专题详情'
     });
@@ -83,20 +99,26 @@ router.get('/account/collections/detailes', function (req, res, next) {
 
 router.get('/account/dcs', function (req, res, next) {
     res.render('../views/account/document/detailes', {
-        token: req.token,
         page_type: 'document_detailes',
-        uid: req.uid,
+        platform: req.platform ? req.platform : req.cookies.get('platform') ? req.cookies.get('platform') : '',
+        uid: req.session.uid || req.cookies.uid,
         coll_id: req.query.id,
         title: '文集详情'
     });
 });
 
 router.get('/register', function (req, res, next) {
-    res.render('../views/register');
+    res.render('../views/register', {
+        page_type: 'register',
+        title: '注册帐号'
+    });
 });
 
 router.get('/login', function (req, res, next) {
-    res.render('../views/login');
+    res.render('../views/login', {
+        page_type: 'login',
+        title: '用户登录'
+    });
 });
 
 module.exports = router;

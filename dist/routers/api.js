@@ -5,6 +5,8 @@ var _require = require('child_process'),
 
 var fs = require('fs');
 var express = require('express');
+var request = require('request');
+var requestPromise = require('request-promise');
 var md5 = require('md5');
 var sillyDateTime = require('silly-datetime');
 var multer = require('multer');
@@ -25,10 +27,9 @@ var phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
 var uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
 var NowDate = new Date();
 var downloadBasecDir = '/Users/bluelife/www/node/blog/download/';
-var responseData = {};
 
 router.use(function (req, res, next) {
-    responseData = {
+    output = {
         code: 0,
         msg: '',
         ok: false,
@@ -67,46 +68,25 @@ router.get('/gettest', function (req, res, next) {
 });
 
 /**
- * 获取TOKEN
- */
-router.get('/gettoken', function (req, res, next) {
-    responseData.code = 1;
-    responseData.msg = 'success';
-    responseData.ok = true;
-    if (req.cookies.get('token') && req.cookies.get('token') != '') {
-        responseData.data = {
-            token: req.cookies.get('token')
-        };
-    } else {
-        var token = crt_token();
-        responseData.data = {
-            token: crt_token
-        };
-    }
-    res.json(responseData);
-    return;
-});
-
-/**
  * 获取所有标签
  */
-router.get('/tags', function (req, res, next) {
+router.get('/docs', function (req, res, next) {
     // console.log(Tags);
     // res.send();
-    Tags.find().then(function (tags) {
-        if (tags) {
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = tags;
-            res.json(responseData);
+    Docs.find({ isDel: 0 }).then(function (docs) {
+        if (docs) {
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = docs;
+            res.json(output);
             return;
         } else {
-            responseData.code = 0;
-            responseData.msg = 'error';
-            responseData.ok = false;
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
             return;
         }
     });
@@ -118,18 +98,18 @@ router.get('/tags', function (req, res, next) {
 router.get('/slides', function (req, res, next) {
     Slide.find().then(function (slides) {
         if (slides) {
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = slides;
-            res.json(responseData);
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = slides;
+            res.json(output);
             return;
         } else {
-            responseData.code = 0;
-            responseData.msg = 'error';
-            responseData.ok = false;
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
             return;
         }
     });
@@ -139,17 +119,17 @@ router.get('/getUsers', function (req, res, next) {
     var uid = req.query.uid;
     Users.findOne({ _id: uid, isDel: 0 }).then(function (usersInfo) {
         if (usersInfo) {
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = usersInfo;
-            res.json(responseData);
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = usersInfo;
+            res.json(output);
         } else {
-            responseData.code = 0;
-            responseData.msg = 'error';
-            responseData.ok = false;
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
         }
     });
 });
@@ -163,65 +143,68 @@ router.get('/allUsers', function (req, res, next) {
         { name: { $regex: reg } }]
     }).then(function (users) {
         if (users) {
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = users;
-            res.json(responseData);
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = users;
+            res.json(output);
         } else {
-            responseData.code = 0;
-            responseData.msg = 'error';
-            responseData.ok = false;
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
         }
     });
 });
 
 router.get('/getDocLists', function (req, res, next) {
-    var uid = req.query.uid ? req.query.uid : req.cookies.get('uid') ? req.cookies.get('uid') : '';
+    var uid = req.query.uid ? req.query.uid : req.cookies.uid || req.session.uid;
+    var offset = req.query.offset ? parseInt(req.query.offset) : 1;
+    var num = req.query.num ? parseInt(req.query.num) : 20;
     var where = uid ? { uid: uid, isDel: 0 } : { isDel: 0 };
-    Docs.find(where).then(function (docs) {
+    Docs.find(where).skip(offset == 0 ? offset : offset - 1).limit(num).then(function (docs) {
         if (docs) {
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = docs;
-            res.json(responseData);
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = docs;
+            res.json(output);
         } else {
-            responseData.code = 0;
-            responseData.msg = 'error';
-            responseData.ok = false;
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
         }
     });
 });
 
 router.get('/allArticles', function (req, res, next) {
-    var uid = '';
+    var uid = req.query.uid ? req.query.uid : req.cookies.token && req.cookies.uid;
     var all = false;
     var offset = req.query.offset ? parseInt(req.query.offset) : 0;
     var num = req.query.num ? parseInt(req.query.num) : 10;
-    if (req.cookies.get('token') && req.cookies.get('uid')) {
-        uid = req.cookies.get('uid');
-    } else {
+    if (!uid) {
         all = true;
     }
     var where = all ? { isDel: 0 } : { uid: uid, isDel: 0 };
     Articles.find(where).skip(offset == 0 ? offset : offset - 1).limit(num).then(function (alls) {
         if (alls) {
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = alls;
-            res.json(responseData);
+            alls.forEach(function (item) {
+                item.add_date = sillyDateTime.format(item.add_date, 'YYYY-MM-DD HH:mm:ss');
+            });
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = alls;
+            res.json(output);
         } else {
-            responseData.code = 0;
-            responseData.msg = 'error';
-            responseData.ok = false;
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
         }
     });
 });
@@ -234,17 +217,17 @@ router.get('/getArticleLists', function (req, res, next) {
     }).then(function (articles) {
         // console.log(articles);
         if (articles) {
-            responseData.code = 1;
-            responseData.msg = 'success';
-            responseData.ok = true;
-            responseData.data = articles;
-            res.json(responseData);
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = articles;
+            res.json(output);
         } else {
-            responseData.code = 0;
-            responseData.msg = 'error';
-            responseData.ok = false;
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
         }
     });
 });
@@ -253,56 +236,58 @@ router.get('/getArticle', function (req, res, next) {
     var id = req.query.id;
     Articles.findOne({ _id: id }).then(function (article) {
         if (article) {
-            if (!req.cookies.get(id)) {
+            article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
+            if (!req.cookies.id) {
                 //增加阅读数
                 article.watch++;
                 article.save();
-                req.cookies.set(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
+                res.cookie(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
             }
 
             Discuss.find({ article_id: article._id }).then(function (discuss) {
-                responseData.code = 1;
-                responseData.msg = 'success';
-                responseData.ok = true;
-                responseData.data = {
+                output.code = 1;
+                output.msg = 'success';
+                output.ok = true;
+                output.data = {
                     'article': article,
                     'discuss': discuss
                 };
-                res.json(responseData);
+                res.json(output);
             });
         } else {
-            responseData.code = 0;
-            responseData.msg = 'error';
-            responseData.ok = false;
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
         }
     });
 });
 
 router.post('/signin', function (req, res, next) {
+    // let redirect = req.body.redirect ? req.body.redirect : '';
     var name = req.body.name;
     var password = req.body.password;
     var form = req.body.form;
     var validateCode = form == 'login' ? req.body.validateCode : '';
     var remember = req.body.remember;
     if (name == '') {
-        responseData.code = 0;
-        responseData.msg = '用户名不能为空';
-        res.json(responseData);
+        output.code = 0;
+        output.msg = '用户名不能为空';
+        res.json(output);
         return;
     }
     if (password == '') {
-        responseData.code = 0;
-        responseData.msg = "密码不能为空";
-        res.json(responseData);
+        output.code = 0;
+        output.msg = "密码不能为空";
+        res.json(output);
         return;
     }
     if (form == 'login') {
         if (validateCode == '') {
-            responseData.code = 0;
-            responseData.msg = "请先通过验证";
-            res.json(responseData);
+            output.code = 0;
+            output.msg = "请先通过验证";
+            res.json(output);
             return;
         }
     }
@@ -314,29 +299,33 @@ router.post('/signin', function (req, res, next) {
     } else {
         user.name = name;
     }
-    Users.findOne(user).then(function (userInfo) {
-        if (userInfo) {
-            if (userInfo.password == md5(password + userInfo.salt)) {
-                responseData.code = 1;
-                responseData.msg = "success";
-                responseData.ok = true;
-                responseData.data = userInfo;
-                req.cookies.set('uid', userInfo._id, { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
-                req.cookies.set('token', crt_token(), { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
-                res.json(responseData);
+    Users.findOne(user).then(function (user) {
+        if (user) {
+            if (user.password == md5(password + user.salt)) {
+                res.cookie('uid', user._id);
+                req.session.uid = user._id;
+                if (remember) {
+                    res.cookie('name', name, { maxAge: 3600000 * 24 * 7 });
+                    res.cookie('password', password, { maxAge: 3600000 * 24 * 7 });
+                }
+                output.code = 1;
+                output.msg = "success";
+                output.ok = true;
+                output.data = user;
+                res.json(output);
                 return;
             } else {
-                responseData.code = 2;
-                responseData.msg = "登录失败，密码不正确";
-                responseData.ok = false;
-                responseData.data = null;
-                res.json(responseData);
+                output.code = 0;
+                output.msg = "登录失败，密码不正确";
+                output.ok = false;
+                output.data = null;
+                res.json(output);
             }
         } else {
-            responseData.code = 0;
-            responseData.msg = "您还没有帐号，请注册帐号";
-            responseData.data = '';
-            res.json(responseData);
+            output.code = 2;
+            output.msg = "您还没有帐号，请注册帐号";
+            output.data = '';
+            res.json(output);
         }
     });
 });
@@ -346,30 +335,29 @@ router.post('/signup', function (req, res, next) {
     var phone = req.body.phone;
     var password = req.body.password;
     var passwordConfirm = req.body.passwordConfirm;
-    var token = req.body.token;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     if (name == '') {
-        responseData.code = 0;
-        responseData.msg = '用户名不能为空';
-        res.json(responseData);
+        output.code = 0;
+        output.msg = '用户名不能为空';
+        res.json(output);
         return;
     }
     if (password == '') {
-        responseData.code = 0;
-        responseData.msg = "密码不能为空";
-        res.json(responseData);
+        output.code = 0;
+        output.msg = "密码不能为空";
+        res.json(output);
         return;
     }
 
     if (password != passwordConfirm) {
-        responseData.code = 0;
-        responseData.msg = "两次输入密码不同";
-        res.json(responseData);
+        output.code = 0;
+        output.msg = "两次输入密码不同";
+        res.json(output);
         return;
     }
 
@@ -383,11 +371,11 @@ router.post('/signup', function (req, res, next) {
     }
     Users.findOne(findData).then(function (userInfo) {
         if (userInfo) {
-            responseData.code = 0;
-            responseData.ok = false;
-            responseData.msg = '帐号已存在，请注册新帐号';
-            responseData.data = null;
-            res.json(responseData);
+            output.code = 0;
+            output.ok = false;
+            output.msg = '帐号已存在，请注册新帐号';
+            output.data = null;
+            res.json(output);
         } else {
             var t_salt = salt();
             var user = {
@@ -405,7 +393,12 @@ router.post('/signup', function (req, res, next) {
                 website: '',
                 introduce: '',
                 editors: 2,
-                add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+                follow: 0,
+                github_id: '',
+                github: {
+                    html_url: ''
+                },
+                add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
                 isDel: 0
             };
             if (emailRegexp.test(name)) {
@@ -430,36 +423,39 @@ router.post('/signup', function (req, res, next) {
             name: '随笔',
             photos: '',
             describe: '',
-            add_date: new Date(),
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
             isDel: 0
         }).save();
         if (inser) {
-            responseData.code = 1;
-            responseData.ok = true;
-            responseData.msg = '注册成功';
-            responseData.data = { id: inser._id };
-            res.json(responseData);
+            output.code = 1;
+            output.ok = true;
+            output.msg = '注册成功';
+            output.data = { id: inser._id };
+            res.json(output);
         } else {
-            responseData.code = 2;
-            responseData.ok = true;
-            responseData.msg = '注册失败';
-            responseData.data = null;
-            res.json(responseData);
+            output.code = 2;
+            output.ok = true;
+            output.msg = '注册失败';
+            output.data = null;
+            res.json(output);
         }
     });
 });
 
 router.get('/signout', function (req, res, next) {
-    req.cookies.set('token', '');
-    req.cookies.set('uid', '');
-    req.token = '';
-    req.userInfo = null;
-    res.redirect(302, '/login');
+    res.clearCookie('uid'); // 清除cookie中的uid
+    req.session.destroy(function () {
+        // 销毁session中的uid
+        res.redirect(302, '/login');
+    });
+    // console.log(store);
+    // req.session.store.clear(()=>{
+    //     res.redirect(302,'/login');
+    // })
 });
 
 router.post('/updateUserBasic', function (req, res, next) {
-    var token = req.body.token;
-    var uid = req.body.uid;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var updateUserBasic = {
         nick: req.body.nick,
         phone: req.body.phone,
@@ -467,99 +463,97 @@ router.post('/updateUserBasic', function (req, res, next) {
         editors: req.body.editors,
         avatar: req.body.avatar,
         qq: req.body.qq,
-        wechat: req.body.wechat
+        wechat: req.body.wechat,
+        github: req.body.github
     };
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '未登陆';
-        res.json(responseData);
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
         return;
     }
     Users.update({ _id: uid }, updateUserBasic, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '用户基础信息修改成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '用户基础信息修改成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.post('/changeProfile', function (req, res, next) {
-    var token = req.body.token;
-    var uid = req.body.uid;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var updateProfile = {
         sex: req.body.sex,
         introduce: req.body.introduce,
         website: req.body.website
     };
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '未登陆';
-        res.json(responseData);
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
         return;
     }
     Users.update({ _id: uid }, updateProfile, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '用户个人资料修改成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '用户个人资料修改成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.post('/changeReward', function (req, res, next) {
-    var token = req.body.token;
-    var uid = req.body.uid;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var updateReward = {
         rewardStatus: req.body.rewardStatus,
         rewardDesc: req.body.rewardDesc
     };
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '未登陆';
-        res.json(responseData);
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
         return;
     }
     Users.update({ _id: uid }, updateReward, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '赞赏修改成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '赞赏修改成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.post('/saveArticle', function (req, res, next) {
-    var token = req.body.token;
     var id = req.body.id;
     var contents = req.body.contents;
     var markDownText = req.body.markdownText ? req.body.markdownText : null;
     var title = req.body.title;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     var article_date = {
@@ -571,62 +565,54 @@ router.post('/saveArticle', function (req, res, next) {
     }
     Articles.update({ _id: id }, article_date, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文章修改成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章修改成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.get('/downloadAllArticles', function (req, res, next) {
-    var uid = req.query.uid ? req.query.uid : req.cookies.get('uid');
-    var token = req.query.token;
-    if (uid == '') {
-        responseData.code = 0;
-        responseData.ok = false;
-        responseData.msg = '未登陆';
-        responseData.data = {};
-        res.json(responseData);
+    var uid = req.query.uid ? req.query.uid : req.cookies.uid;
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '未登陆';
+        output.data = {};
+        res.json(output);
         return;
     }
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     var allArticles = Articles.find({ uid: uid }).then(function (articles) {
         return articles;
     });
     var dirname = downloadBasecDir + '/' + uid;
-    fs.exists(dirname, function (exists) {
-        //如果目录不存在创建目录
-        if (!exists) {
-            fs.mkdir(dirname, function (err) {
-                if (err) throw console.log(err);
+    fs.existsSync(dirname) || fs.mkdirSync(dirname); // 下载目录不存在创建目录
+    allArticles.then(function (all) {
+        all.forEach(function (article) {
+            fs.writeFile('/Users/bluelife/www/node/blog/download/' + uid + '/' + article.title + '.md', article.markDownText, 'utf8', function (err) {
+                if (err) throw err;
             });
-        }
-        allArticles.then(function (all) {
-            all.forEach(function (article) {
-                fs.writeFile('/Users/bluelife/www/node/blog/download/' + uid + '/' + article.title + '.md', article.markDownText, 'utf8', function (err) {
-                    if (err) throw err;
-                });
-            });
-            exec('tar -czf ' + dirname + '.tar.gz' + ' ' + dirname, { encoding: 'utf8', maxBuffer: parseInt(200 * 1024) }, function (error, stdout, stderr) {
-                if (error) throw error;
-                responseData.code = 1;
-                responseData.ok = true;
-                responseData.msg = '所有文章打包下载完成';
-                responseData.data = { tar_path: 'http://blog.mcloudhub.com/download/' + uid + '.tar.gz' };
-                res.json(responseData);
-            });
+        });
+        exec('tar -czf ' + dirname + '.tar.gz' + ' ' + dirname, { encoding: 'utf8', maxBuffer: parseInt(200 * 1024) }, function (error, stdout, stderr) {
+            if (error) throw error;
+            output.code = 1;
+            output.ok = true;
+            output.msg = '所有文章打包下载完成';
+            output.data = { tar_path: 'http://blog.mcloudhub.com/download/' + uid + '.tar.gz' };
+            res.json(output);
         });
     });
 });
 
 router.post('/newDocument', function (req, res, next) {
-    var uid = req.body.uid;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var name = req.body.name;
     var docs = new Docs({
         uid: uid,
@@ -637,45 +623,43 @@ router.post('/newDocument', function (req, res, next) {
         isDel: 0
     });
     docs.save().then(function (insert) {
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文集创建成功';
-        responseData.data = { id: insert._id };
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文集创建成功';
+        output.data = { id: insert._id };
+        res.json(output);
     });
 });
 
 router.post('/updateDocumentName', function (req, res, next) {
-    var uid = req.body.uid;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var id = req.body.id;
-    var token = req.body.token;
     var name = req.body.name;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     Docs.update({ _id: id, uid: uid }, { name: name }, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文集名称修改成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文集名称修改成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.post('/newArticle', function (req, res, next) {
-    var uid = req.body.uid;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var doc_id = req.body.doc_id;
     var doc_name = req.body.doc_name;
     var user_name = req.body.user_name;
-    var token = req.body.token;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     var article = new Articles({
@@ -690,115 +674,110 @@ router.post('/newArticle', function (req, res, next) {
         watch: 0,
         start: 0,
         fork: 0,
-        add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+        add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
         isRelease: 0,
         isDel: 0
     });
     article.save().then(function (insert) {
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文章创建成功';
-        responseData.data = { id: insert._id };
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章创建成功';
+        output.data = { id: insert._id };
+        res.json(output);
     });
 });
 
 router.get('/deleteDoc', function (req, res, next) {
     var uid = req.query.uid;
     var id = req.query.id;
-    var token = req.query.token;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     Docs.update({ _id: id, uid: uid }, { isDel: 1 }, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文集删除成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文集删除成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.get('/releaseArticle', function (req, res, next) {
     var uid = req.query.uid;
     var id = req.query.id;
-    var token = req.query.token;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     Articles.update({ _id: id, uid: uid }, { isRelease: 1 }, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文章已发布';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章已发布';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.get('/deleteArticle', function (req, res, next) {
     var uid = req.query.uid;
     var id = req.query.id;
-    var token = req.query.token;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     Articles.update({ _id: id, uid: uid }, { isDel: 1 }, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文章删除成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章删除成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.post('/changeAticleTitle', function (req, res, next) {
-    var uid = req.body.uid;
-    var token = req.body.token;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var id = req.body.id;
     var title = req.body.title;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     Articles.update({ _id: id, uid: uid }, { title: title }, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '文章删除成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章删除成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.post('/postDiscuss', function (req, res, next) {
     var id = req.body.id;
     var contents = req.body.contents;
-    var uid = req.body.uid;
-    var token = req.body.token;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '您尚未登录';
-        res.json(responseData);
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '您尚未登录';
+        res.json(output);
         return;
     }
     Articles.findOne({ _id: id }).then(function (article) {
@@ -807,28 +786,27 @@ router.post('/postDiscuss', function (req, res, next) {
             article_id: article._id, //评论的文章id
             article_uid: article.uid, //评论的文章的用户id
             contents: contents, //评论的内容
-            add_date: new Date(), //评论时间
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'), //评论时间
             isDel: 0
         };
         new Discuss(data).save();
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '评论成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '评论成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
 router.get('/getDiscuss', function (req, res, next) {
     var id = req.query.id;
-    var token = req.query.token;
     Discuss.find({ article_id: id }).then(function (discuss) {
         if (!discuss) throw console.log(discuss);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = 'SUCCESS';
-        responseData.data = discuss;
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = discuss;
+        res.json(output);
     });
 });
 
@@ -838,52 +816,49 @@ router.post('/uploader', uoloader.single('editormd-image-file'), function (req, 
     var filename = sillyDateTime.format(new Date(), 'YYYYMMMDDHHmmss') + '_' + crt_token() + '.' + ext;
     var now_timer = sillyDateTime.format(new Date(), 'YYYYMMMDD');
     var dirname = '/Users/bluelife/www/node/blog/public/images/uploads/' + now_timer + '/';
-
-    fs.exists(dirname, function (exists) {
-        //如果目录不存在创建目录
-        if (!exists) {
-            fs.mkdir(dirname, function (err) {
-                if (!err) throw console.log(err);
+    fs.existsSync(dirname) || fs.mkdirSync(dirname); // 目录不存在创建目录
+    fs.writeFile(dirname + filename, req.file.buffer, function (err) {
+        if (!err) {
+            new Photos({
+                originalname: req.file.originalname,
+                filename: filename,
+                path: dirname,
+                fullpath: dirname + filename,
+                encoding: req.file.encoding,
+                mimetype: req.file.mimetype,
+                size: req.file.size,
+                add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+                isDel: 0
+            }).save().then(function (insert) {
+                if (!insert) throw console.log(insert);
+                res.json({
+                    message: '图片上传成功',
+                    url: 'https://blog.mcloudhub.com/public/images/uploads/' + now_timer + '/' + filename,
+                    success: 1
+                });
             });
         }
-        fs.writeFile(dirname + filename, req.file.buffer, function (err) {
-            if (!err) {
-                new Photos({
-                    originalname: req.file.originalname,
-                    filename: filename,
-                    path: dirname,
-                    fullpath: dirname + filename,
-                    encoding: req.file.encoding,
-                    mimetype: req.file.mimetype,
-                    size: req.file.size,
-                    add_date: new Date(),
-                    isDel: 0
-                }).save().then(function (insert) {
-                    if (!insert) throw console.log(insert);
-                    res.json({
-                        message: '图片上传成功',
-                        url: 'https://blog.mcloudhub.com/public/images/uploads/' + now_timer + '/' + filename,
-                        success: 1
-                    });
-                });
-            }
-        });
     });
 });
 
 router.post('/collection/new', function (req, res, next) {
-    var uid = req.body.uid;
-    var token = req.body.token;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var icon = req.body.icon;
     var name = req.body.name;
     var describe = req.body.describe;
     var push = req.body.push;
     var admins = req.body.admins;
     var verify = req.body.verify;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '您尚未登录';
+        res.json(output);
         return;
     }
     var collections = new Collections({
@@ -892,7 +867,7 @@ router.post('/collection/new', function (req, res, next) {
         type: 1, // 集合类型
         icon: icon, // 集合图标
         describe: describe, // 集合描述
-        add_date: new Date(), // 集合添加时间,
+        add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'), // 集合添加时间,
         admins: admins, // 其他管理员
         push: push, // 是否允许投稿
         follow: 0, //关注数
@@ -904,69 +879,103 @@ router.post('/collection/new', function (req, res, next) {
     });
     collections.save().then(function (coll) {
         if (!coll) {
-            responseData.code = 0;
-            responseData.ok = false;
-            responseData.msg = '文集添加失败';
-            responseData.data = {};
-            res.json(responseData);
+            output.code = 0;
+            output.ok = false;
+            output.msg = '文集添加失败';
+            output.data = {};
+            res.json(output);
         } else {
-            responseData.code = 1;
-            responseData.ok = true;
-            responseData.msg = '文集添加成功';
-            responseData.data = coll;
-            res.json(responseData);
+            output.code = 1;
+            output.ok = true;
+            output.msg = '文集添加成功';
+            output.data = coll;
+            res.json(output);
         }
     });
 });
 
+router.post('/collection/update', function (req, res, next) {
+    var id = req.body.id;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var icon = req.body.icon;
+    var name = req.body.name;
+    var describe = req.body.describe;
+    var push = req.body.push;
+    var admins = req.body.admins;
+    var verify = req.body.verify;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '您尚未登录';
+        res.json(output);
+        return;
+    }
+    Collections.update({ _id: id, uid: uid }, {
+        icon: icon,
+        name: name,
+        describe: describe,
+        push: push,
+        verify: verify,
+        admins: admins
+    }, { multi: false }, function (err, doc) {
+        if (err) throw console.log(err);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '专题已修改';
+        output.data = {};
+        res.json(output);
+    });
+});
+
 router.get('/get_collections', function (req, res, next) {
-    var uid = req.query.uid;
-    var token = req.query.token;
     var offset = req.query.offset ? parseInt(req.query.offset) : 0;
     var num = req.query.num ? parseInt(req.query.num) : 10;
-    var where = uid === void 0 ? { isDel: 0, uid: uid } : { isDel: 0 };
+    var where = { isDel: 0 };
     Collections.find(where).skip((offset == 0 ? offset : offset - 1) * num).limit(num).then(function (colls) {
         if (!colls) throw console.log(colls);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = 'SUCCESS';
-        responseData.data = colls;
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = colls;
+        res.json(output);
     });
 });
 
 router.get('/getCollectionById', function (req, res, next) {
     var id = req.query.id;
-    var token = req.query.token;
     var articleArr = [];
     Collections.findOne({ _id: id }).then(function (coll) {
         if (!coll) throw console.log(coll);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = 'SUCCESS';
-        responseData.data = coll;
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = coll;
+        res.json(output);
     });
 });
 
 router.get('/collectionFollow', function (req, res, next) {
     var uid = req.query.uid;
     var id = req.query.id;
-    var token = req.query.token;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     Collections.findOne({ _id: id }).then(function (coll) {
         coll.follow++;
         coll.subscribe.push({ uid: uid });
         coll.save();
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '关注成功';
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '关注成功';
+        res.json(output);
     });
 });
 
@@ -974,11 +983,10 @@ router.get('/articlePush', function (req, res, next) {
     var uid = req.query.uid;
     var id = req.query.id;
     var article_id = req.query.article_id;
-    var token = req.query.token;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     Collections.findOne({ _id: id }).then(function (coll) {
@@ -986,60 +994,213 @@ router.get('/articlePush', function (req, res, next) {
         if (coll.article_ids.length > 0) {
             coll.article_ids.forEach(function (ids) {
                 if (ids.id == article_id) {
-                    responseData.code = 0;
-                    responseData.ok = false;
-                    responseData.msg = '此文章已投稿，请另选一篇文章再投。';
-                    res.json(responseData);
+                    output.code = 0;
+                    output.ok = false;
+                    output.msg = '此文章已投稿，请另选一篇文章再投。';
+                    res.json(output);
                 } else {
                     coll.article_ids.push({ id: article_id });
                     coll.save();
-                    responseData.code = 1;
-                    responseData.ok = true;
-                    responseData.msg = '投稿成功';
-                    res.json(responseData);
+                    output.code = 1;
+                    output.ok = true;
+                    output.msg = '投稿成功';
+                    res.json(output);
                 }
                 return;
             });
         } else {
             coll.article_ids.push({ id: article_id });
             coll.save();
-            responseData.code = 1;
-            responseData.ok = true;
-            responseData.msg = '投稿成功';
-            res.json(responseData);
+            output.code = 1;
+            output.ok = true;
+            output.msg = '投稿成功';
+            res.json(output);
             return;
         }
     });
 });
 
 router.post('/updateIntroduce', function (req, res, next) {
-    var uid = req.body.uid;
-    var token = req.body.token;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
     var introduce = req.body.introduce;
-    if (token == '') {
-        responseData.code = 0;
-        responseData.msg = '非法请求';
-        res.json(responseData);
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
         return;
     }
-    if (req.cookies.get('uid') == '' && req.cookies.get('token') == '') {
-        responseData.code = 0;
-        responseData.msg = '未登陆';
-        res.json(responseData);
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
         return;
     }
     Users.update({ _id: uid }, { introduce: introduce }, { multi: false }, function (err, docs) {
         if (err) throw console.log(err);
-        responseData.code = 1;
-        responseData.ok = true;
-        responseData.msg = '用户个人介绍修改成功';
-        responseData.data = {};
-        res.json(responseData);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '用户个人介绍修改成功';
+        output.data = {};
+        res.json(output);
     });
 });
 
-router.get('/zhi', function (req, res, next) {
-    res.json(req.query);
+router.get('/documents/get', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : '';
+    var id = req.query.id ? req.query.id : '';
+    var where = uid ? { _id: id, uid: uid, isDel: 0 } : { _id: id, isDel: 0 };
+    Docs.findOne(where).then(function (doc) {
+        if (!doc) throw console.log(doc);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = doc;
+        res.json(output);
+    });
+});
+
+router.get('/collections/delete', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : '';
+    var id = req.query.id ? req.query.id : '';
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
+        return;
+    }
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Collections.update({ _id: uid, uid: uid }, { isDel: 1 }, { multi: false }, function (err, docs) {
+        if (err) throw console.log(err);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '专题已删除';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.get('/users/follow', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : '';
+    var follow_id = req.query.follow_id ? req.query.follow_id : '';
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
+        return;
+    }
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (follow_id) {
+        Users.findOne({ _id: follow_id }).then(function (user) {
+            user.follow++;
+            user.uids.push({ id: uid });
+            user.save();
+            output.code = 1;
+            output.ok = true;
+            output.msg = '关注成功';
+            res.json(output);
+            return;
+        });
+    } else {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '关注失败';
+        res.json(output);
+        return;
+    }
+});
+
+router.get('/github', function (req, res, next) {
+    var code = req.query.code;
+    var state = NowDate.getTime();
+    var getTokenOptations = {
+        uri: 'https://github.com/login/oauth/access_token',
+        qs: {
+            client_id: '5fe59ee126edbea8f3df',
+            client_secret: 'eaf2f8a2d1b0e21ebdf4ca75628a1dd6c9fdbeff',
+            code: code,
+            redirect_uri: 'https://blog.mcloudhub.com/api/github',
+            state: state
+        },
+        headers: {
+            'User-Agent': 'Request-Promise'
+        },
+        json: true // Automatically parses the JSON string in the response
+    };
+
+    requestPromise(getTokenOptations).then(function (token) {
+        var getGithubUsersOptaions = {
+            uri: 'https://api.github.com/user',
+            headers: {
+                'User-Agent': 'Request-Promise',
+                'Authorization': 'token ' + token.access_token
+            },
+            json: true
+        };
+        requestPromise(getGithubUsersOptaions).then(function (github) {
+            console.log(github);
+            if (github) {
+                Users.findOne({ github_id: github.id }).then(function (user) {
+                    if (!user) {
+                        var user_data = {
+                            name: github.name,
+                            phone: '',
+                            email: github.email,
+                            password: '',
+                            salt: '',
+                            sex: 3,
+                            nick: github.name,
+                            wechat: '',
+                            qq: '',
+                            avatar: github.avatar_url,
+                            signature: '',
+                            website: '',
+                            introduce: '',
+                            editors: 2,
+                            follow: 0,
+                            github_id: github.id,
+                            github: github,
+                            add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+                            isDel: 0
+                        };
+                        new Users(user_data).save().then(function (add) {
+                            try {
+                                res.cookie('uid', add._id);
+                                req.session.uid = add._id;
+                                res.redirect(302, '/');
+                            } catch (e) {
+                                console.log(e);
+                                res.redirect(302, '/');
+                            }
+                        });
+                    } else {
+                        res.cookie('uid', user._id);
+                        req.session.uid = user._id;
+                        res.redirect(302, '/');
+                    }
+                });
+            }
+        }).catch(function (err) {
+            console.log(err);
+            res.redirect(302, '/');
+        });
+        // https://api.github.com/user?access_token=...
+        // Authorization: token OAUTH-TOKEN
+    }).catch(function (err) {
+        console.log(err);
+        res.redirect(302, '/');
+    });
+    // console.log(code);
+    // res.json({code:code});
 });
 
 module.exports = router;

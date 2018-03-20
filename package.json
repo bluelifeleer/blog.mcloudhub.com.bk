@@ -1,45 +1,55 @@
 {
-  "name": "blog",
-  "version": "1.0.0",
-  "description": "# express(框架) # swig(模板) # mongodb(数据库) # node(服务器) # Vue(js库)",
-  "main": ".eslintrc.js",
-  "dependencies": {
-    "body-parser": "^1.18.2",
-    "cookie": "^0.3.1",
-    "cookie-parser": "^1.4.3",
-    "cookie-session": "^2.0.0-beta.3",
-    "cookies": "^0.7.1",
-    "eslint": "^4.17.0",
-    "express": "^4.16.2",
-    "express-session": "^1.15.6",
-    "gt3-sdk": "^2.0.0",
-    "markdown": "^0.5.0",
-    "md5": "^2.2.1",
-    "mongodb": "^3.0.2",
-    "mongoose": "^5.0.3",
-    "morgan": "^1.9.0",
-    "multer": "^1.3.0",
-    "rotating-file-stream": "^1.3.4",
-    "silly-datetime": "^0.1.2",
-    "spdy": "^3.4.7",
-    "swig": "^1.4.2",
-    "test": "^0.6.0",
-    "vhost": "^3.0.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:bluelifeleer/blog.git"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
-  },
-  "presets": [
-    "env"
-  ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "bluelife",
-  "license": "ISC"
+    "name": "blog",
+    "version": "1.0.0",
+    "description": "# express(框架) # swig(模板) # mongodb(数据库) # node(服务器) # Vue(js库)",
+    "main": ".eslintrc.js",
+    "dependencies": {
+        "bluebird": "^3.5.1",
+        "body-parser": "^1.18.2",
+        "connect-mongodb-session": "^2.0.0",
+        "cookie": "^0.3.1",
+        "cookie-parser": "^1.4.3",
+        "csurf": "^1.9.0",
+        "eslint": "^4.17.0",
+        "express": "^4.16.2",
+        "express-request-id": "^1.4.0",
+        "express-session": "^1.15.6",
+        "gt3-sdk": "^2.0.0",
+        "markdown": "^0.5.0",
+        "md5": "^2.2.1",
+        "mongodb": "^3.0.2",
+        "mongoose": "^5.0.3",
+        "morgan": "^1.9.0",
+        "multer": "^1.3.0",
+        "oauth2-server": "^3.0.0",
+        "request": "^2.83.0",
+        "request-promise": "^4.2.2",
+        "rotating-file-stream": "^1.3.4",
+        "serve-index": "^1.9.1",
+        "silly-datetime": "^0.1.2",
+        "spdy": "^3.4.7",
+        "swig": "^1.4.2",
+        "test": "^0.6.0",
+        "uuid": "^3.2.1",
+        "vhost": "^3.0.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:bluelifeleer/blog.git"
+    },
+    "devDependencies": {
+        "babel-cli": "^6.26.0",
+        "babel-preset-env": "^1.6.1"
+    },
+    "presets": [
+        "env"
+    ],
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "pandora dev",
+        "start": "pandora start",
+        "stop": "pandora stop"
+    },
+    "author": "bluelife",
+    "license": "ISC"
 }

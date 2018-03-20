@@ -7,7 +7,7 @@ var router = express.Router();
 router.get('/', function (req, res, next) {
     res.render('../views/photos/lists', {
         token: req.token,
-        uid: req.uid,
+        uid: req.session.uid && req.cookies.uid,
         page_type: 'photos',
         title: '我的相册'
     });

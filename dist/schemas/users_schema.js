@@ -14,13 +14,18 @@ module.exports = new mongoose.Schema({
     wechat: String, //微信
     avatar: String, //头像
     email: String, //邮箱
-    github: String, //github授权帐号
     website: String, // 个人网站
     introduce: String, //个人介绍
     editors: Number, //常用编辑器
     rewardStatus: Number, // 赞赏设置
     rewardDesc: String, // 赞赏描述
     type: Number, // 用户注册类型
+    follow: Number, // 用户关注数
+    uids: [{ //关注的用户id
+        id: String
+    }],
+    github_id: Number,
+    github: {}, //github授权帐号信息
     add_date: Date,
     isDel: Number
 });

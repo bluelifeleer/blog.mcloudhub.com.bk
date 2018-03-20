@@ -1,0 +1,1534 @@
+https://www.vmware.com/cn.html
+帐号：thebulelife@163.com
+密码：xx19890907
+
+
+阿里云云数据库POLARDB
+Blog
+_xx19890907
+
+
+微信开放平台
+https://open.weixin.qq.com
+bluelifeleer@icloud.com
+Xx19890907
+
+极验验证：
+http://geetest.com/
+
+帐号：thebulelife@163.com
+
+密码：xx19890907
+
+
+
+自己服务器帐号：
+ip:101.201.68.177
+帐号：root
+密码：Xx19890907@#
+
+知呼：https://www.zhihu.com/people/xuan-cao-53-71/activities
+用户名：bluelife
+密码：xx19890907
+
+华为网站
+连接：http://www.huaweicloud.com/?locale=zh-cn
+登录：fanli_01
+密码：@fanli#
+
+ip:139.159.225.183
+服务帐号：7fanli_01
+密码：Ll19890608
+
+ExpressVPN
+https://www.buy-express-vpn-in-cn.com
+account:thebulelife@outlook.com
+password:xx19890907
+vcode:EHQXGGN19EPUQC2FIR1AM6M
+
+高德地图：http://lbs.amap.com/
+帐号：15167167331
+密码：xx19890907
+手机：15167167331
+
+
+
+https://segmentfault.com
+帐号：bluelife
+密码：l19890608
+邮箱：thebulelife@163.com
+
+
+
+gitlab:
+https://gitlab.mcodehub.com
+帐号：thebulelife@outlook.com
+密码：l19890608
+帐号：root
+密码：l19890608
+
+
+laravel chain:
+https://laravel-china.org
+帐号：thebulelife@sina.com
+密码：xx19890907
+
+优达学城：
+帐号：thebulelife@outlook.com
+密码：xx19890907
+
+
+docker:
+帐号：bluelife
+密码：thebulelife@163.com
+邮箱：xx19890907
+
+vue论坛：
+https://forum.vuejs.org/
+帐号：bluelife
+邮箱：thebulelife@163.com
+密码：xx19890907
+中文网站：https://cn.vuejs.org/v2/api/
+英文网站：https://vuejs.org/
+
+Vue.js专业中文社区:
+https://www.vue-js.com/
+用户名：bluelifeleer
+密码：
+
+Perl学习手册：file:///usr/local/ActivePerl-5.24/html/index.html
+
+
+
+
+
+工作SVN相关记录：
+
+svn服务器：121.41.228.195
+
+http的svn地址通过nginx访问，并跳转到httpd服务器（httpd监听端口8888）
+
+nginx配置文件：/etc/nginc/conf.d/svn.conf
+     
+启动文件：/etc/init.d/nginx
+httpd配置文件：/etc/httpd/conf.d/subversion.conf
+     
+启动文件：/etc/init.d/httpd
+
+svn服务启动文件：/etc/init.d/svnserve
+
+Svn仓库地址:/data3/koolbao_svn/svn_path/koolbao_project
+
+svn仓库用户配置文件：/data3/koolbao_svn/conf/passwd
+s
+vn仓库密码配置文件：/data3/koolbao_svn/conf/authz
+
+
+www.adlinkx.com.key
+
+www.adlinkx.com.pem
+
+
+阿里云工作平台：
+https://signin.aliyun.com/huihex/login.htm?callback=https%3A%2F%2Frdc.aliyun.com%2F
+
+帐号：junmei@huihex
+
+密码：xx19890907
+
+ckeditor
+编辑器：
+http://ckeditor.com/
+
+
+关爱通：
+
+帐号：bulelife
+
+密码：l19890608
+
+
+
+
+http://www.tuicool.com/articles/3eeIVfi
+http://www.linuxidc.com/Linux/2013-09/90529.htm
+http://nginx.org/en/docs/http/ngx_http_geo_module.html
+https://github.com/openresty/lua-nginx-module#installation
+http://onlyzq.blog.51cto.com/1228/533162
+https://github.com/arut/nginx-dav-ext-module
+https://github.com/nghttp2/nghttp2
+
+人民银行征信中心：https://ipcrs.pbccrc.org.cn/
+登录名：bluelife
+密码：xx19890907
+
+vpn：
+网站连接：http://ss.baihuib.cn/SS/
+端口:36014
+密码:j47hhz
+
+
+Let’s Encrypt永久免费的SSL证书
+https://letsencrypt.org
+https://www.generosity.com
+account:thebulelife@outlook.com
+passwd:l19890608
+
+radhat:https://www.redhat.com/en
+account:thebulelife@163.com
+passwd:l19890608
+
+
+npm https://www.npmjs.com
+account:bulelife
+passwd:l19890608
+
+
+通过pm2能守护node.js程序永远在线，在实际应用中是非常有必要的。另外，pm2配合keymetrics能实时监控node.js程序的运行，达到监控node.js程序的目的。
+keymetrics：https://app.keymetrics.io
+account：thebulelife@163.com
+passwd:xx19890907
+pm2:http://pm2.keymetrics.io/
+PM2 是一个带有负载均衡功能的 Node 应用的进程管理器
+
+http://svn.koolbao.com/svn/koolbao_project/huihe_sigma_dsp/trunk/bes_branch
+
+***********************************************************************************************
+
+AS3.0文档：
+	http://help.adobe.com/zh_CN/ActionScript/3.0_ProgrammingAS3/WS5b3ccc516d4fbf351e63e3d118a9b8cbfe-7ff7.html
+
+***********************************************************************************************
+
+js控件库:
+http://www.layui.com/doc/modules/layedit.html
+
+***********************************************************************************************
+
+openssl:
+	下载:https://www.openssl.org/source/
+	查看版本:https://www.openssl.org/news/secadv/20150611.txt
+
+***********************************************************************************************
+
+OpenResty 系列课程
+	http://www.stuq.org/courseware/1015/1314
+     文档：
+	http://xuewb.com/openresty/work_with_location.html
+
+***********************************************************************************************
+
+微软jQuery CND:
+https://www.asp.net/ajax/cdn#jQuery_Releases_on_the_CDN_0
+
+***********************************************************************************************
+
+淘宝文档中心：
+http://open.taobao.com/docs/doc.htm?spm=a219a.7386797.0.0.0wfS12&treeId=10&articleId=102538&docType=1
+
+***********************************************************************************************
+
+http://www.pbccrc.org.cn/
+account:bulelife
+password:l9890608
+
+eclipse update:http://download.eclipse.org/webtools/updates/
+
+工商网银密码：l19890608
+
+
+
+***********************************************************************************************
+
+
+
+顺飞后台：
+http://managerx.biddingx.com/
+
+用户名：neo.zhou@huihex.com
+
+密码：neo.zhou@2016
+
+
+
+***********************************************************************************************
+
+
+
+数字引擎
+
+数字营销引擎后台：http://114.55.5.136:8088/portal/admin/login/
+
+账号：huihex
+
+密码 1f39e59cKM2017
+数字营销：http://ad.huihex.com:8088/portal/static/signup 
+
+帐号：mudan@huihex.com
+
+密码：huihex2017
+
+
+
+***********************************************************************************************
+
+
+杭州启盟网络科技有限公司
+银行账号：  571909737710501
+
+公司域名：www.qimengyx.com
+
+登录名：向驰网络2016
+
+密码：oscarlili198211
+
+管理终端连接密码:367767
+
+公网IP:120.77.178.35
+
+内网IP:172.18.157.186
+
+Ssh登录帐号:root
+
+ssh登录密码:ZJXCqimeng@2017
+
+web-develoop-Service:
+Lnmp-1.4
+Nginx:/user/local/nginx
+Php:/user/local/php
+
+Start-script:
+/etc/init.d/nginx
+/etc/init.d/php-fpm
+
+MariaDB:
+Account:root
+Passwd:ZJXCqimeng@2017
+
+
+***********************************************************************************************
+
+
+7返利
+百度云：https://console.bce.baidu.com
+
+帐号：7shier@7fanli.com
+
+密码：7fanli@hz
+
+服务器：
+IP:182.61.5.84
+
+帐号：root
+
+密码：qifanli@hz2015
+
+
+mysql启动：/etc/init/mysqld start
+mysql错误日志/var/log/mysqld.log
+mysql.socket:/var/lib/mysql/mysql.sock
+mysql数据目录：/var/lib/mysql
+
+binlog日志恢复命令：mysqlbinlog --no-defaults mysql-bin.000004 | mysql -u root -p
+初始化数据库:mysql_install_db
+修改数据库登录密码：update user set password=password('root') where user='root' and host='localhost';
+刷新权限：flush privileges;
+
+7返利博客数据库迁移至阿里云：
+IP:rm-bp1b4s3j088z1m964o.mysql.rds.aliyuncs.com
+帐号：fanliblog
+密码：Koolma2010
+数据库：wordpress
+
+
+***********************************************************************************************
+
+
+景姻网络
+
+aliyun:
+账号：景姻网络科技
+
+密码：jywlkj123
+
+公司名称：杭州景姻网络科技有限公司
+
+支付宝账号(杭州景姻网络科技有限公司)：2644189411@qq.com
+
+银行账号(杭州景姻网络科技有限公司)：农行账户（下沙金沙湖支行）19033701040001194
+
+公司域名(阿里)：cpcdsp.cn
+
+IP:116.62.184.4(公)
+   172.16.161.99(私有)
+
+云服务器： root （景姻网络科技）
+
+密码：Jywlkj123
+
+客服QQ：1324230770
+
+远程连接密码：393800
+
+MariaDB:root
+
+password:jywl123
+
+
+
+***********************************************************************************************
+
+
+正新科技
+公司名称：杭州正欣互动科技有限公司
+支付宝号：18858157060 
+姓名：彭镇锋
+银行账号：3301040160007528113  杭州银行滨江支行 开户名称：杭州正欣互动科技有限公司
+公司域名：zxcps.cn
+服务器账号密码：IP: 119.23.8.1(公)172.18.145.138(私有)
+账号：root  
+密码：Zhengxin007
+客房q：491748342
+阿里云帐号：账户：彭镇锋
+密码：peng911
+MariaDB:
+Account:Root
+Passwd:Zhengxin007
+***********************************************************************************************
+
+
+包大巴
+Aliyun
+
+帐号：44463594@qq.com
+
+密码：msly24lm
+
+
+Aliyun-ecs-server:
+ip:118.178.253.158
+   10.28.15.140
+
+Account:root
+
+Passed:Lbaodaba20170727
+
+
+Mariadb:
+
+Account:root
+
+Passed:baodaba20170627
+
+
+
+***********************************************************************************************
+
+御善房：
+ip:114.55.15.31
+
+account:root
+
+password:26ee05fb69ddd1a2HUIHEX2015
+
+Nginx:/usr/local/nginx
+
+Php:/usr/local/php
+
+访问地址：http://yushanfang.huihex.com
+svn:http://svn.koolbao.com/svn/koolbao_project/huihe_yushanfang
+
+数据库：
+ip:rm-bp157fb187nr32zr2.mysql.rds.aliyuncs.com
+
+帐号：koolbao
+
+密码：koolma2010
+
+端口：3306
+
+数据表：koolbao_mv_system
+
+***********************************************************************************************
+
+www.qx.hzcangyu.com
+http://hzcangyu.com/
+
+服务器是阿里云服务器
+登陆帐号：2492699449@qq.com
+密码：q26236694
+服务器登陆密码：868890
+
+仓宇服务器：121.41.104.214
+服务器管理帐号：root
+密码：Promise01314 
+
+***********************************************************************************************
+
+周报传送门host:121.41.228.183		wiki.koolbao.com
+
+印像笔记：
+	https://www.yinxiang.com/
+	thebulelife@outlook.com
+	Ll19890608
+
+Markdown 语法说明
+http://wowubuntu.com/markdown/
+
+
+企业邮箱：
+http://tel.exmail.qq.com/login
+酷宝邮箱：
+邮箱账号：peng.li@koolbao.com
+密码：Ll19890608
+汇合邮箱：
+邮箱账号：peng.li@huihex.com
+别名：junmei@huihex.com
+密码：Ll19890608
+
+nginx+lua学习
+http://jinnianshilongnian.iteye.com/blog/2186270
+http://www.runoob.com/manual/lua53doc/contents.html
+http://www.luaer.cn/
+
+http://pm.koolbao.com
+用户名：junmei
+密码：huihex2016
+这个是你PM的账号
+绑定ip:223.4.55.206 pm.koolbao.com
+
+天猫聚石塔
+帐号：酷宝数据
+密码：Koolbao.com2017
+
++====================================================
+腾讯云服务器:
+https://www.qcloud.com/
+公网IP:123.206.198.52
+内网IP:10.105.61.249
+account:root
+passwd:d1a2HUIHEX2015
++====================================================
+
+
++---------------------------------------------------
+传易：
+http://adserver.vamaker.com
+帐号：tongwei@yundsp.cn
+密码：123456
+阿里云
+网址：www.aliyun.com
+登录名：931111688@qq.com
+密码：zcy198372
++—————————————————————————
+
++------------------------------------------------------------------------------------------------+
+汇合营销阿里云服务器登录                                                                           |
+帐号：汇合营销                                                                                     |
+密码：###Huihex2016@@@                                                                             |
+==================================================================================================|
+MYSQL:                                                                                            |
+ip:rm-bp161jfen84tpr7d2o.mysql.rds.aliyuncs.com                                                   |
+account:huihex                                                                                    |
+pasd:koolma2010                                                                                   |
+==================================================================================================|
+缓存新服务器                                                                                       |
+120.27.135.180                                                                                    |
+account:root					                                                  |
+passwd:26ee05fb69ddd1a2HUIHEX2015                                                                 |
+svn:http://svn.koolbao.com/svn/koolbao_project/koolbao_huihe_dsp/trunk				  |
+==================================================================================================|
+redis服务器：                                                                                      |
+ip:120.27.129.138                                                                                 |
+port:6379                                                                                         |
+auth:26ee05fb69ddd1a2HUIHEX2015                                                                   |
+==================================================================================================|
+新迁移服务器：                                                                                      |
+服务器：121.40.79.205                                                                              |
+帐号：root                                                                                         |
+密码：26ee05fb69ddd1a2HUIHEX2015                                                                   |
+==================================================================================================|
+传易：                                                                                             |
+url:adease.yundsp.cn                                                                              |
+项目地址:/home/wwwr/sigma.huihex.adease                                                            |
+配置文件:/usr/local/nginc/conf/vhost/dsp.sigma.adease.yundsp.cn.conf                               |
+==================================================================================================|
+仓宇：                                                                                              |
+url:sigma.hzcangyu.com                                                                             |
+项目地址:/home/wwwr/sigma.huihex.cangyu                                                            |
+配置文件:/usr/local/nginc/conf/vhost/dsp.sigma.hzcangyu.com.conf                                   |
+==================================================================================================|
+驰亮：                                                                                             |
+url:dsp.taoguanj.com                                                                              |
+项目地址:/home/wwwr/sigma.huihex.chiliang                                                         |
+配置文件:/usr/local/nginc/conf/vhost/dsp.sigma.chiliang.com.conf                                  |
+                                                                                                  |
+重启nginx:/etc.init.d/nginx {start|stop|force-quit|restart|reload|status|configtest}              |
++-------------------------------------------------------------------------------------------------+
+
+
+灵集：
+api:http://docs.thextrader.cn/dsp/adexchange_dsp_api.html
+帐号：11315
+密码：113f99f4ea53481687cead64a7cef1d8
+
+
+
+OA登录
+oa.huihex.com
+用户名：君眉
+密码：123
+
+dmp：hoa.huihex.com
+account:huihex
+password:huihex@hz163
+svn:http://svn.koolbao.com/svn/koolbao_project/huihe_tages
+
+服务器：121.40.79.205
+
+百度bes信息：
+	bes_api_url:https://api.es.baidu.com
+	bes_dsp_id:18010532
+	bes_tiken:c1cab1eb74dd83561cc042cd713b24d9
+
+
+======================================================================================
+定时任务脚本放置服务器
+ip:118.178.120.8
+account:root
+passwd:085cdf082fbc8649HUIHEX2016
+======================================================================================
+
+======================================================================================
+传易样式服务器：
+传易：公网IP:120.26.216.23
+系统用户名：root
+密码：Zcy1984214
+======================================================================================
+
+
+
+
+1.服务器相关
+测试服务器：223.4.6.202 ---->	121.41.228.195
+项目在/home/wwwroot/
+nginx配置在/etc/nginx/conf.d/下面
+
+dsp服务器：115.236.18.52
+项目在/home/wwwroot/下面
+nginx配置在 /usr/local/nginx/conf/vhosts/下面
+重启：/user/local/nginx/sbin/nginx -s reload
+
+oa服务器：223.4.21.10 ----->	
+
+项目在/home/wwwroot/
+nginx配置在 /etc/nginx/conf.d/下面
+oa添加渠道：
+	db：koolbao_oa_system.platform_name_oa  host:115.236.20.105
+	controller:ajax_channel.php
+	model:channel_model.php
+
+
+
+
+样式服务器：223.4.55.206 ----->	121.41.228.183
+项目在/home/wwwroot/
+nginx配置在 /usr/local/nginx/conf/vhost/下面
+（image/js/css）
+
+
+传易样式服务器
+ip：120.26.216.23
+account：root
+password：Zcy1984214
+
+
+
+223.4.21.10 ------> 121.41.228.173
+223.4.55.206 ------> 121.41.228.183
+223.4.6.202 ------> 121.41.228.195
+
+
+
+
+账户名：junmei
+密码：!devjunmei@koolma201506
+
+
+ip:115.236.20.108
+账户名:yeqing
+密码：:!devyeqing@koolma201506
+
+
+
+tomcat-server:
+ip:121.196.234.84
+acccount:root
+password:Koolma2010
+
+/opt/apache-tomcat-7.0.57/bin/start.sh
+
+
+http://svn.koolbao.com/svn/koolbao_project/koolbao_oa_stylecdn_dev/trunk
+
+萧山主要机器列表
+外网IP     	内网IP     	主机名
+115.236.18.52	192.168.18.100	k100
+115.236.18.60	192.168.18.101	k101
+
+115.236.20.108	192.168.18.104	k104
+115.236.59.19	192.168.18.111	k111
+115.236.23.140	192.168.18.112	k112
+115.236.16.23	192.168.18.113	k113
+115.236.16.30	192.168.18.114	k114
+115.236.19.102	192.168.18.115	k115
+115.236.19.103	192.168.18.116	k116
+115.236.19.104	192.168.18.117	k117
+115.236.19.114	192.168.18.118	k118
+115.236.19.118	192.168.18.119	k119
+
+数据库
+115.236.20.105	192.168.18.120	k120	【主备份】【读】【网站】
+115.236.20.107	192.168.18.121	k121	【主备份】【写】【数据】
+
+数据库
+115.236.19.108	192.168.18.102	k102	【定时备份7天】
+
+115.236.18.52		phpmyadmin.huihe.com
+
+钻展数据服务器
+ip:115.236.18.60
+account:root
+pasd:koolma2010
+port:59061
+
+
+
+
+SELECT `shop_title`,`shop_id`,`website`,`tanx_category`,`tanx_audit_status`,`tanx_fail_reason`,`tanx_user_id`,`qualifications_type` FROM `huihe_marketing_system`.`store` WHERE shop_title='\u5e7f\u5dde\u4fe1\u8475\u8d38\u6613\u6709\u9650\u516c\u53f8'
+SELECT `shop_title`,`shop_id`,`website`,`tanx_category`,`tanx_audit_status`,`tanx_fail_reason`,`tanx_user_id`,`qualifications_type` FROM `huihe_marketing_system`.`store` WHERE shop_id='288230376257083075'
+
+
+
+
+
+phpMyAdmin:phpmyadmin.huihe.com
+数据库				帐号：				密码：
+192.168.18.120			root				koolma2010
+192.168.18.102			root				koolbao
+绑定IP:115.236.18.52		phpmyadmin.huihe.com
+
+
+
+
+
+
+
+
+样式服务器：223.4.55.206 ----->	121.41.228.183
+项目在/home/wwwroot/
+svn:http://svn.koolbao.com/svn/koolbao_project/koolbao_oa_stylecdn_dev/trunk
+nginx配置在 /usr/local/nginx/conf/vhost/下面
+（image/js/css）
+
+
+svn地址：http://svn.koolbao.com/svn/koolbao_project/
+帐号：lipeng
+密码：koolma2010
+
+
+
+钻展透视
+服务器：223.4.21.10 ------>	121.41.228.173
+域名：zuan.koolbao.com
+项目路径：/Users/xujinbo/wwwroot/koolbao_zuan
+配置文件路径：/etc/nginx/conf.d/zuan.koolbao.com.conf
+svn路径：http://svn.koolbao.com/svn/koolbao_project/koolbao_zuan_web_dev/trunk
+后台登入路径：http://zuan.koolbao.com/greenload/koolbao_admin/酷宝数据  用户名：koolbao 密码：koolmaforever@61
+数据库
+用户信息表：koolbao_zuan_system.store
+订购关系表：koolbao_zuan_system.user_subscribe
+每个用户一个库，命名规则koolbao_zuan_xx(shop_id进行MD5最后两位)
+
+
+
+店铺透视
+服务器：223.4.21.10 ------>	121.41.228.173
+域名：shop.koolbao.com
+项目文件路径：/home/wwwroot/koolbao_store_v2.1.3
+配置文件路径：/etc/nginx/conf.d/shop.koolbao.com.conf
+svn路径：http://svn.koolbao.com/svn/koolbao_project/koolbao_storev2_web_dev/trunk
+后台登入路径：shop.koolbao.com/greenload/koolbao_admin/米素旗舰店  用户名：koolbao   密码：koolmaforever@61
+数据库：
+用户信息表：koolbao_nshop_system.store
+订购关系表：koolbao_nshop_system.user_subscribe
+每个用户一个库，命名规则koolbao_nshop_xx(shop_id进行MD5最后两位)
+
+
+
+
+淘问卷
+服务器：223.4.21.10 ------>	121.41.228.173
+域名：wen.koolbao.com
+项目文件路径：/home/wwwroot/koolbao_wenjuan
+配置文件路径：/etc/nginx/conf.d/wen.koolbao.com.conf
+svn路径：http://svn.koolbao.com/svn/koolbao_project/koolbao_wenjuan
+后台登入路径：http://wen.koolbao.com/greenload/index  用户名：koolbao  密码： KBSJ.tea@hz
+taeURL：http://tae.taobao.com/ide/myapps?spm=a1z4f.7755612.1998615459.7.9lMtnk
+数据库：
+IP:rm-bp16b194rz9ad1216o.mysql.rds.aliyuncs.com
+帐号：koolbao
+密码：Koolma2010
+数据库：koolbao_wenjuan
+
+
+
+===========================================================================================
+
+PC端控制台：
+淘问卷新：
+tae.taobao.com
+帐号：酷宝数据
+密码：Koolbao.com2017
+
+图片空间：http://tadget.taobao.com/redaction/manager.htm#goto/174401164432640163/1
+
+ip:121.41.228.173
+wen.koolbao.com/greenload
+帐号：koolbao
+密码：2016koolbaoUP
+
+svn:http://svn.koolbao.com/svn/koolbao_project/koolbao_wenjuan
+
+数据库：
+IP：rm-bp16b194rz9ad1216o.mysql.rds.aliyuncs.com
+帐号：koolbao
+密码：Koolma2010
+
+短信发送接口代码：wenjuan_msg.php
+
+爱空间：report_api.php
+
+数据表名：invest_databack_last_max_time
+
+
+淘问卷无线端控制台：
+https://ews.cloud.tmall.com/#/service/manage
+
+VR联合营销：
+https://tbvr.ews.m.jaeapp.com
+php：
+	ps -ef | grep php
+		/acs/env/php/php-fpm.conf
+		/acs/log/php.log
+nginx:
+	ps -ef | grep nginx
+		/acs/user/tengine/sbin/nginx -c /acs/env/tengine/nginx.conf
+
+
+===========================================================================================
+
+
+
+OA
+服务器：223.4.21.10 ------>	121.41.228.173
+域名：oa.koolbao.com
+项目文件路径：/home/wwwroot/koolbao_oa
+配置文件路径：/etc/nginx/conf.d/oa.koolbao.com.conf
+svn路径：http://svn.koolbao.com/svn/koolbao_project/koolbao_oa_dev/trunk
+后台登入路径：http://oa.koolbao.com/greenload/index
+数据库：
+数据库：koolbao_oa_system
+
+
+
+Tanx项目
+IP：114.55.113.231
+account:root
+pasd:085cdf082fbc8649HUIHEX2016
+项目目录：/home/wwwroot/koolbao_huihe_dsp/
+svn:http://svn.koolbao.com/svn/koolbao_project/koolbao_huihe_adview/branches/ouyangming_20140730_test
+
+
+
+
+
+
+
+
+
+
+服务器基本维护
+PHP-FPM重启： /etc/init.d/php-fpm {start|stop|status|restart|reload|force-reload|condrestart|try-restart|configtest}
+nginx重启：/etc/init.d/nginx   {start|stop|restart|condrestart|try-restart|force-reload|upgrade|reload|status|help|configtest}
+php的版本：php -v
+nginx的版本：nginx -v
+
+
+
+
+
+
+
+
+
+
+站外透视配置信息
+
+酷宝数据——站外推广透视
+http://zhanwai.koolbao.com/greenload/koolbao_admin/高夫官方旗舰店
+帐号：koolbao
+密码：koolmaforever@61
+==================================================================
+zhanwai.koolbao.com/greenload/koolbao_admin/林氏木业家具旗舰店
+账户：koolbao
+密码Koolbao@hz2016h
+
+
+
+
+站外透视
+服务器：223.4.21.10
+域名：zhanwai.koolbao.com
+项目路径：/Users/xujinbo/wwwroot/koolbao_zhanwai
+配置文件路径：/etc/nginx/conf.d/zhanwai.koolbao.com.conf
+svn路径：http://svn.koolbao.com/svn/koolbao_project/koolbao_ad_web_dev/trunk
+后台登入路径： zhanwai.koolbao.com/greenload/koolbao_admin/酷宝数据 用户名：koolbao   密码：koolmaforever@61
+数据库
+用户信息表：koolbao_ad_system
+订购关系表：koolbao_ad_system
+每个用户一个库，命名规则koolbao_ad_xx(shop_id进行MD5最后两位)
+
+account:koolbao
+password:Koolbao@hz2016h
+
+
+
+站外透视数据库
+host:115.236.18.60
+user:root
+pasd:koolma2010
+port:59061
+
+
+
+
+短连接
+tburl跳转服务：
+ ip:114.55.5.136
+ 帐号：root 
+ 密码：26ee05fb69ddd1a2HUIHEX2015
+ svn http://svn.koolbao.com/svn/koolbao_project/tburl/trunk
+
+
+短连接网站基于nginx+php+lua+mysql+redis,搭建于openresty工具之上，
+启动nginx:/usr/local/openresty/nginx/sbin/nginx -c /usr/local/openresty/nginx/conf/nginx.conf
+启动php-fpm:/usr/local/php/sbin/php-fpm -c /usr/local/php/lib/php.ini -y /usr/local/php/etc/php-fpm.conf
+启动redis:redis-server ./redis.conf
+
+查看端口号：netstat -ntupl
+
+
+
+
+ redis服务
+	host：114.55.5.136
+	pasd:koolbao!@.com
+	port:6379
+	redis_map_key:tburl
+
+
+
+传易项目服务器：
+	测试服务：
+		ip:223.4.6.202
+		/home/wwwroot/adease/
+		svn:http://svn.koolbao.com/svn/koolbao_project/huihe_sigma_dsp/branches/new_adease
+
+
+
+
+传易样式服务器：
+	ip:120.26.216.23
+	account:root
+	pasd:Zcy1984214
+	svn:http://svn.koolbao.com/svn/koolbao_project/style_koolbao_dev/branch/style_yundsp
+
+
+http://adease.yundsp.cn/popularize/plan/1/add
+
+
+
+
+
+站外京东：
+	ip:115.236.18.52
+	svn:http://svn.koolbao.com/svn/koolbao_project/koolbao_jd_zhanwai/trunk
+	zhanwai.jd.koolbao.com/greenload/user_nick/花瑶花自营旗舰店
+	登录帐号：koolbao
+	密码：2014.koolbao.com
+
+
+
+
+http://my.oschina.net/china008/blog/215828
+http://www.linuxidc.com/Linux/2012-03/56066.htm
+http://blog.chinaunix.net/uid-9950859-id-98279.html
+http://blog.chinaunix.net/uid-26495963-id-3279216.html
+http://blog.163.com/dqc_witkey/blog/static/548841492010282133827/
+http://blog.csdn.net/feihong247/article/details/8518613
+https://www.douban.com/note/226421734/
+http://blog.sina.com.cn/s/blog_567e650201012jmq.html
+http://blog.chinaunix.net/uid-26546620-id-3220087.html
+
+
+
+
+
+
+mysql获取当前时间
+select now() as 当前日期时间;
+select curdate() as 今天日期;
+select curtime() as 当前时间;
+
+
+
+php加密：
+	string crypt($str[,$salt]);
+		$str:必须
+		$salt:可选，然而，如果没有salt的话，crypt()创建出来的会是弱密码。 php 5.6及之后的版本会在没有它的情况下抛出一个 E_NOTICE 级别的错误。为了更好的安全性，请确保指定一个足够强度的盐值
+	string md5($str[,$raw_outpu]);
+		$str:必须
+		$raw_outpu:如果可选的 raw_output 被设置为 TRUE，那么 MD5 报文摘要将以16字节长度的原始二进制格式返回。
+
+
+
+
+
+
+10年9月，twitter改版。一个显著变化，就是URL加入了"#!"符号。比如，改版前的用户主页网址为http://twitter.com/username改版后，就变成了http://twitter.com/#!/username
+　　这是主流网站第一次将"#"大规模用于重要URL中。这表明井号（Hash）的作用正在被重新认识。本文根据HttpWatch的文章，整理与井号有关的所有重要知识点。
+一、#的涵义
+　　#代表网页中的一个位置。其右面的字符，就是该位置的标识符。比如，http://www.example.com/index.html#print就代表网页index.html的print位置。浏览器读取这个URL后，会自动将print位置滚动至可视区域。
+　　为网页位置指定标识符，有两个方法。一是使用锚点，比如<a name="print"></a>，二是使用id属性，比如<div id="print">。
+
+
+二、HTTP请求不包括#
+　　#是用来指导浏览器动作的，对服务器端完全无用。所以，HTTP请求中不包括#。
+比如，访问下面的网址，http://www.example.com/index.html#print，浏览器实际发出的请求是这样的：
+
+GET /index.html HTTP/1.1
+Host: www.example.com
+ 
+
+三、#后的字符
+　　在第一个#后面出现的任何字符，都会被浏览器解读为位置标识符。这意味着，这些字符都不会被发送到服务器端。
+比如，下面URL的原意是指定一个颜色值：http://www.example.com/?color=#fff，但是，浏览器实际发出的请求是：
+
+GET /?color= HTTP/1.1
+Host: www.example.com
+ 　　
+
+四、改变#不触发网页重载
+　　单单改变#后的部分，浏览器只会滚动到相应位置，不会重新加载网页。
+比如，从http://www.example.com/index.html#location1改成http://www.example.com/index.html#location2，浏览器不会重新向服务器请求index.html。
+
+ 
+
+五、改变#会改变浏览器的访问历史
+　　每一次改变#后的部分，都会在浏览器的访问历史中增加一个记录，使用"后退"按钮，就可以回到上一个位置。这对于ajax应用程序特别有用，可以用不同的#值，表示不同的访问状态，然后向用户给出可以访问某个状态的链接。值得注意的是，上述规则对IE 6和IE 7不成立，它们不会因为#的改变而增加历史记录。
+　　
+
+六、window.location.hash读取#值
+　　window.location.hash这个属性可读可写。读取时，可以用来判断网页状态是否改变；写入时，则会在不重载网页的前提下，创造一条访问历史记录。
+　　
+
+七、onhashchange事件
+　　这是一个HTML 5新增的事件，当#值发生变化时，就会触发这个事件。IE8+、Firefox 3.6+、Chrome 5+、Safari 4.0+支持该事件。
+　　它的使用方法有三种：
+
+window.onhashchange = func;
+<body onhashchange="func();">
+window.addEventListener("hashchange"， func, false);
+　　对于不支持onhashchange的浏览器，可以用setInterval监控location.hash的变化。
+
+八、Google抓取#的机制
+　　默认情况下，Google的网络蜘蛛忽视URL的#部分。
+　　但是，Google还规定，如果你希望Ajax生成的内容被浏览引擎读取，那么URL中可以使用"#!"，Google会自动将其后面的内容转成查询字符串_escaped_fragment_的值。
+　　比如，Google发现新版twitter的URL：http://twitter.com/#!/username
+　　就会自动抓取另一个URL：http://twitter.com/?_escaped_fragment_=/username
+　　通过这种机制，Google就可以索引动态的Ajax内容。
+
+ 注
+
+AJAX = 异步 JavaScript和XML（标准通用标记语言的子集）。AJAX 是一种用于创建快速动态网页的技术。
+
+回到顶部
+2. ？
+1）连接作用：比如
+
+http://www.xxx.com/Show.asp?id=77&nameid=2905210001&page=1
+2）清除缓存：比如
+
+http://www.xxxxx.com/index.html 
+http://www.xxxxx.com/index.html?test123123
+两个url打开的页面一样，但是后面这个有问号，说明不调用缓存的内容，而认为是一个新地址，重新读取。
+
+回到顶部
+3. &
+不同参数的间隔符
+
+
+php
+@在php中可能忽略错误提示
+PHP_OS				显示服务器端php的操作系统
+PHP_VERSION			显示服务器端php的版本
+php_uname([string $mode = "a"])			返回运行PHP的系统有关信息
+	a		默认显示所有
+	s		操作系统名称
+	n		主机名
+	r		版本名称
+	v		版本信息
+	m		机器类型
+extension_loaded(string $extension_name)	检查扩展是否加载,return:true/false
+
+ReflectionClass()
+strpos($str, $prex)			查找一个字符串中是否有指定的子串
+preg_replace($prex,$replacement,$str)	正则查找并替换字符串
+Strcmp()函数对两个字符串进行二进制安全的比较，并区分大小写。其形式为： 
+	int strcmp ( string str1 , string str2 ) 
+	根据比较的结果将返回如下的一个可能值。 
+	•如果str1 和str2 相等则返回0 。 
+	•如果str1小于str2则返回-1 。 
+	•如果str1大于str2则返回1 。 
+PHP_EOL			获取不同系统的换行符
+
+parse_url解析 URL，返回其组成部分
+chunk_split($str,$chunklen,$end)		// 将字符串分割成小块,并返回新的字符串
+	$str		// 要分割的字符串
+	$chunklen	// 要分割的尺寸
+	$end		// 行尾序列符号
+	return 		// 分割后的字符串
+如:
+	$str = ‘Hello Word’;
+	$chunk_str = chunk_split($str,6,’….’);
+	var_dump(chunk_str); // Hello …Word…
+flush privileges;		刷新mysql用户权限
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'l19890608';		添加用户权限 
+
+
+getView(string:name)	返回给定名称的VIEW类，创建一个VIEW的实例。可以使用它就像被Application用来创建Viewport样
+	this.getView().create()
+	parameters
+		string:name
+	returns 
+		Ext.base
+
+getFeature(string:id)	获取特性
+
+	Parameters
+		id : String 该特性的id
+	Returns
+		Ext.grid.feature.Feature
+		指定特性。如果没有找到则返回Undefined
+collapse(string/Ext.Element groupName)	折叠一个分组
+	parameters
+		groupName:string/Ext.Element	分组名称或group body包含的元素
+collapseAll()	折叠所有分组
+callParent(arr/arguments)	重写父类方法
+	parameters
+		arr/arguments	通过当前 方法得到数组或arguments对象
+	returns
+		object		返回调用方法的结果
+tbar	创建一个上边条
+bbar	创建一个下边条
+
+
+
+forceFit : Boolean
+	设置为true，则强制列自适应成可用宽度。标题头部的尺寸首先根据配置来确定， 无论它被指定了一个width，或是flex。 然后，它们的宽度成比例地改变，以便采用内容的整个宽度。
+failure ： function	加载请求失败时调用，使用以下配置参数调用:
+	this - ElementLoader实例
+	response - 响应对象
+	options - Ajax选项
+
+
+
+
+
+
+js:
+js void使用isUndefind()判断一个对象是否是undefind
+/**
+ *     isUndefind()判断一个对象是否是undefind
+ *     @param [object] object [要判断的对象]
+ *     @return [boolean] boolean [返回布尔值true/false]
+ *     @author bluelife
+ *     @email thebulelife@163|outlook.com
+ *     @date 2016-05-24
+ */
+function isUndefind(obj){
+	return obj === void 0 ? true : false;
+	//void:是一个操作符，用于对表达式求值，并返回 undefined
+	//用void的好处，因为undefin不是js中的一个保留字，可以为undefin赋值，而void操作符后面不管是什么表达式都会返回undefind,所以这种方法处理undefind更好。
+}
+
+
+
+
+
+
+
+数据库设计与开发
+《MySQL技术内幕(第4版)》
+深入浅出MySQL：数据库开发、优化与管理维护(第2版)
+高性能MySQL（第3版）
+MySQL技术内幕：InnoDB存储引擎(第2版)》
+MySQL必知必会
+MySQL开发者SQL权威指南
+《MySQL性能调优与架构设计基础与优化》
+《软件架构师教程》
+《大型软件体系结构-使用UML指南》
+《软件体系结构的艺术》
+《软件架构编档》
+《企业应用架构模式》
+《分析模式》
+《特定领域分析框架，行业的框架体验》
+《Effective Enterprise Java》
+《企业应用架构模式》
+《敏捷软件开发原则、模式与实践》 
+《大型网站技术架构-核心原理与案例分析》
+可扩展的艺术:现代企业的Web架构、流程及组织
+架构即未来:现代企业可扩展的Web架构、流程和组织
+Spring实战(第4版) 
+php高级编程
+高性能php应用开发
+开发高质量php框架与应用的实际案例解析
+
+php yield()
+
+
+
+Unity启动器不再无法移动。从Ubuntu 16.04开始，用户可以实现改变启动器的位置，可以将启动器移到屏幕底部，但是无法移到右边或顶部。打开终端，然后输入下面这个命令，即可将启动器移到屏幕底部：
+gsettings set com.canonical.Unity.Launcher launcher-position Bottom 
+如果你使用后，觉得不喜欢，还可以恢复到屏幕左边，只要运行：
+gsettings set com.canonical.Unity.Launcher launcher-position Left 
+
+
+php Event(事件)
+php Stream(流)
+
+
+call_user_func_array() 调用回调函数，并把一个数组(索引数组)参数作为回调函数的参数
+	语法：call_user_func_array(callback $callback_name,array $paramsArr) 把第一个参数作为回调函数（callback）调用，把参数数组作（param_arr）为回调函数的的参数传入。 
+	callback	被调用的回调函数。 
+	param_arr	要被传入回调函数的数组，这个数组得是索引数组。
+	return		返回回调函数的结果。如果出错的话就返回FALSE
+
+call_user_func()把第一个参数做为回调函数，其余参数做为回调函数的参数
+	语法：call_user_func(callback $callback_name[,$param1,$param2,$param..])
+	参数 
+		callback	将被调用的回调函数（callable）。 
+		parameter	0个或以上的参数，被传入回调函数。 
+	return	返回回调函数的返回值，如果错误则返回FALSE。
+	请注意，传入call_user_func()的参数不能为引用传递。
+
+
+说明：5.3.0 对面向对象里面的关键字的解析有所增强。在此之前，使用双引号来来连接一个类和里面的一个方法，把之作为参数来作为回调函数的会，将会发出一个E_STRICT的警告，因为这个传入的参数被视为静态方法。 
+is_callable()	检测参数是否为合法的要可调用结构
+	语法：is_callable(callback $name, boolean $syntax_only = false, string $callback_name)
+	name	要检查的回调函数。 
+	syntax_only	如果设置为 TRUE，这个函数仅仅验证 name 可能是函数或方法。 它仅仅拒绝非字符，或者未包含能用于回调函数的有效结构。有效的应该包含两个元素，第一个是一个对象或者字符，第二个元素是个字符。 
+	callable_name	接受“可调用的名称”。下面的例子是“someClass::someMethod”。 注意，尽管 someClass::SomeMethod() 的含义是可调用的静态方法，但例子的情况并不是这样的。 
+	return 		如果 name 可调用则返回 TRUE，否则返回 FALSE。 
+function_exists(function $function_name)	检测一个函数是否被定义，返回true/false
+method_exists(class $object, string $class_function_name)	检测一个方法是否存在给定的对象（class类）中，返回true/false
+class_exists(class $object[, boolean $auot_load])	检测一个类是否定义，参数：对象，是否默认调用
+interface_exists(string $interface_name[, boolean $auot_load])			检测接口是否定义
+get_defined_functions(void)			返回一个包含所有系统常是函数的数组（获取所有系统常是函数）
+debug_backtrace					产生一条回溯跟踪(backtrace)
+
+array_keys($array)				返回数组中部分或所有键
+range($start,$limit)				建立一个包含指定范围单元的数组
+extension_loaded(string $extend_moduel)		检查一个扩展模块是否已加载
+dl(string $libaray)				运行时载入一个扩展						
+get_loaded_extensions(boolean $zend_extension = false)				返回PHP解析器里编译并加载的模块,如果$zend_extension为true则返回zend扩展,否则返回普通扩展 
+getextension_funcs(string $moduel_name)		返回模块内函数的名称的数组				
+function_exists(string $func_name)		判断一个函数是否已定义
+phpinfo()					输出关于php的配置信息
+ReflectionExtension::getFunctions(void)		获取扩展中的函数,void:表示无参数,或无效参数
+ReflectionExtension::getClass()			从扩展中获取类列表
+ReflectionExtension::getClassName()		以数组的形式获取扩展中的类名称
+reflectionExtension::getName()			获取扩展名称
+strpos()					查找指定字符串在给定字符串的出现的次数
+sprinft()					返回一个格式化后的字符串
+in_array($needl,array $arr,boolean $strict = false)	判断给定的是否在数组中
+	$needl			要检查的值
+	$arr			数组
+	$strict			如果为true，则会检查$needl的值跟数组中的值类型是否相同
+is_array(array $arr)				判断给定的是否是一个数组
+array_merge($arr1,$arr2)			合并多个数组
+array_keys(array $arr[,$seach_value,$strict])	返回数组中部分或全部键名
+	$arr
+	$search_value				返回
+	$strict						
+join()						impolde的别名
+implode(string $space,array $array)		将数据合并成指定分隔符分隔的字符串	
+explode(string $space,string $str)		使用一个分隔符将字符串拆分成数组
+http_build_query(array $array)		构造url,生成url中?后面的参数,将参数urlencode
+str_pad()					填充一个字符串为指定长度的字符串
+is_numeric
+is_dir()
+is_really_writable()
+realpath()				返回归范化的绝对路径名，realpath() 扩展所有的符号连接并且处理输入的 path 中的 '/./', '/../' 以及多余的 '/' 并返回规范化后的绝对路径名。返回的路径中没有符号连接，'/./' 或 '/../' 成分。
+pathinfo()				返回一个文件的带有basename,extension,filename,dirname信息的关联数组。通过第二个参数PATHINFO_DIRNAME,PATHINFO_BASENAME,PATHINFO_EXTENSION,PATHINFO_FILENAME等关键字可返回某一个信息
+parse_url($url,opation)			解析url，返回其组成部分，指定 PHP_URL_SCHEME、 PHP_URL_HOST、 PHP_URL_PORT、 PHP_URL_USER、 PHP_URL_PASS、 PHP_URL_PATH、 PHP_URL_QUERY 或 PHP_URL_FRAGMENT 的其中一个来获取 URL 中指定的部分的 string。 （除了指定为 PHP_URL_PORT 后，将返回一个 integer 的值）。
+getcwd()				获取当前脚本的工作目录[绝对路径]
+$_SERVER['HTTP_ORIGIN']			当跨域提交时$_SERVER中会包括HTTP_ORIGIN源连接
+
+
+parse	英 [pɑ:z]  美 [pɑ:rs] 
+vt.
+从语法上描述或分析（词句等）
+第三人称单数： parses 现在分词： parsing 过去式： parsed 过去分词： parsed
+ 解析
+
+parseInt()
+parseFloat()				
+JSON.parse()				将字符串解析为对象
+JSON.stringify()			将对句解析为字符串
+numberObj.toFixed(num)			将number四舍五入为指定的小数位数的数字，num必需。规定小数的位数，是 0 ~ 20 之间的值，包括 0 和 20，有些实现可以支持更大的数值范围。如果省略了该参数，将用 0 代替
+
+
+websocke
+	检测浏览器是否支持webSocket
+	window.ws = window.WebSocket ? window.WebSocket : (window.MozWebSocket ? window.MozWebSocket : null ) ;
+	申请一个WebSocket对象，参数是需要连接的服务器端的地址，同http协议使用http://开头一样，WebSocket协议的URL使用ws://开头，另外安全的WebSocket协议使用wss://开头。。
+	if(!ws) console.log('您的浏览器不支持websocket,请您升级浏览器到最新版本'); return false;
+	var url = 'ws://server.com/ws';
+	var webSocke = new ws(url);
+	WebSocket对象一共支持四个消息 onopen, onmessage, onclose和onerror，
+	WebSocket对象方法：send/close
+	//打开一个连接
+	webSocket.onopen = function(event){
+		console.log('connecting server.....');
+		//发送信息
+		this.send();
+		//关闭webSocket
+		this.close();	
+	}
+	//接收信息
+	webSocket.onmessage = function(event){
+		
+		
+	}
+	//webSocket关闭时触发
+	websocket.onclose = function(event){
+
+	}
+	//webSocket出错时触发
+	webSocket.onerror = function(event){
+
+	}
+
+
+
+colspan				合并单元格
+rowspan				合并列
+
+
+
+insert ignore into
+INSERT IGNORE 与INSERT INTO的区别就是INSERT IGNORE会忽略数据库中已经存在 的数据，如果数据库没有数据，就插入新的数据，如果有数据的话就跳过这条数据。这样就可以保留数据库中已经存在数据，达到在间隙中插入数据的目的。
+INSERT IGNORE INTO / REPLACE INTO
+
+INSERT IGNORE INTO test(id, starttime, endtime) VALUES(8, '22','22')
+
+IGNORE有则忽略，无则添加
+
+ 
+
+ 
+
+REPLACE INTO test(id, starttime, endtime) VALUES(7,'222','222')
+
+替换指定ID的值
+
+
+设置sql安全更新
+SET SQL_SAFE_UPDATES=0;
+查看mysql进程：
+	启动mysql:show processlist;
+	进入mysql/bin:mysqladmin processlist
+	显示状态：
+如果您得到“too many connections”错误信息，并且想要了解正在发生的情况，本语句是非常有用的。MySQL保留一个额外的连接，让拥有SUPER权限的 账户使用，以确保管理员能够随时连接和检查系统（假设您没有把此权限给予所有的用户）。
+
+这个命令中最关键的就是state列，mysql列出的状态主要有以下几种：
+
+Checking table
+　正在检查数据表（这是自动的）。
+Closing tables
+　正在将表中修改的数据刷新到磁盘中，同时正在关闭已经用完的表。这是一个很快的操作，如果不是这样的话，就应该确认磁盘空间是否已经满了或者磁盘是否正处于重负中。
+Connect Out
+　复制从服务器正在连接主服务器。
+Copying to tmp table on disk
+　由于临时结果集大于tmp_table_size，正在将临时表从内存存储转为磁盘存储以此节省内存。
+Creating tmp table
+　正在创建临时表以存放部分查询结果。
+deleting from main table
+　服务器正在执行多表删除中的第一部分，刚删除第一个表。
+deleting from reference tables
+　服务器正在执行多表删除中的第二部分，正在删除其他表的记录。
+Flushing tables
+　正在执行FLUSH TABLES，等待其他线程关闭数据表。
+Killed
+　发送了一个kill请求给某线程，那么这个线程将会检查kill标志位，同时会放弃下一个kill请求。MySQL会在每次的主循环中检查kill标志位，不过有些情况下该线程可能会过一小段才能死掉。如果该线程程被其他线程锁住了，那么kill请求会在锁释放时马上生效。
+Locked
+　被其他查询锁住了。
+Sending data
+　正在处理SELECT查询的记录，同时正在把结果发送给客户端。
+Sorting for group
+　正在为GROUP BY做排序。
+　Sorting for order
+　正在为ORDER BY做排序。
+Opening tables
+　这个过程应该会很快，除非受到其他因素的干扰。例如，在执ALTER TABLE或LOCK TABLE语句行完以前，数据表无法被其他线程打开。正尝试打开一个表。
+Removing duplicates
+　正在执行一个SELECT DISTINCT方式的查询，但是MySQL无法在前一个阶段优化掉那些重复的记录。因此，MySQL需要再次去掉重复的记录，然后再把结果发送给客户端。
+Reopen table
+　获得了对一个表的锁，但是必须在表结构修改之后才能获得这个锁。已经释放锁，关闭数据表，正尝试重新打开数据表。
+Repair by sorting
+　修复指令正在排序以创建索引。
+Repair with keycache
+　修复指令正在利用索引缓存一个一个地创建新索引。它会比Repair by sorting慢些。
+Searching rows for update
+　正在讲符合条件的记录找出来以备更新。它必须在UPDATE要修改相关的记录之前就完成了。
+Sleeping
+　正在等待客户端发送新请求.
+System lock
+　正在等待取得一个外部的系统锁。如果当前没有运行多个mysqld服务器同时请求同一个表，那么可以通过增加--skip-external-locking参数来禁止外部系统锁。
+Upgrading lock
+　INSERT DELAYED正在尝试取得一个锁表以插入新记录。
+Updating
+　正在搜索匹配的记录，并且修改它们。
+User Lock
+　正在等待GET_LOCK()。
+Waiting for tables
+　该线程得到通知，数据表结构已经被修改了，需要重新打开数据表以取得新的结构。然后，为了能的重新打开数据表，必须等到所有其他线程关闭这个表。以下几种情况下会产生这个通知：FLUSH TABLES tbl_name, ALTER TABLE, RENAME TABLE, REPAIR TABLE, ANALYZE TABLE,或OPTIMIZE TABLE。
+waiting for handler insert
+　INSERT DELAYED已经处理完了所有待处理的插入操作，正在等待新的请求。
+　大部分状态对应很快的操作，只要有一个线程保持同一个状态好几秒钟，那么可能是有问题发生了，需要检查一下。
+　还有其他的状态没在上面中列出来，不过它们大部分只是在查看服务器是否有存在错误是才用得着。
+
+mysql 查看当前连接数
+
+命令： show processlist; 
+如果是root帐号，你能看到所有用户的当前连接。如果是其它普通帐号，只能看到自己占用的连接。 
+show processlist;只列出前100条，如果想全列出请使用show full processlist; 
+mysql> show processlist;
+
+命令： show status;
+
+Aborted_clients 由于客户没有正确关闭连接已经死掉，已经放弃的连接数量。 
+Aborted_connects 尝试已经失败的MySQL服务器的连接的次数。 
+Connections 试图连接MySQL服务器的次数。 
+Created_tmp_tables 当执行语句时，已经被创造了的隐含临时表的数量。 
+Delayed_insert_threads 正在使用的延迟插入处理器线程的数量。 
+Delayed_writes 用INSERT DELAYED写入的行数。 
+Delayed_errors 用INSERT DELAYED写入的发生某些错误(可能重复键值)的行数。 
+Flush_commands 执行FLUSH命令的次数。 
+Handler_delete 请求从一张表中删除行的次数。 
+Handler_read_first 请求读入表中第一行的次数。 
+Handler_read_key 请求数字基于键读行。 
+Handler_read_next 请求读入基于一个键的一行的次数。 
+Handler_read_rnd 请求读入基于一个固定位置的一行的次数。 
+Handler_update 请求更新表中一行的次数。 
+Handler_write 请求向表中插入一行的次数。 
+Key_blocks_used 用于关键字缓存的块的数量。 
+Key_read_requests 请求从缓存读入一个键值的次数。 
+Key_reads 从磁盘物理读入一个键值的次数。 
+Key_write_requests 请求将一个关键字块写入缓存次数。 
+Key_writes 将一个键值块物理写入磁盘的次数。 
+Max_used_connections 同时使用的连接的最大数目。 
+Not_flushed_key_blocks 在键缓存中已经改变但是还没被清空到磁盘上的键块。 
+Not_flushed_delayed_rows 在INSERT DELAY队列中等待写入的行的数量。 
+Open_tables 打开表的数量。 
+Open_files 打开文件的数量。 
+Open_streams 打开流的数量(主要用于日志记载） 
+Opened_tables 已经打开的表的数量。 
+Questions 发往服务器的查询的数量。 
+Slow_queries 要花超过long_query_time时间的查询数量。 
+Threads_connected 当前打开的连接的数量。 
+Threads_running 不在睡眠的线程数量。 
+Uptime 服务器工作了多少秒
+
+
+phpGC机制：
+
+system(string cmd[,int return_val])			//PHP执行一个外部命令并显示输出，跟c版本中的system函数一样
+exec(string cmd[,array out_put,int return_val])		//执行一个命令，不输出信息，只是简单的从执行命令结果中返回最后一条信息
+passthru(string cmd[, int result_val])			//执行外部程序并且显示原始输出
+escapeshellcmd()					//对字符串中shell命令执行任意命令的字符进行转义（安全执行命令的方式）
+escapsehellarg()					//把字符串转码为可以在 shell 命令里使用的参数
+popen()							//打开一个指向进程的管道，该进程由派生给定的 command 命令执行而产生
+proc_get_status()					//获取由 proc_open() 函数打开的进程的信息
+proc_close()						//关闭由 proc_open() 打开的进程并且返回进程退出码
+proc_nice()						//修改当前进程的优先级
+proc_terminate()					//杀除由 proc_open 打开的进程
+shell_exec(string cmd)					//通过 shell 环境执行命令，并且将完整的输出以字符串的方式返回
+stream_copy_to_stream(resource $source , resource $dest [, int $maxlength = -1 [, int $offset = 0 ]])	//将数据从一个流复制到另一个流
+copy ( string $source , string $dest [, resource $context ] )//复制一个文件
+rename()						//重命名一个文件【修改文件名】
+move_uploaded_file ( string $filename , string $destination )//将上传的文件移动到一个新位置
+is_upload_file(string $filename)					//判断文件是否是通过http上传的
+stream_context_create(array $opt,array $params)		//创建资源流上下文
+stream_context_set_option()				//对资源流、数据包或者上下文设置参数
+php -S localhost:8000 [file.php]			//启动PHP内置的服务器[只能在本地开发，使用，]
+php -S localhost:8000 -t /dir				//启动PHP内置的服务器并指定目录
+
+
+
+
+pow(number $base, number $exp)				//指数表示式，返回一个数的N次幂，integer
+exp(float $arg)						//计划e的指数
+log(float $arg[,float $base = M_E ])			//自然对数
+sqrt(float $arg)					//平方根
+
+
+
+
+***********************************************************************************************
+
+SQL：
+left join(左联接) 返回包括左表中的所有记录和右表中联结字段相等的记录 
+right join(右联接) 返回包括右表中的所有记录和左表中联结字段相等的记录
+inner join(等值连接) 只返回两个表中联结字段相等的行
+
+
+
+
+***********************************************************************************************
+
+JS：
+JSON.parse()
+JSON.stringify()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

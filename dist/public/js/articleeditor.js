@@ -22,7 +22,6 @@ var VM = new Vue({
         checked: false,
         tagLists: [],
         uid: '',
-        token: '',
         docName: '输入文集名称',
         userName: '',
         docList: [],
@@ -40,8 +39,7 @@ var VM = new Vue({
     },
     methods: {
         init: function init() {
-            if (token != '' && uid != '') {
-                this.token = token;
+            if (uid != '') {
                 this.uid = uid;
                 this.getUser();
             }
@@ -133,91 +131,81 @@ var VM = new Vue({
             // }
             this.wangedit.create();
         },
-        getToken: function getToken() {
+        getTags: function getTags() {
             var _this2 = this;
 
-            if (!this.token || this.token == '') {
-                this.$http.get('/api/gettoken').then(function (res) {
-                    if (!res) throw console.log(err);
-                    _this2.token = res.body.data.token;
-                });
-            }
-        },
-        getTags: function getTags() {
-            var _this3 = this;
-
             this.$http.get('/api/tags').then(function (res) {
-                _this3.tags = res.body.data;
+                _this2.tags = res.body.data;
             });
         },
         getUser: function getUser() {
-            var _this4 = this;
+            var _this3 = this;
 
             var winH = document.body.clientHeight || document.documentElement.clientHeight;
             this.editorsHeight = winH + 'px';
             this.$http.get('/api/getUsers?uid=' + this.uid).then(function (res) {
                 if (!res) throw console.log(res);
-                _this4.uid = res.body.data._id;
-                _this4.userName = res.body.data.name;
-                _this4.editors = res.body.data.editors;
-                if (_this4.editors == 2) {
-                    _this4.markdownEditor = 'block';
-                    _this4.wangEditor = 'none';
-                    _this4.initMarked(_this4.editorsWidth, _this4.editorsHeight);
+                _this3.uid = res.body.data._id;
+                _this3.userName = res.body.data.name;
+                _this3.editors = res.body.data.editors;
+                if (_this3.editors == 2) {
+                    _this3.markdownEditor = 'block';
+                    _this3.wangEditor = 'none';
+                    _this3.initMarked(_this3.editorsWidth, _this3.editorsHeight);
                 } else {
-                    _this4.initEditor(_this4.editorsWidth, _this4.editorsHeight);
-                    _this4.markdownEditor = 'none';
-                    _this4.wangEditor = 'block';
+                    _this3.initEditor(_this3.editorsWidth, _this3.editorsHeight);
+                    _this3.markdownEditor = 'none';
+                    _this3.wangEditor = 'block';
                 }
-                _this4.getDocLists();
+                _this3.getDocLists();
             });
         },
         getDocLists: function getDocLists() {
-            var _this5 = this;
+            var _this4 = this;
 
             this.$http.get('/api/getDocLists?uid=' + this.uid).then(function (res) {
                 if (!res) throw console.log(res);
-                _this5.docList = res.body.data;
-                if (_this5.docList.length > 0) {
-                    _this5.docList[0].active = true;
-                    _this5.doc_id = res.body.data[0]._id;
-                    _this5.docName = res.body.data[0].name;
-                    _this5.getArticleLists();
+                _this4.docList = res.body.data;
+                if (_this4.docList.length > 0) {
+                    _this4.docList[0].active = true;
+                    _this4.doc_id = res.body.data[0]._id;
+                    _this4.docName = res.body.data[0].name;
+                    _this4.getArticleLists();
                 }
             });
         },
         getArticleLists: function getArticleLists() {
-            var _this6 = this;
+            var _this5 = this;
 
             this.$http.get('/api/getArticleLists?doc_id=' + this.doc_id).then(function (res) {
                 if (!res) throw console.log(res);
-                _this6.articleLsts = res.body.data;
-                if (_this6.articleLsts.length > 0) {
-                    _this6.articleLsts[0].active = true;
-                    _this6.nowArticleId = res.body.data[0]._id;
-                    _this6.title = res.body.data[0].title;
-                    if (_this6.editors == 2) {
-                        _this6.contents = res.body.data[0].markDownText;
+                _this5.articleLsts = res.body.data;
+                if (_this5.articleLsts.length > 0) {
+                    _this5.articleLsts[0].active = true;
+                    _this5.nowArticleId = res.body.data[0]._id;
+                    _this5.title = res.body.data[0].title;
+                    if (_this5.editors == 2) {
+                        _this5.contents = res.body.data[0].markDownText;
                     } else {
-                        _this6.contents = res.body.data[0].contents;
-                        _this6.wangedit.txt.html(_this6.contents);
+                        _this5.contents = res.body.data[0].contents;
+                        _this5.wangedit.txt.html(_this5.contents);
                     }
                 }
             });
         },
         getArticle: function getArticle() {
-            var _this7 = this;
+            var _this6 = this;
 
             this.$http.get('/api/getArticle?id=' + this.nowArticleId).then(function (res) {
                 if (!res) throw console.log(res);
-                _this7.title = res.body.data.article.title;
-                _this7.nowArticleId = res.body.data.article._id;
-                if (_this7.editors == 2) {
-                    _this7.contents = res.body.data.article.markDownText;
-                    _this7.editormd.setMarkdown(_this7.contents);
+                _this6.title = res.body.data.article.title;
+                _this6.nowArticleId = res.body.data.article._id;
+                if (_this6.editors == 2) {
+                    _this6.contents = res.body.data.article.markDownText;
+                    _this6.editormd.setMarkdown(_this6.contents);
                 } else {
-                    _this7.contents = res.body.data.article.contents;
-                    _this7.wangedit.txt.html(_this7.contents);
+                    _this6.contents = res.body.data.article.contents;
+                    _this6.wangedit.txt.html(_this6.contents);
                 }
             });
         },
@@ -249,15 +237,15 @@ var VM = new Vue({
             this.docName = '';
         },
         confirmDocSubmitForm: function confirmDocSubmitForm(e) {
-            var _this8 = this;
+            var _this7 = this;
 
             this.$http.post('/api/newDocument', {
                 uid: this.uid,
                 name: this.docName
             }).then(function (res) {
                 if (!res) throw console.log(res);
-                _this8.docInputBox = 'none';
-                _this8.getDocLists();
+                _this7.docInputBox = 'none';
+                _this7.getDocLists();
             });
         },
         cleanDocConfirm: function cleanDocConfirm(e) {
@@ -288,7 +276,6 @@ var VM = new Vue({
             this.$http.post('/api/updateDocumentName', {
                 uid: this.uid,
                 id: id,
-                token: this.token,
                 name: value
             }).then(function (res) {
                 // pass
@@ -300,35 +287,34 @@ var VM = new Vue({
             this.$refs.showDocumentBox[index].innerHTML = this.$refs.showDocumentInput[index].value;
         },
         deleteDocument: function deleteDocument(e, id, index) {
-            var _this9 = this;
+            var _this8 = this;
 
-            this.$http.get('/api/deleteDoc?id=' + id + '&uid=' + this.uid + '&token=' + this.token).then(function (res) {
+            this.$http.get('/api/deleteDoc?id=' + id + '&uid=' + this.uid).then(function (res) {
                 if (!res) throw console.log(res);
-                _this9.docMenuShow = 'none';
-                _this9.$refs.menu[index].style.display = _this9.docMenuShow;
-                _this9.getDocLists();
+                _this8.docMenuShow = 'none';
+                _this8.$refs.menu[index].style.display = _this8.docMenuShow;
+                _this8.getDocLists();
             });
         },
         createArticle: function createArticle(e) {
-            var _this10 = this;
+            var _this9 = this;
 
             this.showLoadBut = 'block';
             this.$http.post('/api/newArticle', {
                 uid: this.uid,
                 doc_id: this.doc_id,
                 doc_name: this.docName,
-                user_name: this.userName,
-                token: this.token
+                user_name: this.userName
             }).then(function (res) {
-                _this10.showLoadBut = 'none';
+                _this9.showLoadBut = 'none';
                 if (!res) throw console.log(res);
                 console.log(res);
-                _this10.nowArticleId = res.body.data.id;
-                _this10.getArticleLists();
+                _this9.nowArticleId = res.body.data.id;
+                _this9.getArticleLists();
             });
         },
         saveArticle: function saveArticle(e, id) {
-            var _this11 = this;
+            var _this10 = this;
 
             // markdownToHTML
             if (this.editors == 2) {
@@ -344,7 +330,7 @@ var VM = new Vue({
                 contents: this.contents,
                 markdownText: this.markdownText
             }).then(function (res) {
-                _this11.showSaveTip();
+                _this10.showSaveTip();
             });
         },
         articleSetting: function articleSetting(e, id, index) {
@@ -375,13 +361,13 @@ var VM = new Vue({
             this.getArticle();
         },
         releaseArticle: function releaseArticle(e, id, index) {
-            var _this12 = this;
+            var _this11 = this;
 
-            this.$http.get('/api/releaseArticle?id=' + id + '&uid=' + this.uid + '&token=' + this.token).then(function (res) {
+            this.$http.get('/api/releaseArticle?id=' + id + '&uid=' + this.uid).then(function (res) {
                 if (!res) throw console.log(res);
-                _this12.articleMenuShow = 'none';
-                _this12.$refs.articleMenu[index].style.display = _this12.articleMenuShow;
-                _this12.getArticleLists();
+                _this11.articleMenuShow = 'none';
+                _this11.$refs.articleMenu[index].style.display = _this11.articleMenuShow;
+                _this11.getArticleLists();
             });
         },
         moveArticle: function moveArticle(e, id, index) {
@@ -394,25 +380,24 @@ var VM = new Vue({
             this.$refs.articlMenuDocumentBlock.style.top = parseInt(68 * (index + 1) + 72) + 'px';
         },
         deleteArticle: function deleteArticle(e, id, index) {
-            var _this13 = this;
+            var _this12 = this;
 
-            this.$http.get('/api/deleteArticle?id=' + id + '&uid=' + this.uid + '&token=' + this.token).then(function (res) {
+            this.$http.get('/api/deleteArticle?id=' + id + '&uid=' + this.uid).then(function (res) {
                 if (!res) throw console.log(res);
-                _this13.articleMenuShow = 'none';
-                _this13.$refs.articleMenu[index].style.display = _this13.articleMenuShow;
-                _this13.getArticleLists();
+                _this12.articleMenuShow = 'none';
+                _this12.$refs.articleMenu[index].style.display = _this12.articleMenuShow;
+                _this12.getArticleLists();
             });
         },
         changeArticleTitle: function changeArticleTitle(e) {
-            var _this14 = this;
+            var _this13 = this;
 
             this.$http.post('/api/changeAticleTitle', {
                 uid: this.uid,
-                token: this.token,
                 id: this.nowArticleId,
                 title: this.title
             }).then(function (res) {
-                _this14.showSaveTip();
+                _this13.showSaveTip();
             });
             this.$refs.articleTitle[this.articleTitleIndex].innerHTML = this.title;
         },

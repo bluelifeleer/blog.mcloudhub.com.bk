@@ -7,7 +7,7 @@ var router = express.Router();
 router.get('/lists', function (req, res, nex) {
     res.render('../views/articles/lists', {
         token: req.token,
-        uid: req.uid,
+        uid: req.session.uid && req.cookies.uid,
         page_type: 'article_list',
         title: '文章列表'
     });
@@ -16,7 +16,7 @@ router.get('/lists', function (req, res, nex) {
 router.get('/details', function (req, res, nex) {
     res.render('../views/articles/details', {
         token: req.token,
-        uid: req.uid,
+        uid: req.session.uid && req.cookies.uid,
         page_type: 'article_details',
         title: '文章详情'
     });

@@ -1,98 +1,116 @@
 'use strict';
 
-var _data;
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var vm = new Vue({
     delimiters: ['${', '}'],
     el: '#app',
-    data: (_data = {
-        winW: document.body.clientWidth || document.documentElement.clientWidth,
-        winH: document.body.clientHeight || document.documentElement.clientHeight,
-        token: '',
-        name: '',
-        password: '',
+    data: {
+        dialogTableVisible: false,
+        isSigin: false,
+        navbarSearchHover: false,
+        navbarUsersInfoDropdownShow: 'none',
+        dropdownToggle: false,
+        users: {
+            name: '',
+            password: '',
+            avatar: '',
+            accountHref: '',
+            github: {
+                html_url: ''
+            }
+        },
         remember: true,
-        phone: '',
-        nick: '',
-        fullname: '',
-        email: '',
-        qq: '',
-        wechat: '',
-        website: '',
-        editors: '',
-        avatar: '/public/images/QQ20180131-224008@2x.png',
-        sex: 3,
-        introduce: ''
-    }, _defineProperty(_data, 'website', 'http://|https://'), _defineProperty(_data, 'rewardStatus', 2), _defineProperty(_data, 'rewardDesc', '赞赏描述'), _defineProperty(_data, 'slide_list', {}), _defineProperty(_data, 'tags_list', {}), _defineProperty(_data, 'slideAttr', {
-        timer: null,
-        left: 0,
-        length: 0,
-        value: 1024,
-        index: 0,
-        cursor: null
-    }), _defineProperty(_data, 'accountSymbol', '&#xe68f;'), _defineProperty(_data, 'accountBox', 'none'), _defineProperty(_data, 'popupLayerBoxShow', 'none'), _defineProperty(_data, 'popupLayerWidth', '100%'), _defineProperty(_data, 'popupLayerHeight', '100%'), _defineProperty(_data, 'popupLayerLeft', 0), _defineProperty(_data, 'popupLayerTop', 0), _defineProperty(_data, 'popupLayerText', ''), _defineProperty(_data, 'articleLists', []), _defineProperty(_data, 'article', []), _defineProperty(_data, 'articleComments', '填写您的评论....'), _defineProperty(_data, 'discuss', []), _defineProperty(_data, 'imgRegexp', /<img [^>]*src=['"]([^'"]+)[^>]*>/gi), _defineProperty(_data, 'hasImg', null), _defineProperty(_data, 'collectionIconHtml', '<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>'), _defineProperty(_data, 'collectionIcon', ''), _defineProperty(_data, 'collectionName', '专题名称'), _defineProperty(_data, 'collectionDesc', '专题描述。。。'), _defineProperty(_data, 'collectionKeyWord', ''), _defineProperty(_data, 'collectionAdmins', []), _defineProperty(_data, 'collectionPus', 1), _defineProperty(_data, 'collectionVerify', 1), _defineProperty(_data, 'adminArr', []), _defineProperty(_data, 'collectionLists', []), _defineProperty(_data, 'collHref', ''), _defineProperty(_data, 'collectionPopupLayer', 'none'), _defineProperty(_data, 'collectionSearchKeyWord', ''), _defineProperty(_data, 'collection', {}), _defineProperty(_data, 'collSubscribe', false), _defineProperty(_data, 'collOffset', 1), _defineProperty(_data, 'newIncludeArticleLists', []), _defineProperty(_data, 'switchButSelected', true), _defineProperty(_data, 'swtichFlagShow', 'none'), _defineProperty(_data, 'swtichFlagLeft', 0), _defineProperty(_data, 'showAccountIntroduceEditForm', 'none'), _defineProperty(_data, 'showAccountIntroduceText', 'block'), _defineProperty(_data, 'documentLists', null), _data),
+        slide_list: {},
+        docs_list: {},
+        accountSymbol: '&#xe68f;',
+        accountBox: 'none',
+        popupLayerBoxShow: 'none',
+        popupLayerText: '',
+        articleLists: [],
+        article: {
+            users: {
+                article: '',
+                name: ''
+            }
+        },
+        articleComments: '填写您的评论....',
+        discuss: [],
+        imgRegexp: /<img [^>]*src=['"]([^'"]+)[^>]*>/gi,
+        hasImg: null,
+        collectionIconHtml: '<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>',
+        collectionIcon: '',
+        collectionName: '专题名称',
+        collectionDesc: '专题描述。。。',
+        collectionKeyWord: '',
+        collectionAdmins: [],
+        collectionPus: 1,
+        collectionVerify: 1,
+        adminArr: [],
+        collectionLists: [],
+        collHref: '',
+        collectionSearchKeyWord: '',
+        collection: {},
+        collSubscribe: false,
+        collOffset: 1,
+        newIncludeArticleLists: [],
+        switchButSelected: true,
+        swtichFlagShow: 'none',
+        swtichFlagLeft: 0,
+        showAccountIntroduceEditForm: 'none',
+        showAccountIntroduceText: 'block',
+        documentLists: null,
+        doc: {},
+        collectionFormNew: true,
+        collection_id: '',
+        now_date: new Date(),
+        dialogVisible: false,
+        rewardAmountButsActive: true,
+        showRewardSelfAmount: true,
+        selfAmountAutofocus: true,
+        selfAmountNums: 0,
+        rewardMessage: '给Ta留言。。。',
+        rewardAmount: '￥2',
+        changePayMethodText: '更换',
+        showPayMethod: 'none',
+        payMethodActive: true,
+        payMethod: 'wechat'
+    },
     methods: {
         init: function init() {
-            console.log();
-            if (token != '' && uid != '') {
-                this.uid = uid;
-                this.token = token;
+            if (uid != '') {
+                this.isSigin = true;
+                this.users.uid = page_type == 'account' ? quid : uid;
                 this.getUsers();
             }
-            this.getTags();
+            this.getDocs();
             this.getSlides();
-            this.slideAutoPlay();
-            this.getAllArticles(0, 10);
+            this.getAllArticles(0, 20);
             this.getArticle();
+            if (page_type == 'account') {
+                this.users.uid = quid;
+                this.getUsers();
+            }
             if (page_type == 'collections_list') {
                 this.getCollections(0, 9);
             } else {
                 this.getCollections(0, 7);
             }
             if (page_type == 'collections_detailes') {
-                this.getCollectionById(coll_id);
+                this.getCollectionById(coll_id, 'detailes');
+            }
+            if (page_type == 'collections_edit') {
+                this.collectionFormNew = false;
+                this.getCollectionById(coll_id, 'edit');
             }
             if (page_type == 'account') {
                 this.getDocuments();
             }
-        },
-        switchSlide: function switchSlide(e, direction) {
-            if (direction == 'next') {
-                this.slideAttr.index--;
-                if (this.slideAttr.index <= -this.slideAttr.length) {
-                    this.slideAttr.index = 0;
-                }
-            } else {
-                this.slideAttr.index++;
-                if (this.slideAttr.index >= 0) {
-                    this.slideAttr.index = -this.slideAttr.length + 1;
-                }
+            if (page_type == 'document_detailes') {
+                this.getDoc();
             }
-            this.slidePlay(this.slideAttr.index);
-        },
-        slidePlay: function slidePlay(index) {
-            this.slideAttr.left = index * this.slideAttr.value;
-        },
-        slideAutoPlay: function slideAutoPlay() {
-            var _this = this;
-            this.slideAttr.timer = setInterval(function () {
-                _this.switchSlide(null, 'next');
-            }, 1000);
-        },
-        stopSlidePlay: function stopSlidePlay() {
-            this.slideAttr.cursor = 'pointer';
-            clearInterval(this.slideAttr.timer);
-        },
-        autoSlidePlay: function autoSlidePlay() {
-            this.slideAttr.cursor = null;
-            this.slideAutoPlay();
         },
         submitForm: function submitForm(e, type) {
-            this.$http.post('/api/signin', { name: this.name, password: this.password, form: 'index', remember: this.remember }).then(function (res) {
+            this.$http.post('/api/signin', { name: this.users.name, password: this.users.password, form: 'index', remember: this.remember }).then(function (res) {
                 if (!res) throw console.log(res);
-                console.log(res);
                 if (res.body.code == 0) {
                     window.location = '/register';
                 } else {
@@ -100,54 +118,70 @@ var vm = new Vue({
                 }
             });
         },
-        getToken: function getToken() {
+        getDocs: function getDocs() {
             var _this2 = this;
 
-            if (!this.token || this.token == '') {
-                this.$http.get('/api/gettoken').then(function (res) {
-                    if (!res) throw console.log(err);
-                    _this2.token = res.body.data.token;
-                });
-            }
-        },
-        getTags: function getTags() {
-            var _this3 = this;
-
-            this.$http.get('/api/tags').then(function (res) {
-                _this3.tags_list = res.body.data;
+            this.$http.get('/api/docs').then(function (docs) {
+                if (docs.body.code && docs.body.ok) {
+                    var docs_data = docs.body.data;
+                    docs_data.forEach(function (item) {
+                        item.href = '/account/dcs?id=' + item._id;
+                    });
+                    _this2.docs_list = docs_data;
+                }
             });
         },
         getSlides: function getSlides() {
-            var _this4 = this;
+            var _this3 = this;
 
             this.$http.get('/api/slides').then(function (res) {
-                _this4.slide_list = res.body.data;
-                _this4.slideAttr.length = res.body.data.length;
+                _this3.slide_list = res.body.data;
             });
         },
         getDocuments: function getDocuments() {
-            var _this5 = this;
+            var _this4 = this;
 
-            this.$http.get('/api/getDocLists').then(function (doc) {
+            var query_string = page_type == 'account' ? 'uid=' + quid + '&offset=1&num=10' : 'offset=1&num=10';
+            this.$http.get('/api/getDocLists?' + query_string).then(function (doc) {
                 if (doc.body.code && doc.body.ok) {
                     if (doc.body.data.length > 0) {
                         var docs = doc.body.data;
                         docs.forEach(function (item) {
-                            item.href = '/account/dcs?id' + item._id;
+                            item.href = '/account/dcs?id=' + item._id;
                         });
-                        _this5.documentLists = docs;
+                        _this4.documentLists = docs;
                     } else {
-                        _this5.documentLists = null;
+                        _this4.documentLists = null;
                     }
                 } else {
-                    _this5.documentLists = null;
+                    _this4.documentLists = null;
+                }
+            });
+        },
+        getDoc: function getDoc() {
+            var _this5 = this;
+
+            var id = this.getQueryString('id');
+            this.$http.get('/api/documents/get?uid=' + this.users.uid + '&id=' + id).then(function (doc) {
+                if (doc.body.code && doc.body.ok) {
+                    _this5.doc = doc.body.data;
+                } else {
+                    _this5.doc = {};
                 }
             });
         },
         getAllArticles: function getAllArticles(offset, num) {
             var _this6 = this;
 
-            this.$http.get('/api/allArticles?offset=' + offset + '&num=' + num).then(function (all) {
+            var query_string = '';
+            if (page_type == 'account') {
+                query_string = 'uid=' + quid + '&offset=' + offset + '&num=' + num;
+            } else if (page_type == 'collections_detailes') {
+                query_string = 'uid=' + this.users.uid + '&offset=' + offset + '&num=' + num;
+            } else {
+                query_string = 'offset=' + offset + '&num=' + num;
+            }
+            this.$http.get('/api/allArticles?' + query_string).then(function (all) {
                 var ArticleArrs = [];
                 if (all.body.code && all.body.ok) {
                     ArticleArrs = all.body.data;
@@ -170,14 +204,26 @@ var vm = new Vue({
             if (window.location.pathname == '/article/details') {
                 var id = this.getQueryString('id');
                 this.$http.get('/api/getArticle?id=' + id).then(function (article) {
-                    console.log(article);
                     if (!article) throw console.log(article);
                     var articleArr = article.body.data.article;
+                    articleArr.users = {};
+                    _this7.$http.get('/api/getUsers?uid=' + articleArr.uid).then(function (user) {
+                        if (user.body.code && user.body.ok) {
+                            articleArr.users = user.body.data;
+                            articleArr.users.accountHref = '/account?uid=' + user.body.data._id;
+                        }
+                    });
                     articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
                     _this7.article = articleArr;
                     var discussArr = article.body.data.discuss;
                     discussArr.forEach(function (item) {
                         item.add_date = _this7.formate_date(item.add_date);
+                        _this7.$http.get('/api/getUsers?uid=' + item.uid).then(function (user) {
+                            if (user.body.code && user.body.ok) {
+                                item.users = user.body.data;
+                                item.users.accountHref = '/account?uid=' + user.body.data._id;
+                            }
+                        });
                     });
                     _this7.discuss = discussArr.reverse();
                 });
@@ -188,45 +234,43 @@ var vm = new Vue({
             var r = window.location.search.substr(1).match(reg);
             return r != null ? unescape(r[2]) : null;
         },
-        showAccountBox: function showAccountBox() {
-            if (this.accountBox == 'none') {
-                this.accountBox = 'block';
+        showAccountBox: function showAccountBox(e) {
+            if (this.navbarUsersInfoDropdownShow == 'none') {
+                this.navbarUsersInfoDropdownShow = 'block';
                 this.accountSymbol = '&#xe68d';
             } else {
-                this.accountBox = 'none';
+                this.navbarUsersInfoDropdownShow = 'none';
                 this.accountSymbol = '&#xe68f;';
             }
+        },
+        navbarSearchButFocus: function navbarSearchButFocus(e) {
+            this.navbarSearchHover = !this.navbarSearchHover;
+        },
+        navbarSearchButBlur: function navbarSearchButBlur() {
+            this.navbarSearchHover = !this.navbarSearchHover;
         },
         getUsers: function getUsers() {
             var _this8 = this;
 
-            this.$http.get('/api/getUsers?uid=' + this.uid).then(function (res) {
+            this.$http.get('/api/getUsers?uid=' + this.users.uid).then(function (res) {
                 if (!res) throw console.log(res);
-                _this8.nick = res.body.data.nick;
-                _this8.phone = res.body.data.phone;
-                _this8.name = res.body.data.name.length > 10 ? res.body.data.name.substr(0, 10) + '...' : res.body.data.name;
-                _this8.fullname = res.body.data.name;
-                _this8.email = res.body.data.email;
-                _this8.qq = res.body.data.qq;
-                _this8.wechat = res.body.data.wechat;
-                _this8.editors = res.body.data.editors;
-                _this8.avatar = res.body.data.avatar ? res.body.data.avatar : _this8.avatar;
-                _this8.sex = res.body.data.sex;
-                _this8.introduce = res.body.data.introduce;
-                _this8.website = res.body.data.website;
-                _this8.rewardStatus = res.body.data.rewardStatus ? res.body.data.rewardStatus : _this8.rewardStatus;
-                _this8.rewardDesc = res.body.data.rewardDesc;
+                var data = res.body.data;
+                data.uid = data._id;
+                data.name = data.name.length > 10 ? data.name.substr(0, 10) + '...' : data.name;
+                data.fullname = data.name;
+                data.avatar = data.avatar ? data.avatar : '/public/images/avatar_default-78d4d1f68984cd6d4379508dd94b4210.png';
+                data.rewardStatus = data.rewardStatus ? data.rewardStatus : 2;
+                data.rewardDesc = data.rewardDesc ? data.rewardDesc : '如果您觉得这文章能帮助到您，您可以对我进行打赏。';
+                data.accountHref = '/account?uid=' + data._id;
+                _this8.users = data;
             });
         },
         changeAvatar: function changeAvatar(e) {
-            console.log(e);
             var _this = this;
             var file = e.target.files[0];
             var Reader = new FileReader();
             Reader.addEventListener('load', function (e) {
-                console.log(e);
-                console.log(Reader);
-                _this.avatar = Reader.result;
+                _this.users.avatar = Reader.result;
             }, false);
             Reader.readAsDataURL(file);
         },
@@ -234,23 +278,19 @@ var vm = new Vue({
             var _this9 = this;
 
             this.$http.post('/api/updateUserBasic', {
-                uid: this.uid,
-                nick: this.nick,
-                phone: this.phone,
-                email: this.email,
-                editors: this.editors,
-                avatar: this.avatar,
-                qq: this.qq,
-                wechat: this.wechat,
-                token: this.token
+                uid: this.users.uid,
+                nick: this.users.nick,
+                phone: this.users.phone,
+                email: this.users.email,
+                editors: this.users.editors,
+                avatar: this.users.avatar,
+                qq: this.users.qq,
+                wechat: this.users.wechat,
+                github: this.users.github
             }).then(function (res) {
                 if (!res) throw console.log(res);
-                console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this9.popupLayerBoxShow = 'block';
-                    _this9.popupLayerLeft = parseInt((_this9.winW - 500) / 2) + 'px';
-                    _this9.popupLayerTop = '200px';
-                    _this9.popupLayerText = res.body.msg;
+                    _this9.alertSuccess(res.body.msg);
                 }
             });
         },
@@ -258,19 +298,14 @@ var vm = new Vue({
             var _this10 = this;
 
             this.$http.post('/api/changeProfile', {
-                uid: this.uid,
-                sex: this.sex,
-                introduce: this.introduce,
-                website: this.website,
-                token: this.token
+                uid: this.users.uid,
+                sex: this.users.sex,
+                introduce: this.users.introduce,
+                website: this.users.website
             }).then(function (res) {
                 if (!res) throw console.log(res);
-                console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this10.popupLayerBoxShow = 'block';
-                    _this10.popupLayerLeft = parseInt((_this10.winW - 500) / 2) + 'px';
-                    _this10.popupLayerTop = '200px';
-                    _this10.popupLayerText = res.body.msg;
+                    _this10.alertSuccess(res.body.msg);
                 }
             });
         },
@@ -278,18 +313,13 @@ var vm = new Vue({
             var _this11 = this;
 
             this.$http.post('/api/changeReward', {
-                uid: this.uid,
-                rewardStatus: this.rewardStatus,
-                rewardDesc: this.rewardDesc,
-                token: this.token
+                uid: this.users.uid,
+                rewardStatus: this.users.rewardStatus,
+                rewardDesc: this.users.rewardDesc
             }).then(function (res) {
                 if (!res) throw console.log(res);
-                console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this11.popupLayerBoxShow = 'block';
-                    _this11.popupLayerLeft = parseInt((_this11.winW - 500) / 2) + 'px';
-                    _this11.popupLayerTop = '200px';
-                    _this11.popupLayerText = res.body.msg;
+                    _this11.alertSuccess(res.body.msg);
                 }
             });
         },
@@ -302,18 +332,14 @@ var vm = new Vue({
             var a = document.createElement('a');
             a.setAttribute('style', 'display:none;');
             a.setAttribute('target', '_blank');
-            document.body.appendChild(a);
-            this.$http.get('/api/downloadAllArticles?uid=' + this.uid + '&token=' + this.token).then(function (res) {
+            this.$refs.downloadAllArticles.appendChild(a);
+            this.$http.get('/api/downloadAllArticles?uid=' + this.users.uid).then(function (res) {
                 if (!res) throw console.log(res);
                 if (res.body.code && res.body.ok) {
                     a.setAttribute('href', res.body.data.tar_path);
                     a.click();
                     a.parentNode.removeChild(a);
-                    // window.open(res.body.data.tar_path,'_blank');
-                    _this12.popupLayerBoxShow = 'block';
-                    _this12.popupLayerLeft = parseInt((_this12.winW - 500) / 2) + 'px';
-                    _this12.popupLayerTop = '200px';
-                    _this12.popupLayerText = res.body.msg;
+                    _this12.alertSuccess(res.body.msg);
                 }
             });
         },
@@ -326,25 +352,18 @@ var vm = new Vue({
         postCommentBut: function postCommentBut(e, id) {
             var _this13 = this;
 
-            if (uid !== '' && token !== '') {
+            if (uid !== '') {
                 if (this.articleComments == '' || this.articleComments == '填写您的评论....') {
-                    this.popupLayerBoxShow = 'block';
-                    this.popupLayerText = '请填写您的评论内容';
-                    this.popupLayerLeft = parseInt((this.winW - 500) / 2) + 'px';
-                    this.popupLayerTop = '200px';
+                    this.alertWarning(res.body.msg);
                     return false;
                 } else {
                     this.$http.post('/api/postDiscuss', {
                         contents: this.articleComments,
-                        uid: this.uid,
-                        token: this.token,
+                        uid: this.users.uid,
                         id: id
                     }).then(function (res) {
                         if (res.body.code && res.body.ok) {
-                            _this13.popupLayerBoxShow = 'block';
-                            _this13.popupLayerText = '评论成功';
-                            _this13.popupLayerLeft = parseInt((_this13.winW - 500) / 2) + 'px';
-                            _this13.popupLayerTop = '200px';
+                            _this13.alertSuccess('评论成功');
                         }
                         _this13.getDiscuss(id);
                     });
@@ -363,11 +382,17 @@ var vm = new Vue({
         getDiscuss: function getDiscuss(id) {
             var _this14 = this;
 
-            this.$http.get('/api/getDiscuss?id=' + id + '&token=' + this.token).then(function (discuss) {
+            this.$http.get('/api/getDiscuss?id=' + id).then(function (discuss) {
                 if (discuss.body.code && discuss.body.ok) {
                     var discussArr = discuss.body.data.reverse();
                     discussArr.forEach(function (item) {
                         item.add_date = _this14.formate_date(item.add_date);
+                        _this14.$http.get('/api/getUsers?uid=' + item.uid).then(function (user) {
+                            if (user.body.code && user.body.ok) {
+                                item.users = user.body.data;
+                                item.users.accountHref = '/account?uid=' + user.body.data._id;
+                            }
+                        });
                     });
                     _this14.discuss = discussArr;
                 } else {
@@ -394,26 +419,36 @@ var vm = new Vue({
                 _this15.adminArr = users.body.data;
             });
         },
-        collectionSubmitForm: function collectionSubmitForm(e) {
+        collectionSubmitForm: function collectionSubmitForm(e, s) {
             var _this16 = this;
 
-            var descArr = this.collectionDesc.split('\n');
+            var descArr = platform == 'win32' ? this.collectionDesc.split('\r\n') : this.collectionDesc.split('\n');
             var tmp = '';
             descArr.forEach(function (desc) {
                 tmp += '<p>' + desc + '</p>';
             });
-            this.$http.post('/api/collection/new', {
-                uid: this.uid,
-                token: this.token,
+            var url = s ? '/api/collection/new' : '/api/collection/update';
+            var data = s ? {
+                uid: this.users.uid,
                 icon: this.collectionIcon,
                 name: this.collectionName,
                 describe: tmp,
                 push: this.collectionPus,
                 verify: this.collectionVerify,
                 admins: this.collectionAdmins
-            }).then(function (res) {
+            } : {
+                id: this.collection_id,
+                uid: this.users.uid,
+                icon: this.collectionIcon,
+                name: this.collectionName,
+                describe: tmp,
+                push: this.collectionPus,
+                verify: this.collectionVerify,
+                admins: this.collectionAdmins
+            };
+            this.$http.post(url, data).then(function (res) {
                 if (res.body.code && res.body.ok) {
-                    window.location.href = '/account/collections/detailes?id=' + res.body.data._id;
+                    window.location.href = '/account/collections/detailes?id=' + (s ? res.body.data._id : _this16.collection_id);
                 } else {
                     _this16.popupLayerBoxShow = 'block';
                     _this16.popupLayerText = res.body.msg;
@@ -425,14 +460,15 @@ var vm = new Vue({
         getCollections: function getCollections(offset, num) {
             var _this17 = this;
 
-            this.$http.get('/api/get_collections?uid=' + this.uid + '&token=' + this.token + '&offset=' + offset + '&num=' + num).then(function (res) {
+            var query_string = page_type == 'account' ? 'uid=' + quid + '&offset=' + offset + '&num=' + num : 'offset=' + offset + '&num=' + num;
+            this.$http.get('/api/get_collections?' + query_string).then(function (res) {
                 var collections = res.body.data;
                 collections.forEach(function (item) {
                     item.href = '/account/collections/detailes?id=' + item._id;
                     item.describe = item.describe.replace(/<[^>]*>/g, "");
                     item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
                     item.subscribe.forEach(function (uids) {
-                        if (uids.uid == _this17.uid) {
+                        if (uids.uid == _this17.users.uid) {
                             item.subscribed = true;
                         } else {
                             item.subscribed = false;
@@ -442,38 +478,52 @@ var vm = new Vue({
                 _this17.collectionLists = collections;
             });
         },
-        getCollectionById: function getCollectionById(id) {
+        getCollectionById: function getCollectionById(id, type) {
             var _this18 = this;
 
-            this.$http.get('/api/getCollectionById?id=' + id + '&token=' + this.token).then(function (coll) {
+            this.$http.get('/api/getCollectionById?id=' + id).then(function (coll) {
                 if (coll.body.code && coll.body.ok) {
                     var collection = coll.body.data;
-                    collection.articles = [];
-                    collection.article_ids.forEach(function (ids) {
-                        _this18.$http.get('/api/getArticle?id=' + ids.id).then(function (article) {
-                            var articleContents = article.body.data.article;
-                            articleContents.href = '/article/details?id=' + articleContents._id;
-                            articleContents.hasImg = articleContents.contents.search(_this18.imgRegexp) > 0 ? true : false;
+                    if (type == 'edit') {
+                        var describe = collection.describe.replace(/<p>/g, ''); // 将开头的p标签去掉
+                        var replaceText = platform == 'win32' ? '\r\n' : '\n'; // 根据不同的系统确定换行符
+                        describe = describe.replace(/<\/p>/g, replaceText); // 将结束的p标签替换成换行符
+                        _this18.collectionIconHtml = '<img src="' + collection.icon + '">';
+                        _this18.collection_id = collection._id;
+                        _this18.collectionIcon = collection.icon;
+                        _this18.collectionName = collection.name;
+                        _this18.collectionDesc = describe;
+                        _this18.collectionPus = collection.push;
+                        _this18.collectionVerify = collection.verify;
+                    } else {
+                        collection.articles = [];
+                        collection.article_ids.forEach(function (ids) {
+                            _this18.$http.get('/api/getArticle?id=' + ids.id).then(function (article) {
+                                var articleContents = article.body.data.article;
+                                articleContents.href = '/article/details?id=' + articleContents._id;
+                                articleContents.hasImg = articleContents.contents.search(_this18.imgRegexp) > 0 ? true : false;
 
-                            articleContents.imgHtml = articleContents.hasImg ? articleContents.contents.match(_this18.imgRegexp)[0] : '';
-                            var content = articleContents.contents.replace(/<[^>]*>/g, "");
-                            articleContents.contents = articleContents.hasImg ? content.length > 60 ? content.substr(0, 60) + '...' : content : content.length > 80 ? content.substr(0, 80) + '...' : content;
-                            collection.articles.push(articleContents);
+                                articleContents.imgHtml = articleContents.hasImg ? articleContents.contents.match(_this18.imgRegexp)[0] : '';
+                                var content = articleContents.contents.replace(/<[^>]*>/g, "");
+                                articleContents.contents = articleContents.hasImg ? content.length > 60 ? content.substr(0, 60) + '...' : content : content.length > 80 ? content.substr(0, 80) + '...' : content;
+                                collection.articles.push(articleContents);
+                            });
                         });
-                    });
-                    collection.subscribe.forEach(function (item) {
-                        if (item.uid == _this18.uid) {
-                            _this18.collSubscribe = true;
-                        }
-                    });
-                    // console.log(this.$refs.switchButs);
-                    _this18.swtichFlagShow = 'block';
-                    _this18.swtichFlagLeft = _this18.$refs.switchButsNew.offsetLeft + 'px';
-                    _this18.$refs.switchContentsNew.style = 'display:block';
-                    _this18.$refs.switchContentsDiscuss.style = 'display:none';
-                    _this18.$refs.switchContentsHot.style = 'display:none';
-                    _this18.collection = collection;
-                    _this18.newIncludeArticleLists = collection.articles;
+                        collection.editHref = '/account/collections/edit?id=' + collection._id;
+                        collection.subscribe.forEach(function (item) {
+                            if (item.uid == _this18.users.uid) {
+                                _this18.collSubscribe = true;
+                            }
+                        });
+                        // console.log(this.$refs.switchButs);
+                        _this18.swtichFlagShow = 'block';
+                        _this18.swtichFlagLeft = _this18.$refs.switchButsNew.offsetLeft + 'px';
+                        _this18.$refs.switchContentsNew.style = 'display:block';
+                        _this18.$refs.switchContentsDiscuss.style = 'display:none';
+                        _this18.$refs.switchContentsHot.style = 'display:none';
+                        _this18.collection = collection;
+                        _this18.newIncludeArticleLists = collection.articles;
+                    }
                 }
             });
         },
@@ -513,45 +563,50 @@ var vm = new Vue({
             }
         },
         followButs: function followButs(e, id) {
-            this.$http.get('/api/collectionFollow?uid=' + this.uid + '&id=' + id + '&token=' + this.token).then();
-        },
-        collectionPush: function collectionPush(e, id) {
-            this.collectionPopupLayer = 'block';
-            this.popupLayerLeft = parseInt((this.winW - 580) / 2) + 'px';
-            this.popupLayerTop = 120 + 'px';
-        },
-        collectionSearchArticle: function collectionSearchArticle(e) {
             var _this19 = this;
 
-            this.$http.get('/api/allArticles?keyword=' + this.collectionSearchKeyWord + '&token=' + this.token).then(function (lists) {
-                if (lists.body.code && lists.body.ok) {
-                    var articleArr = lists.body.data;
-                    articleArr.forEach(function (item) {
-                        item.add_date = _this19.formate_date(item.add_date);
-                    });
-                    _this19.articleLists = articleArr.reverse();
+            this.$http.get('/api/collectionFollow?uid=' + this.users.uid + '&id=' + id).then(function (res) {
+                if (res.body.code && res.body.ok) {
+                    _this19.alertSuccess('您已关注');
                 } else {
-                    _this19.articleLists = [];
+                    _this19.alertError('您关注此专题失败');
                 }
             });
         },
-        closeCollectionPushPopupLayer: function closeCollectionPushPopupLayer() {
-            this.collectionPopupLayer = 'none';
+        collectionPush: function collectionPush(e, id) {
+            this.dialogTableVisible = true;
         },
-        pushActionBut: function pushActionBut(e, article_id, id) {
+        collectionSearchArticle: function collectionSearchArticle(e) {
             var _this20 = this;
 
-            this.$http.get('/api/articlePush?uid=' + this.uid + '&article_id=' + article_id + '&token=' + this.token + '&id=' + id).then(function (push) {
-                _this20.collectionPopupLayer = 'none';
-                _this20.popupLayerBoxShow = 'block';
-                _this20.popupLayerText = push.body.msg;
+            this.$http.get('/api/allArticles?keyword=' + this.collectionSearchKeyWord).then(function (lists) {
+                if (lists.body.code && lists.body.ok) {
+                    var articleArr = lists.body.data;
+                    articleArr.forEach(function (item) {
+                        item.add_date = _this20.formate_date(item.add_date);
+                    });
+                    _this20.articleLists = articleArr.reverse();
+                } else {
+                    _this20.articleLists = [];
+                }
+            });
+        },
+        pushActionBut: function pushActionBut(e, article_id, id) {
+            var _this21 = this;
+
+            this.$http.get('/api/articlePush?uid=' + this.users.uid + '&article_id=' + article_id + '&id=' + id).then(function (push) {
+                if (push.body.code && push.body.ok) {
+                    _this21.alertSuccess('您已投稿');
+                } else {
+                    _this21.alertError('您投稿失败');
+                }
             });
         },
         moreCollections: function moreCollections(e) {
-            var _this21 = this;
+            var _this22 = this;
 
             this.collOffset++;
-            this.$http.get('/api/get_collections?uid=' + this.uid + '&token=' + this.token + '&offset=' + this.collOffset + '&num=9').then(function (res) {
+            this.$http.get('/api/get_collections?uid=' + this.users.uid + '&offset=' + this.collOffset + '&num=9').then(function (res) {
                 var collections = res.body.data;
                 if (collections.length > 0) {
                     collections.forEach(function (item) {
@@ -559,13 +614,13 @@ var vm = new Vue({
                         item.describe = item.describe.replace(/<[^>]*>/g, "");
                         item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
                         item.subscribe.forEach(function (uids) {
-                            if (uids.uid == _this21.uid) {
+                            if (uids.uid == _this22.users.uid) {
                                 item.subscribed = true;
                             } else {
                                 item.subscribed = false;
                             }
                         });
-                        _this21.collectionLists.push(item);
+                        _this22.collectionLists.push(item);
                     });
                 }
             });
@@ -575,26 +630,25 @@ var vm = new Vue({
             this.showAccountIntroduceText = 'none';
         },
         accountIntroduceFromSaveBut: function accountIntroduceFromSaveBut(e) {
-            var _this22 = this;
+            var _this23 = this;
 
             this.$http.post('/api/updateIntroduce', {
-                uid: this.uid,
-                token: this.token,
-                introduce: this.introduce
+                uid: this.users.uid,
+                introduce: this.users.introduce
             }).then(function (res) {
                 if (res.body.code && res.body.ok) {
-                    _this22.introduce = _this22.introduce;
-                    _this22.showAccountIntroduceEditForm = 'none';
-                    _this22.showAccountIntroduceText = 'block';
-                    _this22.popupLayerBoxShow = 'block';
-                    _this22.popupLayerText = res.body.msg;
-                    _this22.popupLayerLeft = parseInt((_this22.winW - 500) / 2) + 'px';
-                    _this22.popupLayerTop = '200px';
+                    _this23.introduce = _this23.introduce;
+                    _this23.showAccountIntroduceEditForm = 'none';
+                    _this23.showAccountIntroduceText = 'block';
+                    _this23.popupLayerBoxShow = 'block';
+                    _this23.popupLayerText = res.body.msg;
+                    _this23.popupLayerLeft = parseInt((_this23.winW - 500) / 2) + 'px';
+                    _this23.popupLayerTop = '200px';
                 } else {
-                    _this22.popupLayerBoxShow = 'block';
-                    _this22.popupLayerText = '个人介绍修改失败';
-                    _this22.popupLayerLeft = parseInt((_this22.winW - 500) / 2) + 'px';
-                    _this22.popupLayerTop = '200px';
+                    _this23.popupLayerBoxShow = 'block';
+                    _this23.popupLayerText = '个人介绍修改失败';
+                    _this23.popupLayerLeft = parseInt((_this23.winW - 500) / 2) + 'px';
+                    _this23.popupLayerTop = '200px';
                 }
             });
         },
@@ -602,9 +656,122 @@ var vm = new Vue({
             this.showAccountIntroduceEditForm = 'none';
             this.showAccountIntroduceText = 'block';
         },
+        deleteCollection: function deleteCollection(e, id) {
+            var _this24 = this;
+
+            this.$http.get('/api/collections/delete?id=' + id + '&uid=' + this.users.uid).then(function (res) {
+                if (res.body.code && res.body.ok) {
+                    _this24.alertSuccess('您已删除专题');
+                } else {
+                    _this24.alertError('您删除专题失败');
+                }
+            });
+        },
+        articlFollowAuthorBut: function articlFollowAuthorBut(e, id) {
+            var _this25 = this;
+
+            this.$http.get('/api/users/follow?uid=' + this.users.uid + '&follow_id=' + id).then(function (res) {
+                if (res.body.code && res.body.ok) {
+                    _this25.alertSuccess('您已成功关注');
+                } else {
+                    _this25.alertError('您关注失败');
+                }
+            });
+        },
+        thirdPartyLogin: function thirdPartyLogin(e, type) {
+            var a = document.createElement('a');
+            a.style.display = 'none';
+            // a.target = '_blank';
+            this.$refs.loginLinkBox.appendChild(a);
+            a.setAttribute('href', 'https://github.com/login/oauth/authorize?client_id=5fe59ee126edbea8f3df&state=' + this.now_date.getTime() + '&redirect_uri=https://blog.mcloudhub.com/api/github');
+            a.click();
+            // a.parentNode.removeChild(a);
+        },
+        handleClose: function handleClose(done) {
+            this.$confirm('确认关闭？').then(function (_) {
+                done();
+            }).catch(function (_) {});
+        },
+
+        selectAmountButs: function selectAmountButs(e, index, nums) {
+            var buts = this.$refs.rewardAmountButs.children;
+            for (var i = 0; i < buts.length; i++) {
+                buts[i].style.color = '#999';
+                buts[i].style.border = '1px solid #e6e6e6';
+                // Vue.set(buts[i],'reward-amount-buts-default',false);
+            }
+            buts[index].style.color = '#EA6F5A';
+            buts[index].style.border = '1px solid #EA6F5A';
+            if (!nums) {
+                this.showRewardSelfAmount = false;
+                this.rewardAmount = '￥' + this.selfAmountNums;
+            } else {
+                this.showRewardSelfAmount = true;
+                this.rewardAmount = '￥' + nums;
+            }
+        },
+        setSelfAmountNums: function setSelfAmountNums(e) {
+            this.rewardAmount = this.selfAmountNums ? '￥' + this.selfAmountNums : '￥0';
+        },
+        // hiddenSelfAmountInput:function(e){
+        //     this.showRewardSelfAmount = !this.showRewardSelfAmount;
+        // },
+        // showSelfAmountInput:function(e){
+        //     this.showRewardSelfAmount = !this.showRewardSelfAmount;
+        // },
+        rewardMessageTextareaFocus: function rewardMessageTextareaFocus(e) {
+            this.rewardMessage = this.rewardMessage != '给Ta留言。。。' ? this.rewardMessage : '';
+        },
+        rewardMessageTextareaBlur: function rewardMessageTextareaBlur(e) {
+            this.rewardMessage = this.rewardMessage != '给Ta留言。。。' && this.rewardMessage != '' ? this.rewardMessage : '给Ta留言。。。';
+        },
+        chenagePayMethod: function chenagePayMethod(e) {
+            if (this.showPayMethod == 'none') {
+                this.showPayMethod = 'block';
+                this.changePayMethodText = '关闭';
+            } else {
+                this.showPayMethod = 'none';
+                this.changePayMethodText = '更换';
+            }
+        },
+        selectPayMethods: function selectPayMethods(e, pay) {
+            this.payMethodActive = !this.payMethodActive;
+            this.payMethod = pay;
+        },
+        payAmountActive: function payAmountActive(e) {
+            var rewardAmount = this.rewardAmount.substr(1, this.rewardAmount.length);
+            alert('支付方式：' + this.payMethod + "；支付金额：" + rewardAmount + '；留言：' + this.rewardMessage);
+        },
         formate_date: function formate_date(date) {
             var MyDate = new Date(date);
-            return MyDate.getFullYear() + '-' + (MyDate.getMonth() + 1 <= 9 ? '0' + (MyDate.getMonth() + 1) : MyDate.getMonth() + 1) + '-' + MyDate.getDate() + ' ' + (MyDate.getHours() <= 90 ? '0' + MyDate.getHours() : MyDate.getHours()) + ':' + (MyDate.getMinutes() <= 9 ? '0' + MyDate.getMinutes() : MyDate.getMinutes()) + ':' + (MyDate.getSeconds() <= 9 ? '0' + MyDate.getSeconds() : MyDate.getSeconds());
+            return MyDate.getFullYear() + '-' + (MyDate.getMonth() + 1 <= 9 ? '0' + (MyDate.getMonth() + 1) : MyDate.getMonth() + 1) + '-' + (MyDate.getDate() <= 9 ? '0' + MyDate.getDate() : MyDate.getDate()) + ' ' + (MyDate.getHours() <= 9 ? '0' + MyDate.getHours() : MyDate.getHours()) + ':' + (MyDate.getMinutes() <= 9 ? '0' + MyDate.getMinutes() : MyDate.getMinutes()) + ':' + (MyDate.getSeconds() <= 9 ? '0' + MyDate.getSeconds() : MyDate.getSeconds());
+        },
+        alertMsessage: function alertMsessage(msg) {
+            this.$message({
+                showClose: true,
+                message: msg
+            });
+        },
+        alertSuccess: function alertSuccess(msg) {
+            this.$message({
+                showClose: true,
+                message: msg,
+                type: 'success'
+            });
+        },
+        alertWarning: function alertWarning(msg) {
+            this.$message({
+                showClose: true,
+                message: msg,
+                type: 'warning'
+            });
+        },
+        alertError: function alertError(msg) {
+            this.$message({
+                showClose: true,
+                message: msg,
+                type: 'error'
+            });
         }
     }
 });
