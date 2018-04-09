@@ -27,7 +27,7 @@
                 <a href="https://blog.mcloudhub.com/account/collections/lists" class="more-collections">更多热门专题&nbsp;<i class="icon iconfont">&#xe6c4;</i></a>
             </div>
             <div class="article-list-groups">
-                <div class="article-list-box" v-for="(article,$index) in articleLists" v-bind:class="{'has-img':article.hasImg}">
+                <div class="article-list-box" v-for="(article,$index) in articleLists" v-bind:class="{'has-img':article.hasImg}" v-if="article.permissions == 1">
                     <div class="article-list" v-if="article.hasImg">
                         <a target="_blank" v-bind:href="article.href">
                             <div class="article-list-img-box" v-html="article.imgHtml"></div>

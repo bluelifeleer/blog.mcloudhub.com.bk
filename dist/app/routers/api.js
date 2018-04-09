@@ -1,0 +1,1705 @@
+'use strict';
+
+var _require = require('child_process'),
+    exec = _require.exec;
+
+var fs = require('fs');
+var express = require('express');
+var request = require('request');
+var requestPromise = require('request-promise');
+var md5 = require('md5');
+var sillyDateTime = require('silly-datetime');
+var multer = require('multer');
+var Geetest = require('gt3-sdk');
+var nodemailer = require('nodemailer');
+var salt = require('../libs/salt');
+var crt_token = require('../libs/ctr_token');
+var tools = require('../libs/tools');
+var router = express.Router();
+var Users = require('../models/Users_model');
+var Docs = require('../models/Document_model');
+var Articles = require('../models/Articles_model');
+var Discuss = require('../models/Discuss_model');
+var Tags = require('../models/Tags_model');
+var Slide = require('../models/Slide_model');
+var Photos = require('../models/Photos_model');
+var Collections = require('../models/Collections_model');
+var OneByDay = require('../models/onebyday_model');
+var MailGroup = require('../models/mailGroup');
+var MailUser = require('../models/mailUser');
+var emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+var phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
+var uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
+var NowDate = new Date();
+var downloadBasecDir = '/Users/bluelife/www/node/blog/app/download/';
+var output = {};
+
+router.use(function (req, res, next) {
+    output = {
+        code: 0,
+        msg: '',
+        ok: false,
+        data: null
+    };
+    next();
+});
+
+router.get('/gettest', function (req, res, next) {
+    new Geetest({
+        geetest_id: 'e46e906d776dbd41c4e72f72499ca39f',
+        geetest_key: '30b094aad22445378f7fdc01b83215bb'
+    }).register(null, function (err, data) {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        res.send(data);
+        // console.log(data);
+
+        // if (!data.success) {
+        //     // 进入 fallback，如果一直进入此模式，请检查服务器到极验服务器是否可访问
+        //     // 可以通过修改 hosts 把极验服务器 api.geetest.com 指到不可访问的地址
+        //     // 为以防万一，你可以选择以下两种方式之一：
+        //     // 1. 继续使用极验提供的failback备用方案
+        //     req.session.fallback = true;
+        //     res.send(data);
+        //     // 2. 使用自己提供的备用方案
+        //     // todo
+        // } else {
+        //     // 正常模式
+        //     req.session.fallback = false;
+        //     res.send(data);
+        // }
+    });
+});
+
+/**
+ * 获取所有标签
+ */
+router.get('/docs', function (req, res, next) {
+    // console.log(Tags);
+    // res.send();
+    Docs.find({ isDel: 0 }).then(function (docs) {
+        if (docs) {
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = docs;
+            res.json(output);
+            return;
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+            return;
+        }
+    });
+});
+
+/**
+ * 获取幻灯片
+ */
+router.get('/slides', function (req, res, next) {
+    Slide.find().then(function (slides) {
+        if (slides) {
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = slides;
+            res.json(output);
+            return;
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+            return;
+        }
+    });
+});
+
+router.get('/getUsers', function (req, res, next) {
+    var uid = req.query.uid;
+    Users.findOne({ _id: uid, isDel: 0 }).then(function (usersInfo) {
+        if (usersInfo) {
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = usersInfo;
+            res.json(output);
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+        }
+    });
+});
+
+router.get('/allUsers', function (req, res, next) {
+    var keyWord = req.query.keyword;
+    var reg = new RegExp(keyWord, 'si'); //不区分大小写
+    Users.find({
+        // name:{$regex : /keyWord/,$options: 'si'}
+        $or: [//多条件，数组
+        { name: { $regex: reg } }]
+    }).then(function (users) {
+        if (users) {
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = users;
+            res.json(output);
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+        }
+    });
+});
+
+router.get('/getDocLists', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : req.cookies.uid || req.session.uid;
+    var offset = req.query.offset ? parseInt(req.query.offset) : 1;
+    var num = req.query.num ? parseInt(req.query.num) : 20;
+    var where = uid ? { user_id: uid, isDel: 0 } : { isDel: 0 };
+    Docs.find(where).populate({ path: 'author', select: 'name nick avatar' }).exec().then(function (docs) {
+        if (docs) {
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = docs;
+            res.json(output);
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+        }
+    });
+});
+
+router.get('/allArticles', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : req.cookies.token && req.cookies.uid;
+    var all = false;
+    var offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    var num = req.query.num ? parseInt(req.query.num) : 10;
+    if (!uid) {
+        all = true;
+    }
+    var where = all ? { isDel: 0, permissions: 1 } : { user_id: uid, isDel: 0 };
+    Articles.find(where).skip(offset ? parseInt(offset - 1) * num : offset).limit(num).populate([{
+        path: 'document',
+        select: 'name'
+    }, {
+        path: 'author',
+        select: 'name nick avatar'
+    }]).exec().then(function (articles) {
+        if (articles) {
+            articles.forEach(function (item) {
+                item.add_date = sillyDateTime.format(item.add_date, 'YYYY-MM-DD HH:mm:ss');
+            });
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = articles;
+            res.json(output);
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+        }
+    });
+    // Articles.find(where).skip((offset == 0 ? offset : (offset - 1))).limit(num).then(alls => {
+    //     if (alls) {
+    //         alls.forEach(item => {
+    //             item.add_date = sillyDateTime.format(item.add_date, 'YYYY-MM-DD HH:mm:ss');
+    //         });
+    //         output.code = 1;
+    //         output.msg = 'success';
+    //         output.ok = true;
+    //         output.data = alls;
+    //         res.json(output);
+    //     } else {
+    //         output.code = 0;
+    //         output.msg = 'error';
+    //         output.ok = false;
+    //         output.data = {};
+    //         res.json(output);
+    //     }
+    // });
+});
+
+router.get('/getArticleLists', function (req, res, next) {
+    var doc_id = req.query.doc_id;
+    var offset = req.query.offset ? req.query.offset : 0;
+    var num = req.query.num ? req.query.num : 10;
+    Articles.find({
+        doc_id: doc_id,
+        isDel: 0,
+        permissions: 1
+    }).skip(offset ? parseInt(offset - 1) * num : offset).limit(num).populate([{
+        path: 'author',
+        select: 'name'
+    }]).exec().then(function (articles) {
+        if (articles) {
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = articles;
+            res.json(output);
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+        }
+    });
+});
+
+router.get('/getArticle', function (req, res, next) {
+    var id = req.query.id;
+    Articles.findById(id).populate([{
+        path: 'document',
+        select: 'name'
+    }, {
+        path: 'author',
+        select: 'name nick avatar rewardStatus rewardDesc'
+    }, {
+        path: 'issue_contents',
+        select: 'contents add_date permissions',
+        populate: {
+            path: 'author',
+            select: 'name nick avatar'
+        }
+    }]).exec().then(function (article) {
+        if (article) {
+            article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
+            if (!req.cookies[id]) {
+                //增加阅读数
+                article.watch++;
+                article.save();
+                res.cookie(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
+            }
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = {
+                'article': article
+            };
+            res.json(output);
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+        }
+    });
+});
+
+router.post('/signin', function (req, res, next) {
+    // let redirect = req.body.redirect ? req.body.redirect : '';
+    var name = req.body.name;
+    var password = req.body.password;
+    var form = req.body.form;
+    var validateCode = form == 'login' ? req.body.validateCode : '';
+    var remember = req.body.remember;
+    if (name == '') {
+        output.code = 0;
+        output.msg = '用户名不能为空';
+        res.json(output);
+        return;
+    }
+    if (password == '') {
+        output.code = 0;
+        output.msg = "密码不能为空";
+        res.json(output);
+        return;
+    }
+    if (form == 'login') {
+        if (validateCode == '') {
+            output.code = 0;
+            output.msg = "请先通过验证";
+            res.json(output);
+            return;
+        }
+    }
+    var user = {};
+    if (emailRegexp.test(name)) {
+        user.email = name;
+    } else if (phoneRegexp.test(name)) {
+        user.phone = name;
+    } else {
+        user.name = name;
+    }
+    Users.findOne(user).then(function (user) {
+        if (user) {
+            if (user.password == md5(password + user.salt)) {
+                res.cookie('uid', user._id, { maxAge: 1800000 });
+                req.session.uid = user._id;
+                if (remember) {
+                    res.cookie('name', name, { maxAge: 3600000 * 24 * 7 });
+                    res.cookie('password', password, { maxAge: 3600000 * 24 * 7 });
+                }
+                output.code = 1;
+                output.msg = "success";
+                output.ok = true;
+                output.data = user;
+                res.json(output);
+                return;
+            } else {
+                output.code = 0;
+                output.msg = "登录失败，密码不正确";
+                output.ok = false;
+                output.data = null;
+                res.json(output);
+            }
+        } else {
+            output.code = 2;
+            output.msg = "您还没有帐号，请注册帐号";
+            output.data = '';
+            res.json(output);
+        }
+    });
+});
+
+router.post('/signup', function (req, res, next) {
+    var name = req.body.name;
+    var phone = req.body.phone;
+    var password = req.body.password;
+    var passwordConfirm = req.body.passwordConfirm;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (name == '') {
+        output.code = 0;
+        output.msg = '用户名不能为空';
+        res.json(output);
+        return;
+    }
+    if (password == '') {
+        output.code = 0;
+        output.msg = "密码不能为空";
+        res.json(output);
+        return;
+    }
+
+    if (password != passwordConfirm) {
+        output.code = 0;
+        output.msg = "两次输入密码不同";
+        res.json(output);
+        return;
+    }
+
+    var findData = {};
+    if (emailRegexp.test(name)) {
+        findData.email = name;
+    } else if (phoneRegexp.test(name)) {
+        findData.phone = name;
+    } else {
+        findData.name = name;
+    }
+    Users.findOne(findData).then(function (userInfo) {
+        if (userInfo) {
+            output.code = 0;
+            output.ok = false;
+            output.msg = '帐号已存在，请注册新帐号';
+            output.data = null;
+            res.json(output);
+        } else {
+            var t_salt = salt();
+            var user = {
+                name: '',
+                phone: '',
+                email: '',
+                password: '',
+                salt: '',
+                sex: 3,
+                nick: '',
+                wechat: '',
+                qq: '',
+                avatar: '',
+                signature: '',
+                website: '',
+                introduce: '',
+                editors: 2,
+                follows: 0,
+                follow_users: [],
+                email_verify: false,
+                github_id: '',
+                github: {
+                    html_url: ''
+                },
+                add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+                isDel: 0
+            };
+            if (emailRegexp.test(name)) {
+                user.email = name;
+                user.type = 3;
+            } else if (phoneRegexp.test(name)) {
+                user.phone = name;
+                user.type = 2;
+            } else {
+                user.name = name;
+                user.type = 1;
+            }
+            user.name = name;
+            user.salt = t_salt;
+            user.password = md5(password + t_salt);
+            var newUsers = new Users(user);
+            return newUsers.save();
+        }
+    }).then(function (userAdd) {
+        new Docs({
+            user_id: userAdd._id,
+            name: '随笔',
+            photos: '',
+            describe: '',
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+            author: userAdd,
+            article: [],
+            permissions: 1,
+            isDel: 0
+        }).save();
+        if (userAdd) {
+            output.code = 1;
+            output.ok = true;
+            output.msg = '注册成功';
+            output.data = { id: userAdd._id };
+            res.json(output);
+        } else {
+            output.code = 2;
+            output.ok = true;
+            output.msg = '注册失败';
+            output.data = null;
+            res.json(output);
+        }
+    });
+});
+
+router.get('/signout', function (req, res, next) {
+    res.clearCookie('uid'); // 清除cookie中的uid
+    req.session.destroy(function () {
+        // 销毁session中的uid
+        res.redirect(302, '/login');
+    });
+    // console.log(store);
+    // req.session.store.clear(()=>{
+    //     res.redirect(302,'/login');
+    // })
+});
+
+router.post('/updateUserBasic', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var updateUserBasic = {
+        nick: req.body.nick,
+        phone: req.body.phone,
+        email: req.body.email,
+        editors: req.body.editors,
+        avatar: req.body.avatar,
+        qq: req.body.qq,
+        wechat: req.body.wechat,
+        github: req.body.github
+    };
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
+        return;
+    }
+    Users.findByIdAndUpdate(uid, updateUserBasic, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '用户基础信息修改成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        if (err) throw err;
+    });
+});
+
+router.post('/changeProfile', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var updateProfile = {
+        sex: req.body.sex,
+        introduce: req.body.introduce,
+        website: req.body.website
+    };
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
+        return;
+    }
+    Users.findByIdAndUpdate(uid, updateProfile, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '用户个人资料修改成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        if (err) throw err;
+    });
+});
+
+router.post('/changeReward', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var updateReward = {
+        rewardStatus: req.body.rewardStatus,
+        rewardDesc: req.body.rewardDesc
+    };
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
+        return;
+    }
+    Users.findByIdAndUpdate(uid, updateReward, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '赞赏修改成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        if (err) throw err;
+    });
+});
+
+router.post('/saveArticle', function (req, res, next) {
+    var id = req.body.id;
+    var contents = req.body.contents;
+    var markDownText = req.body.markdownText ? req.body.markdownText : null;
+    var title = req.body.title;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    var article_date = {
+        contents: contents,
+        title: title
+    };
+    if (markDownText) {
+        article_date.markDownText = markDownText;
+    }
+
+    Articles.findByIdAndUpdate(id, { title: title, contents: contents, markDownText: markDownText }, { runValidators: true }).then(function (status) {
+        if (!status) throw console.log(status);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章保存成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+router.get('/article/set_permissions', function (req, res, next) {
+    var id = req.query.id;
+    var type = req.query.type;
+    Articles.findByIdAndUpdate(id, { permissions: type }, { runValidators: true }).then(function (status) {
+        if (!status) throw console.log(status);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章权限设置成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        console.log(err);
+        output.code = 0;
+        output.ok = false;
+        output.msg = '文章权限设置失败';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.get('/downloadAllArticles', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : req.cookies.uid;
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '未登陆';
+        output.data = {};
+        res.json(output);
+        return;
+    }
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    var allArticles = Articles.find({ uid: uid }).then(function (articles) {
+        return articles;
+    });
+    var dirname = downloadBasecDir + '/' + uid;
+    fs.existsSync(dirname) || fs.mkdirSync(dirname); // 下载目录不存在创建目录
+    allArticles.then(function (all) {
+        all.forEach(function (article) {
+            fs.writeFile('/Users/bluelife/www/node/blog/app/download/' + uid + '/' + article.title + '.md', article.markDownText, 'utf8', function (err) {
+                if (err) throw err;
+            });
+        });
+        exec('tar -czf ' + dirname + '.tar.gz' + ' ' + dirname, { encoding: 'utf8', maxBuffer: parseInt(200 * 1024) }, function (error, stdout, stderr) {
+            if (error) throw error;
+            output.code = 1;
+            output.ok = true;
+            output.msg = '所有文章打包下载完成';
+            output.data = { tar_path: 'http://blog.mcloudhub.com/download/' + uid + '.tar.gz' };
+            res.json(output);
+        });
+    });
+});
+
+router.post('/newDocument', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var name = req.body.name;
+    Users.findById(uid).then(function (user) {
+        new Docs({
+            user_id: user._id,
+            name: name,
+            photos: '',
+            describe: '',
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+            author: user,
+            article: [],
+            permissions: 1,
+            isDel: 0
+        }).save().then(function (insert) {
+            output.code = 1;
+            output.ok = true;
+            output.msg = '文集创建成功';
+            output.data = { id: insert._id };
+            res.json(output);
+        });
+    });
+});
+
+router.post('/updateDocumentName', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var id = req.body.id;
+    var name = req.body.name;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Docs.findByIdAndUpdate(id, { name: name }, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文集名称修改成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '文集名称修改失败';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.post('/newArticle', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var doc_id = req.body.doc_id;
+    var doc_name = req.body.doc_name;
+    var user_name = req.body.user_name;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Docs.findById(doc_id).then(function (docs) {
+        var users = Users.findById(uid);
+        return Promise.all([users, docs]);
+    }).spread(function (u, d) {
+        new Articles({
+            user_id: u._id,
+            doc_id: d._id,
+            author: u, // 文章所属用户
+            document: d, // 文章所属文集
+            title: sillyDateTime.format(new Date(), 'YYYY-MMM-DD'), // 文章标题
+            describe: '', // 文章描述
+            photos: '', // 文章图片
+            contents: '', // 文章内容
+            markDownText: '',
+            watch: 0,
+            watch_users: [],
+            start: 0,
+            start_users: [],
+            fork: 0,
+            fork_users: [],
+            issue: 0,
+            issue_contents: [],
+            follows: 0,
+            follow_users: [],
+            permissions: 1,
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+            isRelease: 0,
+            isDel: 0
+        }).save().then(function (insert) {
+            d.article_id.push({ id: insert._id });
+            d.article.push(insert);
+            d.save();
+            u.article.push(insert);
+            u.save();
+            output.code = 1;
+            output.ok = true;
+            output.msg = '文章创建成功';
+            output.data = insert;
+            res.json(output);
+        }).catch(function (err) {
+            console.log(err);
+            output.code = 0;
+            output.ok = false;
+            output.msg = '文章创建失败';
+            output.data = {};
+            res.json(output);
+        });
+    });
+});
+
+router.get('/deleteDoc', function (req, res, next) {
+    var uid = req.query.uid;
+    var id = req.query.id;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Docs.findByIdAndUpdate(id, { isDel: 1 }, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文集删除成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '文集删除失败';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.get('/releaseArticle', function (req, res, next) {
+    var uid = req.query.uid;
+    var id = req.query.id;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Articles.findByIdAndUpdate(id, { isRelease: 1 }, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章已发布';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '文章已失败';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.get('/deleteArticle', function (req, res, next) {
+    var uid = req.query.uid;
+    var id = req.query.id;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Articles.findByIdAndUpdate(id, { isDel: 1 }, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章删除成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '文章删除失败';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.post('/changeAticleTitle', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var id = req.body.id;
+    var title = req.body.title;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Articles.findByIdAndUpdate(id, { title: title }, { runValidators: true }).then(function (status) {
+        if (!status) throw console.log(status);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章修改成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '文章修改失败';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.post('/postDiscuss', function (req, res, next) {
+    var id = req.body.id;
+    var contents = req.body.contents;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var permissions = req.body.permissions ? parseInt(req.body.permissions) : 1;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '您尚未登录';
+        res.json(output);
+        return;
+    }
+    Articles.findById(id).then(function (article) {
+        var users = Users.findById(uid);
+        return Promise.all([users, article]);
+    }).spread(function (u, a) {
+        new Discuss({
+            uid: u._id,
+            article_id: a._id,
+            author: u,
+            article: a,
+            contents: contents,
+            permissions: permissions,
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+            isDel: 0
+        }).save().then(function (status) {
+            a.issue++;
+            a.issue_contents.push(status);
+            a.save();
+            output.code = 1;
+            output.ok = true;
+            output.msg = '评论成功';
+            output.data = {};
+            res.json(output);
+        });
+    });
+});
+
+router.get('/getDiscuss', function (req, res, next) {
+    var id = req.query.id;
+    Discuss.find({ article_id: id }).then(function (discuss) {
+        if (!discuss) throw console.log(discuss);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = discuss;
+        res.json(output);
+    });
+});
+
+router.post('/uploader', uoloader.single('editormd-image-file'), function (req, res, next) {
+    var uid = req.session.uid && req.cookies.uid;
+    var ext = req.file.mimetype.split('/')[1];
+    var filename = sillyDateTime.format(new Date(), 'YYYYMMMDDHHmmss') + '_' + crt_token() + '.' + ext;
+    var now_timer = sillyDateTime.format(new Date(), 'YYYYMMMDD');
+    var dirname = '/Users/bluelife/www/node/blog/app/public/images/uploads/' + now_timer + '/';
+    fs.existsSync(dirname) || fs.mkdirSync(dirname); // 目录不存在创建目录
+    fs.writeFile(dirname + filename, req.file.buffer, function (err) {
+        if (!err) {
+            Users.findById(uid).then(function (user) {
+                new Photos({
+                    user_id: user._id,
+                    author: user,
+                    originalname: req.file.originalname,
+                    filename: filename,
+                    path: dirname,
+                    fullpath: dirname + filename,
+                    encoding: req.file.encoding,
+                    mimetype: req.file.mimetype,
+                    size: req.file.size,
+                    add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+                    isDel: 0
+                }).save().then(function (insert) {
+                    if (!insert) throw console.log(insert);
+                    res.json({
+                        message: '图片上传成功',
+                        url: 'https://blog.mcloudhub.com/public/images/uploads/' + now_timer + '/' + filename,
+                        success: 1
+                    });
+                });
+            });
+        }
+    });
+});
+
+router.post('/collection/new', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var icon = req.body.icon;
+    var name = req.body.name;
+    var describe = req.body.describe;
+    var push = req.body.push;
+    var admins = req.body.admins;
+    var verify = req.body.verify;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '您尚未登录';
+        res.json(output);
+        return;
+    }
+    Users.findById(uid).then(function (user) {
+        new Collections({
+            user_id: user._id,
+            author: user,
+            article: [],
+            name: name, // 集合名称
+            type: 1, // 集合类型
+            icon: icon, // 集合图标
+            describe: describe, // 集合描述
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'), // 集合添加时间,
+            admins: admins, // 其他管理员
+            push: push, // 是否允许投稿
+            follow: 0, //关注数
+            subscribe: [],
+            include: 0, //收录文章数
+            verify: verify, // 是否需要审核
+            isDel: 0
+        }).save().then(function (coll) {
+            if (!coll) {
+                output.code = 0;
+                output.ok = false;
+                output.msg = '文集添加失败';
+                output.data = {};
+                res.json(output);
+            } else {
+                output.code = 1;
+                output.ok = true;
+                output.msg = '文集添加成功';
+                output.data = coll;
+                res.json(output);
+            }
+        });
+    });
+});
+
+router.post('/collection/update', function (req, res, next) {
+    var id = req.body.id;
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var icon = req.body.icon;
+    var name = req.body.name;
+    var describe = req.body.describe;
+    var push = req.body.push;
+    var admins = req.body.admins;
+    var verify = req.body.verify;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '您尚未登录';
+        res.json(output);
+        return;
+    }
+    Collections.findByIdAndUpdate(id, {
+        icon: icon,
+        name: name,
+        describe: describe,
+        push: push,
+        verify: verify,
+        admins: admins
+    }, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '专题已修改';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '专题修改失败';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.get('/get_collections', function (req, res, next) {
+    var offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    var num = req.query.num ? parseInt(req.query.num) : 10;
+    var where = { isDel: 0 };
+    Collections.find(where).skip(offset ? parseInt(offset - 1) * num : offset).limit(num).populate([{
+        path: 'author',
+        select: 'name avatar nick'
+    }, {
+        path: 'admins',
+        select: 'name avatar nick'
+    }, {
+        path: 'subscribe',
+        select: 'name avatar nick'
+    }, {
+        path: 'article',
+        select: 'title contents markDownText watch start fork issue follows',
+        populate: [{
+            path: 'author',
+            select: 'name nick avatar'
+        }, {
+            path: 'document',
+            select: 'name'
+        }]
+    }]).exec().then(function (colls) {
+        if (!colls) throw console.log(colls);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = colls;
+        res.json(output);
+    });
+});
+
+router.get('/getCollectionById', function (req, res, next) {
+    var id = req.query.id;
+    var articleArr = [];
+    Collections.findOne({ _id: id, isDel: 0 }).populate([{
+        path: 'author',
+        select: 'name avatar nick'
+    }, {
+        path: 'admins',
+        select: 'name avatar nick'
+    }, {
+        path: 'subscribe',
+        select: 'name avatar nick'
+    }, {
+        path: 'article',
+        select: 'title contents markDownText watch start fork issue follows',
+        populate: [{
+            path: 'author',
+            select: 'name nick avatar'
+        }, {
+            path: 'document',
+            select: 'name'
+        }]
+    }]).exec().then(function (coll) {
+        if (!coll) throw console.log(coll);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = coll;
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = [];
+        res.json(output);
+    });
+});
+
+router.get('/collectionFollow', function (req, res, next) {
+    var uid = req.query.uid;
+    var id = req.query.id;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+
+    Collections.findById(id).then(function (coll) {
+        var user = Users.findById(uid);
+        return Promise.all([user, coll]);
+    }).spread(function (u, c) {
+        c.follow++;
+        c.subscribe = u;
+        return c.save();
+    }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '关注成功';
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '关注失败';
+        res.json(output);
+    });
+});
+
+router.get('/articlePush', function (req, res, next) {
+    var uid = req.query.uid;
+    var id = req.query.id;
+    var article_id = req.query.article_id;
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Collections.findById(id).then(function (coll) {
+        var user = Users.findById(uid);
+        var article = Articles.findById(article_id);
+        return Promise.all([user, article, coll]);
+    }).spread(function (u, a, c) {
+        var bf = tools.in_array(a._id, c.article_id);
+        if (bf) {
+            return new Promise(function (resolve, reject) {
+                resolve('exists');
+                reject(null);
+            });
+        } else {
+            c.article_id.push({ id: article_id });
+            c.include++;
+            c.article.push(a);
+            return c.save();
+        }
+    }).then(function (status) {
+        if (status == 'exists') {
+            output.code = 2;
+            output.ok = true;
+            output.msg = '此文章已投稿，请另选一篇文章再投。';
+            res.json(output);
+        } else {
+            output.code = 1;
+            output.ok = true;
+            output.msg = '投稿成功';
+            res.json(output);
+        }
+    }).catch(function (err) {
+        console.log(err);
+        output.code = 0;
+        output.ok = false;
+        output.msg = '投稿失败';
+        res.json(output);
+    });
+});
+
+router.post('/updateIntroduce', function (req, res, next) {
+    var uid = req.body.uid ? req.body.uid : req.session.uid;
+    var introduce = req.body.introduce;
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
+        return;
+    }
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Users.findByIdAndUpdate(uid, { introduce: introduce }, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '用户个人介绍修改成功';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        if (err) throw err;
+    });
+});
+
+router.get('/documents/get', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : '';
+    var id = req.query.id ? req.query.id : '';
+    var where = uid ? { _id: id, user_id: uid, isDel: 0 } : { _id: id, isDel: 0 };
+    Docs.findOne(where).populate([{
+        path: 'author',
+        select: 'name nick avatar'
+    }, {
+        path: 'article',
+        select: 'title contents markDownText watch start fork issue follows',
+        populate: [{
+            path: 'author',
+            select: 'name nick avatar'
+        }, {
+            path: 'document',
+            select: 'name'
+        }]
+    }]).exec().then(function (doc) {
+        if (!doc) throw console.log(doc);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = doc;
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.get('/collections/delete', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : '';
+    var id = req.query.id ? req.query.id : '';
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
+        return;
+    }
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    Collections.findByIdAndUpdate(id, { isDel: 1 }, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = '专题已删除';
+        output.data = {};
+        res.json(output);
+    }).catch(function (err) {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '专题删除失败，请稍后再试';
+        output.data = {};
+        res.json(output);
+    });
+});
+
+router.get('/users/follow', function (req, res, next) {
+    var uid = req.query.uid ? req.query.uid : '';
+    var follow_id = req.query.follow_id ? req.query.follow_id : '';
+    if (req.session.uid == '') {
+        output.code = 0;
+        output.msg = '未登陆';
+        res.json(output);
+        return;
+    }
+    if (req.cookies._scrf == '') {
+        output.code = 0;
+        output.msg = '非法请求';
+        res.json(output);
+        return;
+    }
+    if (follow_id) {
+        Users.findOne({ _id: follow_id }).then(function (user) {
+            user.follow++;
+            user.uids.push({ id: uid });
+            user.save();
+            output.code = 1;
+            output.ok = true;
+            output.msg = '关注成功';
+            res.json(output);
+            return;
+        });
+    } else {
+        output.code = 0;
+        output.ok = false;
+        output.msg = '关注失败';
+        res.json(output);
+        return;
+    }
+});
+
+router.get('/github', function (req, res, next) {
+    var code = req.query.code;
+    var state = NowDate.getTime();
+    var getTokenOptations = {
+        uri: 'https://github.com/login/oauth/access_token',
+        qs: {
+            client_id: '5fe59ee126edbea8f3df',
+            client_secret: 'eaf2f8a2d1b0e21ebdf4ca75628a1dd6c9fdbeff',
+            code: code,
+            redirect_uri: 'https://blog.mcloudhub.com/api/github',
+            state: state
+        },
+        headers: {
+            'User-Agent': 'Request-Promise'
+        },
+        json: true // Automatically parses the JSON string in the response
+    };
+
+    requestPromise(getTokenOptations).then(function (token) {
+        var getGithubUsersOptaions = {
+            uri: 'https://api.github.com/user',
+            headers: {
+                'User-Agent': 'Request-Promise',
+                'Authorization': 'token ' + token.access_token
+            },
+            json: true
+        };
+        requestPromise(getGithubUsersOptaions).then(function (github) {
+            console.log(github);
+            if (github) {
+                Users.findOne({ github_id: github.id }).then(function (user) {
+                    if (!user) {
+                        var user_data = {
+                            name: github.name,
+                            phone: '',
+                            email: github.email,
+                            password: '',
+                            salt: '',
+                            sex: 3,
+                            nick: github.name,
+                            wechat: '',
+                            qq: '',
+                            avatar: github.avatar_url,
+                            signature: '',
+                            website: '',
+                            introduce: '',
+                            editors: 2,
+                            follow: 0,
+                            github_id: github.id,
+                            github: github,
+                            add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+                            isDel: 0
+                        };
+                        new Users(user_data).save().then(function (add) {
+                            try {
+                                res.cookie('uid', add._id);
+                                req.session.uid = add._id;
+                                res.redirect(302, '/');
+                            } catch (e) {
+                                console.log(e);
+                                res.redirect(302, '/');
+                            }
+                        });
+                    } else {
+                        res.cookie('uid', user._id);
+                        req.session.uid = user._id;
+                        res.redirect(302, '/');
+                    }
+                });
+            }
+        }).catch(function (err) {
+            console.log(err);
+            res.redirect(302, '/');
+        });
+        // https://api.github.com/user?access_token=...
+        // Authorization: token OAUTH-TOKEN
+    }).catch(function (err) {
+        console.log(err);
+        res.redirect(302, '/');
+    });
+    // console.log(code);
+    // res.json({code:code});
+});
+
+router.get('/check_signin', function (req, res, next) {
+    if (req.session.uid && req.cookies.uid) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = {
+            isSignin: true
+        };
+        res.json(output);
+    } else {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = {
+            isSignin: false
+        };
+        res.json(output);
+    }
+});
+
+router.get('/send_maile', function (req, res, next) {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    // nodemailer.createTestAccount((err, account) => {
+    // console.log(account);
+    // create reusable transporter object using the default SMTP transport
+    var transporter = nodemailer.createTransport({
+        host: 'smtp.163.com',
+        port: 465, // defaults to 587 is secure is false or 465 if true
+        secure: true, // true for 465, false for other ports
+        auth: {
+            user: 'thebulelife@163.com', // generated ethereal user
+            pass: 'xx19890907' // generated ethereal password
+        }
+    });
+
+    // verify connection configuration
+    transporter.verify(function (error, success) {
+        if (error) {
+            console.log(error);
+        }
+    });
+
+    // var htmlstream = fs.createReadStream('');
+    var verify_code = md5(NowDate.getTime());
+    req.session.verify_code = verify_code;
+    var verify_data = sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss');
+    var href = encodeURI('https://blog.mcloudhub.com/api/verify_email?u=' + req.session.uid + '&code=' + verify_code + '&data=' + verify_data);
+    var html_str = '<a href="' + href + '" style="font-size:16px;font-weight:700;padding:15px 40px;color:#fff;background-color:#2595ff;border-color:#0b89ff;text-decoration:none;display:inline-block;margin-bottom: 0;text-align: center;vertical-align: middle;touch-action: manipulation;cursor: pointer;background-image: none;border: 1px solid transparent;white-space: nowrap;line-height: 1.428571429;border-radius: 4px;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;">请验证您的邮箱地址</a>';
+    // setup email data with unicode symbols
+    var mailOptions = {
+        from: '"thebulelife@163.com', // sender address
+        to: '703294267@qq.com', // list of receivers
+        subject: '邮箱验证', // Subject line
+        text: '您好：', // plain text body
+        html: html_str // html body
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            return console.log(error);
+        }
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = null;
+        res.json(output);
+        // console.log(info);
+        // console.log('Message sent: %s', info.messageId);
+        // // Preview only available when sending through an Ethereal account
+        // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    });
+
+    transporter.close();
+    // });
+});
+
+router.get('/verify_email', function (req, res, next) {
+    var uid = req.query.u;
+    var verify_code = req.query.code;
+    if (req.session.verify_code == verify_code) {
+        Users.findById(uid).then(function (user) {
+            user.email_verify = true;
+            return user.save();
+        }).then(function (status) {
+            res.redirect(302, '/setting/basic');
+        });
+    }
+});
+
+router.get('/one_by_day', function (req, res, next) {
+    var date = sillyDateTime.format(new Date(), 'YYYY-MMM-DD');
+    OneByDay.findOne({ date: date }).then(function (data) {
+        if (!data) {
+            var options = {
+                uri: 'https://open.iciba.com/dsapi/',
+                qs: {
+                    file: 'json',
+                    date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD'),
+                    type: ''
+                },
+                headers: {
+                    'User-Agent': 'Request-Promise'
+                },
+                json: true // Automatically parses the JSON string in the response
+            };
+            requestPromise(options).then(function (response) {
+                response.add_date = sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss');
+                response.date = sillyDateTime.format(new Date(), 'YYYY-MMM-DD');
+                response.isDel = 0;
+                new OneByDay(response).save().then(function (status) {
+                    res.json(status);
+                }).catch(function (err) {
+                    console.log(err);
+                });
+            }).catch(function (err) {
+                console.log(err);
+            });
+        } else {
+            res.json(data);
+        }
+    });
+});
+
+router.get('/mail/group/list', function (req, res, next) {
+    MailGroup.find().then(function (mail_group) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = mail_group;
+        res.json(output);
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+router.get('/mail/group/get', function (req, res, next) {
+    var id = req.query.id;
+    MailGroup.findById(id).then(function (mail_group) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = mail_group;
+        res.json(output);
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+router.post('/mail/group/add', function (req, res, next) {
+    var name = req.body.name;
+    MailGroup.findOne({ name: name }).then(function (status) {
+        if (!status) {
+            new MailGroup({
+                name: name,
+                add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+                isDel: false
+            }).save().then(function (insert) {
+                output.code = 1;
+                output.ok = true;
+                output.msg = 'SUCCESS';
+                output.data = insert;
+                res.json(output);
+            });
+        } else {
+            output.code = 2;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = insert;
+            res.json(output);
+        }
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+router.get('/mail/user/list', function (req, res, next) {
+    var offset = req.query.offset ? parseInt(req.query.offset) : 1;
+    var num = req.query.num ? parseInt(req.query.num) : 20;
+    MailUser.count(function (err, count) {
+        if (err) {
+            console.log(err);
+        } else {
+            MailUser.find({ isDel: false }).skip(offset ? parseInt((offset - 1) * num) : offset).limit(num).populate({
+                path: 'group',
+                select: 'name'
+            }).exec().then(function (mail_users) {
+                output.code = 1;
+                output.ok = true;
+                output.msg = 'SUCCESS';
+                output.data = {
+                    count: count,
+                    list: mail_users
+                };
+                res.json(output);
+            }).catch(function (err) {
+                console.log(err);
+            });
+        }
+    });
+});
+
+router.post('/mail/user/add', function (req, res, next) {
+    var mail_user = req.body.mail_user;
+    MailGroup.findById(mail_user.group).then(function (group) {
+        new MailUser({
+            name: mail_user.name,
+            email: mail_user.email,
+            phone: mail_user.phone,
+            group: group,
+            mark: mail_user.mark,
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+            isDel: false
+        }).save().then(function (insert) {
+            output.code = 1;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = insert;
+            res.json(output);
+        }).catch(function (err) {
+            console.log(err);
+        });
+    });
+});
+
+router.get('/mail/move_user_to_group', function (req, res, next) {
+    var user_id = req.query.user_id;
+    var id = req.query.id;
+    MailUser.findById(user_id).then(function (mailUser) {
+        MailGroup.findById(id).then(function (group) {
+            mailUser.group = group;
+            mailUser.save();
+            output.code = 1;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = null;
+            res.json(output);
+        }).catch(function (err) {
+            console.log(err);
+        });
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+router.get('/mail/user/delete', function (req, res, next) {
+    var user_id = req.query.user_id;
+    MailUser.findByIdAndUpdate(user_id, { isDel: true }, { runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = null;
+        res.json(output);
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+module.exports = router;
+//# sourceMappingURL=api.js.map

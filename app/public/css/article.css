@@ -87,6 +87,9 @@
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
+.comment-permissions-buts-box{
+    display:block;float:right;width:300px;height:40px;line-height:40px;margin:0 160px 0 0;
+}
 .comments-clean-but:hover{background:#c2c2c2;}
 .comments-list-block{width:100%;height:auto;}
 .comments-list-box{width:100%;height:auto;margin:0 0 20px 0;}

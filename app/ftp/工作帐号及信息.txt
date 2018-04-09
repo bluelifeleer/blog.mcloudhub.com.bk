@@ -1,11 +1,27 @@
+﻿Mongodb
+https://www.mongodb.com/
+
+Account:thebulelife@163.com
+
+Password:xx19890907@
+
+
+
 https://www.vmware.com/cn.html
+
 帐号：thebulelife@163.com
+
 密码：xx19890907
 
 
-阿里云云数据库POLARDB
+
+
+阿里云云数据库
+POLARDB
 Blog
 _xx19890907
+
+
 
 
 微信开放平台
@@ -432,8 +448,9 @@ account:root
 password:26ee05fb69ddd1a2HUIHEX2015
 
 Nginx:/usr/local/nginx
-
+启动nginx:/usr/local/nginx/sbin/nginx -s reload|stop
 Php:/usr/local/php
+启动php-fpm:sudo /usr/local/php/sbin/php-fpm
 
 访问地址：http://yushanfang.huihex.com
 svn:http://svn.koolbao.com/svn/koolbao_project/huihe_yushanfang
@@ -546,7 +563,7 @@ auth:26ee05fb69ddd1a2HUIHEX2015                                                 
 新迁移服务器：                                                                                      |
 服务器：121.40.79.205                                                                              |
 帐号：root                                                                                         |
-密码：26ee05fb69ddd1a2HUIHEX2015                                                                   |
+密码：386aef9de88ea235HUIHEX2018                                                                   |
 ==================================================================================================|
 传易：                                                                                             |
 url:adease.yundsp.cn                                                                              |

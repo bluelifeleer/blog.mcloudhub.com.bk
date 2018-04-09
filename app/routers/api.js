@@ -9,6 +9,7 @@ const md5 = require('md5');
 const sillyDateTime = require('silly-datetime');
 const multer = require('multer');
 const Geetest = require('gt3-sdk');
+const nodemailer = require('nodemailer');
 const salt = require('../libs/salt');
 const crt_token = require('../libs/ctr_token');
 const tools = require('../libs/tools');
@@ -21,6 +22,9 @@ const Tags = require('../models/Tags_model');
 const Slide = require('../models/Slide_model');
 const Photos = require('../models/Photos_model');
 const Collections = require('../models/Collections_model');
+const OneByDay = require('../models/onebyday_model');
+const MailGroup = require('../models/mailGroup');
+const MailUser = require('../models/mailUser');
 const emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
 const phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
 const uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
@@ -164,7 +168,7 @@ router.get('/getDocLists', (req, res, next) => {
     let offset = req.query.offset ? parseInt(req.query.offset) : 1;
     let num = req.query.num ? parseInt(req.query.num) : 20;
     let where = uid ? { user_id: uid, isDel: 0 } : { isDel: 0 };
-    Docs.find(where).populate({path:'author',select:'name nick avatar'}).exec().then(docs => {
+    Docs.find(where).populate({ path: 'author', select: 'name nick avatar' }).exec().then(docs => {
         if (docs) {
             output.code = 1;
             output.msg = 'success';
@@ -189,36 +193,34 @@ router.get('/allArticles', (req, res, next) => {
     if (!uid) {
         all = true;
     }
-    let where = all ? { isDel: 0 } : { user_id: uid, isDel: 0 };
-    Articles.find(where)
-    .populate([
-        {
-            path:'document',
-            select:'name'
-        },{
-            path:'author',
-            select:'name nick avatar'
-        }
-    ])
-    .exec()
-    .then(articles => {
-        if (articles) {
-            articles.forEach(item => {
-                item.add_date = sillyDateTime.format(item.add_date, 'YYYY-MM-DD HH:mm:ss');
-            });
-            output.code = 1;
-            output.msg = 'success';
-            output.ok = true;
-            output.data = articles;
-            res.json(output);
-        } else {
-            output.code = 0;
-            output.msg = 'error';
-            output.ok = false;
-            output.data = {};
-            res.json(output);
-        }
-    });
+    let where = all ? { isDel: 0, permissions:1 } : { user_id: uid, isDel: 0 };
+    Articles.find(where).skip((offset ? (parseInt(offset-1)*num) :offset)).limit(num)
+        .populate([{
+            path: 'document',
+            select: 'name'
+        }, {
+            path: 'author',
+            select: 'name nick avatar'
+        }])
+        .exec()
+        .then(articles => {
+            if (articles) {
+                articles.forEach(item => {
+                    item.add_date = sillyDateTime.format(item.add_date, 'YYYY-MM-DD HH:mm:ss');
+                });
+                output.code = 1;
+                output.msg = 'success';
+                output.ok = true;
+                output.data = articles;
+                res.json(output);
+            } else {
+                output.code = 0;
+                output.msg = 'error';
+                output.ok = false;
+                output.data = {};
+                res.json(output);
+            }
+        });
     // Articles.find(where).skip((offset == 0 ? offset : (offset - 1))).limit(num).then(alls => {
     //     if (alls) {
     //         alls.forEach(item => {
@@ -241,15 +243,16 @@ router.get('/allArticles', (req, res, next) => {
 
 router.get('/getArticleLists', (req, res, next) => {
     let doc_id = req.query.doc_id;
+    let offset = req.query.offset ? req.query.offset: 0;
+    let num = req.query.num ? req.query.num : 10;
     Articles.find({
         doc_id: doc_id,
-        isDel: 0
-    }).populate([
-        {
-            path:'author',
-            select:'name'
-        }
-    ]).exec().then(articles => {
+        isDel: 0,
+        permissions:1
+    }).skip((offset ? (parseInt(offset-1)*num) :offset)).limit(num).populate([{
+        path: 'author',
+        select: 'name'
+    }]).exec().then(articles => {
         if (articles) {
             output.code = 1;
             output.msg = 'success';
@@ -268,19 +271,18 @@ router.get('/getArticleLists', (req, res, next) => {
 
 router.get('/getArticle', (req, res, next) => {
     let id = req.query.id;
-    Articles.findById(id).populate([
-        {
-            path:'document',
-            select:'name'
+    Articles.findById(id).populate([{
+            path: 'document',
+            select: 'name'
         },
         {
-            path:'author',
-            select:'name nick avatar rewardStatus rewardDesc'
+            path: 'author',
+            select: 'name nick avatar rewardStatus rewardDesc'
         },
         {
-            path:'issue_contents',
-            select:'contents add_date',
-            populate:{
+            path: 'issue_contents',
+            select: 'contents add_date permissions',
+            populate: {
                 path: 'author',
                 select: 'name nick avatar'
             }
@@ -350,7 +352,7 @@ router.post('/signin', (req, res, next) => {
     Users.findOne(user).then(function(user) {
         if (user) {
             if (user.password == md5(password + user.salt)) {
-                res.cookie('uid', user._id,{ maxAge: 1800000 });
+                res.cookie('uid', user._id, { maxAge: 1800000 });
                 req.session.uid = user._id;
                 if (remember) {
                     res.cookie('name', name, { maxAge: 3600000 * 24 * 7 });
@@ -442,7 +444,8 @@ router.post('/signup', (req, res, next) => {
                 introduce: '',
                 editors: 2,
                 follows: 0,
-                follow_users:[],
+                follow_users: [],
+                email_verify: false,
                 github_id: '',
                 github: {
                     html_url: ''
@@ -474,7 +477,8 @@ router.post('/signup', (req, res, next) => {
             describe: '',
             add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
             author: userAdd,
-            article:[],
+            article: [],
+            permissions:1,
             isDel: 0,
         }).save();
         if (userAdd) {
@@ -528,14 +532,14 @@ router.post('/updateUserBasic', (req, res, next) => {
         res.json(output);
         return;
     }
-    Users.findByIdAndUpdate(uid,updateUserBasic,{runValidators:true}).then(status=>{
+    Users.findByIdAndUpdate(uid, updateUserBasic, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '用户基础信息修改成功';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
-        if(err) throw err;
+    }).catch(err => {
+        if (err) throw err;
     });
 });
 
@@ -558,14 +562,14 @@ router.post('/changeProfile', (req, res, next) => {
         res.json(output);
         return;
     }
-    Users.findByIdAndUpdate(uid,updateProfile,{runValidators:true}).then(status=>{
+    Users.findByIdAndUpdate(uid, updateProfile, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '用户个人资料修改成功';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
-        if(err) throw err;
+    }).catch(err => {
+        if (err) throw err;
     });
 });
 
@@ -587,13 +591,13 @@ router.post('/changeReward', (req, res, next) => {
         res.json(output);
         return;
     }
-    Users.findByIdAndUpdate(uid,updateReward,{runValidators:true}).then(status=>{
+    Users.findByIdAndUpdate(uid, updateReward, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '赞赏修改成功';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         if (err) throw err;
     });
 });
@@ -617,15 +621,35 @@ router.post('/saveArticle', (req, res, next) => {
         article_date.markDownText = markDownText;
     }
 
-    Articles.findByIdAndUpdate(id,{title:title,contents:contents,markDownText:markDownText},{runValidators:true}).then(status=>{
+    Articles.findByIdAndUpdate(id, { title: title, contents: contents, markDownText: markDownText }, { runValidators: true }).then(status => {
         if (!status) throw console.log(status);
         output.code = 1;
         output.ok = true;
         output.msg = '文章保存成功';
         output.data = {};
         res.json(output);
+    }).catch(err => {
+        console.log(err);
+    });
+});
+
+router.get('/article/set_permissions',(req, res, next)=>{
+    let id = req.query.id;
+    let type = req.query.type;
+    Articles.findByIdAndUpdate(id, {permissions: type}, {runValidators: true}).then(status=>{
+        if (!status) throw console.log(status);
+        output.code = 1;
+        output.ok = true;
+        output.msg = '文章权限设置成功';
+        output.data = {};
+        res.json(output);
     }).catch(err=>{
         console.log(err);
+        output.code = 0;
+        output.ok = false;
+        output.msg = '文章权限设置失败';
+        output.data = {};
+        res.json(output);
     });
 });
 
@@ -670,7 +694,7 @@ router.get('/downloadAllArticles', (req, res, next) => {
 router.post('/newDocument', (req, res, next) => {
     let uid = req.body.uid ? req.body.uid : req.session.uid;
     let name = req.body.name;
-    Users.findById(uid).then(user=>{
+    Users.findById(uid).then(user => {
         new Docs({
             user_id: user._id,
             name: name,
@@ -679,6 +703,7 @@ router.post('/newDocument', (req, res, next) => {
             add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
             author: user,
             article: [],
+            permissions:1,
             isDel: 0,
         }).save().then(insert => {
             output.code = 1;
@@ -700,13 +725,13 @@ router.post('/updateDocumentName', (req, res, next) => {
         res.json(output);
         return;
     }
-    Docs.findByIdAndUpdate(id,{name:name},{runValidators:true}).then(status=>{
+    Docs.findByIdAndUpdate(id, { name: name }, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '文集名称修改成功';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 0;
         output.ok = false;
         output.msg = '文集名称修改失败';
@@ -726,10 +751,10 @@ router.post('/newArticle', (req, res, next) => {
         res.json(output);
         return;
     }
-    Docs.findById(doc_id).then(docs=>{
+    Docs.findById(doc_id).then(docs => {
         let users = Users.findById(uid);
-        return Promise.all([users,docs]);
-    }).spread((u,d)=>{
+        return Promise.all([users, docs]);
+    }).spread((u, d) => {
         new Articles({
             user_id: u._id,
             doc_id: d._id,
@@ -750,19 +775,23 @@ router.post('/newArticle', (req, res, next) => {
             issue_contents: [],
             follows: 0,
             follow_users: [],
+            permissions:1,
             add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
             isRelease: 0,
             isDel: 0,
         }).save().then(insert => {
-            d.article_id.push({id:insert._id});
+            d.article_id.push({ id: insert._id });
             d.article.push(insert);
             d.save();
+            u.article.push(insert);
+            u.save();
             output.code = 1;
             output.ok = true;
             output.msg = '文章创建成功';
             output.data = insert;
             res.json(output);
-        }).catch(err=>{
+        }).catch(err => {
+            console.log(err);
             output.code = 0;
             output.ok = false;
             output.msg = '文章创建失败';
@@ -781,13 +810,13 @@ router.get('/deleteDoc', (req, res, next) => {
         res.json(output);
         return;
     }
-    Docs.findByIdAndUpdate(id,{isDel:1},{runValidators:true}).then(status=>{
+    Docs.findByIdAndUpdate(id, { isDel: 1 }, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '文集删除成功';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 0;
         output.ok = false;
         output.msg = '文集删除失败';
@@ -805,13 +834,13 @@ router.get('/releaseArticle', (req, res, next) => {
         res.json(output);
         return;
     }
-    Articles.findByIdAndUpdate(id,{isRelease: 1},{runValidators:true}).then(status=>{
+    Articles.findByIdAndUpdate(id, { isRelease: 1 }, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '文章已发布';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 0;
         output.ok = false;
         output.msg = '文章已失败';
@@ -829,13 +858,13 @@ router.get('/deleteArticle', (req, res, next) => {
         res.json(output);
         return;
     }
-    Articles.findByIdAndUpdate(id,{isDel:1},{runValidators:true}).then(status=>{
+    Articles.findByIdAndUpdate(id, { isDel: 1 }, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '文章删除成功';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 0;
         output.ok = false;
         output.msg = '文章删除失败';
@@ -854,14 +883,14 @@ router.post('/changeAticleTitle', (req, res, next) => {
         res.json(output);
         return;
     }
-    Articles.findByIdAndUpdate(id,{title:title},{runValidators:true}).then(status=>{
+    Articles.findByIdAndUpdate(id, { title: title }, { runValidators: true }).then(status => {
         if (!status) throw console.log(status);
         output.code = 1;
         output.ok = true;
         output.msg = '文章修改成功';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 0;
         output.ok = false;
         output.msg = '文章修改失败';
@@ -874,6 +903,7 @@ router.post('/postDiscuss', (req, res, next) => {
     let id = req.body.id;
     let contents = req.body.contents;
     let uid = req.body.uid ? req.body.uid : req.session.uid;
+    let permissions = req.body.permissions ? parseInt(req.body.permissions) : 1;
     if (req.cookies._scrf == '') {
         output.code = 0;
         output.msg = '非法请求';
@@ -886,19 +916,20 @@ router.post('/postDiscuss', (req, res, next) => {
         res.json(output);
         return;
     }
-    Articles.findById(id).then(article=>{
+    Articles.findById(id).then(article => {
         let users = Users.findById(uid);
-        return Promise.all([users,article]);
-    }).spread((u,a)=>{
+        return Promise.all([users, article]);
+    }).spread((u, a) => {
         new Discuss({
             uid: u._id,
             article_id: a._id,
             author: u,
             article: a,
             contents: contents,
+            permissions: permissions,
             add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
             isDel: 0
-        }).save().then(status=>{
+        }).save().then(status => {
             a.issue++;
             a.issue_contents.push(status);
             a.save();
@@ -921,7 +952,7 @@ router.get('/getDiscuss', (req, res, next) => {
         output.data = discuss;
         res.json(output);
     });
-})
+});
 
 router.post('/uploader', uoloader.single('editormd-image-file'), (req, res, next) => {
     let uid = req.session.uid && req.cookies.uid;
@@ -932,7 +963,7 @@ router.post('/uploader', uoloader.single('editormd-image-file'), (req, res, next
     fs.existsSync(dirname) || fs.mkdirSync(dirname); // 目录不存在创建目录
     fs.writeFile(dirname + filename, req.file.buffer, err => {
         if (!err) {
-            Users.findById(uid).then(user=>{
+            Users.findById(uid).then(user => {
                 new Photos({
                     user_id: user._id,
                     author: user,
@@ -978,7 +1009,7 @@ router.post('/collection/new', (req, res, next) => {
         res.json(output);
         return;
     }
-    Users.findById(uid).then(user=>{
+    Users.findById(uid).then(user => {
         new Collections({
             user_id: user._id,
             author: user,
@@ -1035,20 +1066,20 @@ router.post('/collection/update', (req, res, next) => {
         res.json(output);
         return;
     }
-    Collections.findByIdAndUpdate(id,{
+    Collections.findByIdAndUpdate(id, {
         icon: icon,
         name: name,
         describe: describe,
         push: push,
         verify: verify,
         admins: admins
-    },{runValidators:true}).then(status=>{
+    }, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '专题已修改';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 0;
         output.ok = false;
         output.msg = '专题修改失败';
@@ -1061,80 +1092,75 @@ router.get('/get_collections', (req, res, next) => {
     let offset = req.query.offset ? parseInt(req.query.offset) : 0;
     let num = req.query.num ? parseInt(req.query.num) : 10;
     let where = { isDel: 0 };
-    Collections.find(where).populate([
-        {
-            path:'author',
-            select:'name avatar nick',
+    Collections.find(where).skip((offset ? (parseInt(offset-1)*num) :offset)).limit(num).populate([{
+            path: 'author',
+            select: 'name avatar nick',
         },
         {
-            path:'admins',
-            select:'name avatar nick',
+            path: 'admins',
+            select: 'name avatar nick',
         },
         {
             path: 'subscribe',
-            select:'name avatar nick',
+            select: 'name avatar nick',
         },
         {
             path: 'article',
             select: 'title contents markDownText watch start fork issue follows',
-            populate:[
-                {
-                    path: 'author',
-                    select: 'name nick avatar'
-                },{
-                    path: 'document',
-                    select: 'name'
-                }
-            ]
+            populate: [{
+                path: 'author',
+                select: 'name nick avatar'
+            }, {
+                path: 'document',
+                select: 'name'
+            }]
         }
-    ]).exec().then(colls=>{
-            if (!colls) throw console.log(colls);
-            output.code = 1;
-            output.ok = true;
-            output.msg = 'SUCCESS';
-            output.data = colls;
-            res.json(output);
+    ]).exec().then(colls => {
+        if (!colls) throw console.log(colls);
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = colls;
+        res.json(output);
     });
 });
 
 router.get('/getCollectionById', (req, res, next) => {
     let id = req.query.id;
     let articleArr = [];
-    Collections.findOne({_id:id,isDel:0}).populate([
-        {
-            path:'author',
-            select:'name avatar nick',
+    Collections.findOne({ _id: id, isDel: 0 }).populate([{
+            path: 'author',
+            select: 'name avatar nick',
         },
         {
-            path:'admins',
-            select:'name avatar nick',
+            path: 'admins',
+            select: 'name avatar nick',
         },
         {
             path: 'subscribe',
-            select:'name avatar nick',
+            select: 'name avatar nick',
         },
         {
             path: 'article',
             select: 'title contents markDownText watch start fork issue follows',
-            populate:[
-                {
+            populate: [{
                     path: 'author',
-                    select:'name nick avatar'
+                    select: 'name nick avatar'
                 },
                 {
-                    path:'document',
-                    select:'name'
+                    path: 'document',
+                    select: 'name'
                 }
             ]
         }
-    ]).exec().then(coll=>{
+    ]).exec().then(coll => {
         if (!coll) throw console.log(coll);
         output.code = 1;
         output.ok = true;
         output.msg = 'SUCCESS';
         output.data = coll;
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 1;
         output.ok = true;
         output.msg = 'SUCCESS';
@@ -1153,19 +1179,19 @@ router.get('/collectionFollow', (req, res, next) => {
         return;
     }
 
-    Collections.findById(id).then(coll=>{
+    Collections.findById(id).then(coll => {
         let user = Users.findById(uid);
-        return Promise.all([user,coll]);
-    }).spread((u, c)=>{
-            c.follow++;
-            c.subscribe = u;
-            return c.save();
-    }).then(status=>{
+        return Promise.all([user, coll]);
+    }).spread((u, c) => {
+        c.follow++;
+        c.subscribe = u;
+        return c.save();
+    }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '关注成功';
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 0;
         output.ok = false;
         output.msg = '关注失败';
@@ -1183,36 +1209,36 @@ router.get('/articlePush', (req, res, next) => {
         res.json(output);
         return;
     }
-    Collections.findById(id).then(coll=>{
+    Collections.findById(id).then(coll => {
         let user = Users.findById(uid);
         let article = Articles.findById(article_id);
-        return Promise.all([user,article,coll]);
-    }).spread((u,a,c)=>{
+        return Promise.all([user, article, coll]);
+    }).spread((u, a, c) => {
         let bf = tools.in_array(a._id, c.article_id);
-        if(bf){
-            return new Promise((resolve, reject)=>{
+        if (bf) {
+            return new Promise((resolve, reject) => {
                 resolve('exists');
                 reject(null);
             })
-        }else{
-            c.article_id.push({id:article_id});
+        } else {
+            c.article_id.push({ id: article_id });
             c.include++;
             c.article.push(a);
             return c.save();
         }
-    }).then(status=>{
-        if(status == 'exists'){
+    }).then(status => {
+        if (status == 'exists') {
             output.code = 2;
             output.ok = true;
             output.msg = '此文章已投稿，请另选一篇文章再投。';
             res.json(output);
-        }else{
+        } else {
             output.code = 1;
             output.ok = true;
             output.msg = '投稿成功';
             res.json(output);
         }
-    }).catch(err=>{
+    }).catch(err => {
         console.log(err);
         output.code = 0;
         output.ok = false;
@@ -1236,13 +1262,13 @@ router.post('/updateIntroduce', (req, res, next) => {
         res.json(output);
         return;
     }
-    Users.findByIdAndUpdate(uid,{introduce: introduce},{runValidators:true}).then(status=>{
+    Users.findByIdAndUpdate(uid, { introduce: introduce }, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '用户个人介绍修改成功';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         if (err) throw err;
     });
 });
@@ -1251,23 +1277,20 @@ router.get('/documents/get', (req, res, next) => {
     let uid = req.query.uid ? req.query.uid : '';
     let id = req.query.id ? req.query.id : '';
     let where = uid ? { _id: id, user_id: uid, isDel: 0 } : { _id: id, isDel: 0 };
-    Docs.findOne(where).populate([
-        {
+    Docs.findOne(where).populate([{
             path: 'author',
             select: 'name nick avatar'
         },
         {
             path: 'article',
             select: 'title contents markDownText watch start fork issue follows',
-            populate:[
-                {
-                    path:  'author',
-                    select: 'name nick avatar'
-                },{
-                    path: 'document',
-                    select: 'name'
-                }
-            ]
+            populate: [{
+                path: 'author',
+                select: 'name nick avatar'
+            }, {
+                path: 'document',
+                select: 'name'
+            }]
         }
     ]).exec().then(doc => {
         if (!doc) throw console.log(doc);
@@ -1276,7 +1299,7 @@ router.get('/documents/get', (req, res, next) => {
         output.msg = 'SUCCESS';
         output.data = doc;
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 1;
         output.ok = true;
         output.msg = 'SUCCESS';
@@ -1300,13 +1323,13 @@ router.get('/collections/delete', (req, res, next) => {
         res.json(output);
         return;
     }
-    Collections.findByIdAndUpdate(id,{isDel:1},{runValidators:true}).then(status=>{
+    Collections.findByIdAndUpdate(id, { isDel: 1 }, { runValidators: true }).then(status => {
         output.code = 1;
         output.ok = true;
         output.msg = '专题已删除';
         output.data = {};
         res.json(output);
-    }).catch(err=>{
+    }).catch(err => {
         output.code = 0;
         output.ok = false;
         output.msg = '专题删除失败，请稍后再试';
@@ -1435,8 +1458,8 @@ router.get('/github', (req, res, next) => {
     // res.json({code:code});
 });
 
-router.get('/check_signin',(req, res, next)=>{
-    if(req.session.uid && req.cookies.uid){
+router.get('/check_signin', (req, res, next) => {
+    if (req.session.uid && req.cookies.uid) {
         output.code = 1;
         output.ok = true;
         output.msg = 'SUCCESS';
@@ -1444,14 +1467,260 @@ router.get('/check_signin',(req, res, next)=>{
             isSignin: true
         }
         res.json(output);
-    }else{
+    } else {
         output.code = 1;
         output.ok = true;
         output.msg = 'SUCCESS';
         output.data = {
             isSignin: false
         }
+        res.json(output);
     }
+});
+
+
+router.get('/send_maile', (req, res, next) => {
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    // nodemailer.createTestAccount((err, account) => {
+    // console.log(account);
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+        host: 'smtp.163.com',
+        port: 465, // defaults to 587 is secure is false or 465 if true
+        secure: true, // true for 465, false for other ports
+        auth: {
+            user: 'thebulelife@163.com', // generated ethereal user
+            pass: 'xx19890907' // generated ethereal password
+        }
+    });
+
+    // verify connection configuration
+    transporter.verify((error, success) => {
+        if (error) {
+            console.log(error);
+        }
+    });
+
+    // var htmlstream = fs.createReadStream('');
+    let verify_code = md5(NowDate.getTime());
+    req.session.verify_code = verify_code;
+    let verify_data = sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss');
+    let href = encodeURI('https://blog.mcloudhub.com/api/verify_email?u=' + req.session.uid + '&code=' + verify_code + '&data=' + verify_data);
+    let html_str = '<a href="' + href + '" style="font-size:16px;font-weight:700;padding:15px 40px;color:#fff;background-color:#2595ff;border-color:#0b89ff;text-decoration:none;display:inline-block;margin-bottom: 0;text-align: center;vertical-align: middle;touch-action: manipulation;cursor: pointer;background-image: none;border: 1px solid transparent;white-space: nowrap;line-height: 1.428571429;border-radius: 4px;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;">请验证您的邮箱地址</a>';
+    // setup email data with unicode symbols
+    let mailOptions = {
+        from: '"thebulelife@163.com', // sender address
+        to: '703294267@qq.com', // list of receivers
+        subject: '邮箱验证', // Subject line
+        text: '您好：', // plain text body
+        html: html_str // html body
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = null;
+        res.json(output);
+        // console.log(info);
+        // console.log('Message sent: %s', info.messageId);
+        // // Preview only available when sending through an Ethereal account
+        // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    });
+
+    transporter.close();
+    // });
+
+});
+
+router.get('/verify_email', (req, res, next) => {
+    let uid = req.query.u;
+    let verify_code = req.query.code;
+    if (req.session.verify_code == verify_code) {
+        Users.findById(uid).then(user => {
+            user.email_verify = true;
+            return user.save();
+        }).then(status => {
+            res.redirect(302, '/setting/basic');
+        });
+    }
+});
+
+router.get('/one_by_day', (req, res, next)=>{
+    let date = sillyDateTime.format(new Date(), 'YYYY-MMM-DD');
+    OneByDay.findOne({date:date}).then(data=>{
+        if(!data){
+            let options = {
+                uri: 'https://open.iciba.com/dsapi/',
+                qs: {
+                    file: 'json',
+                    date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD'),
+                    type: ''
+                },
+                headers: {
+                    'User-Agent': 'Request-Promise'
+                },
+                json: true // Automatically parses the JSON string in the response
+            };
+            requestPromise(options).then(response=>{
+                response.add_date = sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss');
+                response.date = sillyDateTime.format(new Date(), 'YYYY-MMM-DD');
+                response.isDel = 0;
+                new OneByDay(response).save().then(status=>{
+                    res.json(status);
+                }).catch(err=>{
+                    console.log(err);
+                });
+            }).catch(err=>{
+                console.log(err);
+            });
+        }else{
+            res.json(data);
+        }
+    });
+
+});
+
+router.get('/mail/group/list', (req, res, next)=>{
+    MailGroup.find().then(mail_group=>{
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = mail_group;
+        res.json(output);
+    }).catch(err=>{
+        console.log(err);
+    });
+});
+
+router.get('/mail/group/get', (req, res, next)=>{
+    let id = req.query.id;
+    MailGroup.findById(id).then(mail_group=>{
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = mail_group;
+        res.json(output);
+    }).catch(err=>{
+        console.log(err);
+    });
+});
+
+router.post('/mail/group/add', (req, res, next)=>{
+    let name = req.body.name;
+    MailGroup.findOne({name:name}).then(status=>{
+        if(!status){
+            new MailGroup({
+                name: name,
+                add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+                isDel: false
+            }).save().then(insert=>{
+                output.code = 1;
+                output.ok = true;
+                output.msg = 'SUCCESS';
+                output.data = insert;
+                res.json(output);
+            });
+        }else{
+            output.code = 2;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = insert;
+            res.json(output);
+        }
+    }).catch(err=>{
+        console.log(err);
+    });
+});
+
+router.get('/mail/user/list', (req, res, next)=>{
+    let offset = req.query.offset ? parseInt(req.query.offset) : 1;
+    let num = req.query.num ? parseInt(req.query.num) : 20;
+    MailUser.count((err,count)=>{
+        if(err){
+            console.log(err);
+        }else{
+            MailUser.find({ isDel:false }).skip(offset ? parseInt((offset-1)*num) : offset).limit(num).populate({
+                path: 'group',
+                select: 'name'
+            }).exec().then(mail_users=>{
+                output.code = 1;
+                output.ok = true;
+                output.msg = 'SUCCESS';
+                output.data = {
+                    count: count,
+                    list: mail_users
+                };
+                res.json(output);
+            }).catch(err=>{
+                console.log(err);
+            });
+        }
+    });
+});
+
+router.post('/mail/user/add', (req, res, next)=>{
+    let mail_user = req.body.mail_user;
+    MailGroup.findById(mail_user.group).then(group=>{
+        new MailUser({
+            name: mail_user.name,
+            email: mail_user.email,
+            phone: mail_user.phone,
+            group: group,
+            mark: mail_user.mark,
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+            isDel: false
+        }).save().then(insert=>{
+            output.code = 1;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = insert;
+            res.json(output);
+        }).catch(err=>{
+            console.log(err);
+        });
+    });
+});
+
+router.get('/mail/move_user_to_group', (req, res, next)=>{
+    let user_id = req.query.user_id;
+    let id = req.query.id;
+    MailUser.findById(user_id).then(mailUser=>{
+        MailGroup.findById(id).then(group=>{
+            mailUser.group = group;
+            mailUser.save();
+            output.code = 1;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = null;
+            res.json(output);
+        }).catch(err=>{
+            console.log(err);
+        });
+    }).catch(err=>{
+        console.log(err);
+    });
+});
+
+router.get('/mail/user/delete', (req, res, next)=>{
+    let user_id = req.query.user_id;
+    MailUser.findByIdAndUpdate(user_id,{isDel:true},{ runValidators: true }).then(status=>{
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = null;
+        res.json(output);
+    }).catch(err=>{
+        console.log(err);
+    });
 });
 
 module.exports = router;

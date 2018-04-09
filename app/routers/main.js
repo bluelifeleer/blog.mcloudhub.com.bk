@@ -119,4 +119,32 @@ router.get('/login', (req, res, next) => {
     });
 });
 
+router.get('/mail', (req, res, next) => {
+    res.render('../views/mail/mail', {
+        page_type: 'mail',
+        title: '邮件'
+    });
+});
+
+router.get('/mail/new', (req, res, next) => {
+    res.render('../views/mail/index', {
+        page_type: 'mail',
+        title: '邮件'
+    });
+});
+
+router.get('/mail/draft', (req, res, next) => {
+    res.render('../views/mail/draft', {
+        page_type: 'mail',
+        title: '邮件'
+    });
+});
+
+router.get('/mail/setting', (req, res, next) => {
+    res.render('../views/mail/setting', {
+        page_type: 'mail',
+        title: '邮件'
+    });
+});
+
 module.exports = router;

@@ -21,8 +21,8 @@
             </div>
             <div class="collections-rows-box" style="position:relative;">
                 <div class="collections-lables">其他管理员：</div>
-                <div class="collections-inputs"><input type="text" name="collection-admins" id="collection-admins" v-model="collectionKeyWord" v-on:keyup="queryAdmins($event)"></div>
-                <ul class="admins-list-layer" v-for="(admin,$index) in adminArr">
+                <div class="collections-inputs"><input type="text" name="collection-admins" id="collection-admins" v-model="collection.keyWord" v-on:keyup="queryAdmins($event)"></div>
+                <ul class="admins-list-layer" v-for="(admin,$index) in collection.adminArr">
                     <li class="admin-lists-box" v-bind:data-uid="admin._id">${admin.name}</li>
                 </ul>
             </div>

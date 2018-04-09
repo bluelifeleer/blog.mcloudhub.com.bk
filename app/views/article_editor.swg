@@ -65,6 +65,9 @@
                         <span class="article-name" ref="articleTitle">${article.title}</span>
                         <span class="article-setting-buts" v-on:click.stop="articleSetting($event,article._id,$index)"><i class="icon iconfont">&#xe926;</i></span>
                         <ul class="article-menu-list-group" ref="articleMenu">
+                            <li class="article-menu-list-box" v-if="article.permissions == 2" v-on:click.stop="setPermissions($event,article._id,$index,2)"><i class="icon iconfont">&#xe8d4;</i>&nbsp;&nbsp;设为公开</li>
+                            <li class="article-menu-list-box" v-else-if="article.permissions == 3" v-on:click.stop="setPermissions($event,article._id,$index,3)"><i class="icon iconfont">&#xe63c;</i>&nbsp;&nbsp;指定人可见</li>
+                            <li class="article-menu-list-box" v-else v-on:click.stop="setPermissions($event,article._id,$index,1)"><i class="icon iconfont">&#xe8d5;</i>&nbsp;&nbsp;设为私密</li>
                             <li class="article-menu-list-box" v-on:click.stop="releaseArticle($event,article._id,$index)"><i class="icon iconfont">&#xe601;</i>&nbsp;&nbsp;直接发布</li>
                             <li class="article-menu-list-box" v-on:click.stop="moveArticle($event,article._id,$index)" style="padding:0;"><i class="icon iconfont" style="color:#c1c1c1;">&#xe72f;</i><i class="icon iconfont">&#xe7aa;</i>&nbsp;&nbsp;移动文章</li>
                             <li class="article-menu-list-box" v-on:click.stop="deleteArticle($event,article._id,$index)"><i class="icon iconfont">&#xe631;</i>&nbsp;&nbsp;删除文章</li>

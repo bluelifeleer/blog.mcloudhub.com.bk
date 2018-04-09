@@ -83,7 +83,7 @@
                     <a href="https://blog.mcloudhub.com/editor" class="collection-push-popup-new">写篇新文章</a>
                 </div>
                 <div class="collection-push-popup-search-box">
-                    <input type="text" name="collection-push-popup-search-input" id="collection-push-popup-search-input" value="" placeholder="搜索我的文章" v-model="collectionSearchKeyWord" />
+                    <input type="text" name="collection-push-popup-search-input" id="collection-push-popup-search-input" value="" placeholder="搜索我的文章" v-model="collection.searchKeyWord" />
                     <a href="javascript:void(0);" class="collection-push-popup-search-buts" v-on:click="collectionSearchArticle($event)"><i class="icon iconfont">&#xe71e;</i></a>
                 </div>
             </div>

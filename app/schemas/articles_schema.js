@@ -48,6 +48,7 @@ module.exports = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'
     }],
+    permissions: Number,    // 权限，1：public(公开)，2：private（私密），3：protected，
     add_date: String,
     isRelease: Number, //是否发布，1：发布，0：没有发布
     isDel: Number,

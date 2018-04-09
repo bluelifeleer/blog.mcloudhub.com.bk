@@ -47,6 +47,13 @@
             <div class="comment-buts-box">
                 <a href="javascript:void(0);" class="comments-send-but" v-on:click="postCommentBut($event,article._id)">提交</a>
                 <a href="javascript:void(0);" class="comments-clean-but" v-on:click="resetCommentBut($event)">取消</a>
+                <span class="comment-permissions-buts-box">
+                    <label>评论是否可见：</label>
+                    <template>
+                        <el-radio v-model="commentPermissions" label="1">可见</el-radio>
+                        <el-radio v-model="commentPermissions" label="2">不可见</el-radio>
+                    </template>
+                </span>
             </div>
         </div>
         <div class="send-comment-block" v-else>
@@ -58,13 +65,9 @@
                     <a href="/login" class="login-buts">登录</a><span>后发表评论</span>
                 </div>
             </div>
-            <!-- <div class="comment-buts-box">
-                <a href="javascript:void(0);" class="comments-send-but" v-on:click="postCommentBut($event,article._id)">提交</a>
-                <a href="javascript:void(0);" class="comments-clean-but" v-on:click="resetCommentBut($event)">取消</a>
-            </div> -->
         </div>
         <div class="comments-list-block" v-if="article.issue_contents.length">
-            <div class="comments-list-box" v-for="(item,$index) in article.issue_contents">
+            <div class="comments-list-box" v-for="(item,$index) in article.issue_contents" v-if="item.permissions==1">
                 <div class="comments-author-block">
                     <div class="comments-author-avatar-box">
                         <a v-bind:href="item.author.href" title="" v-if="item.author.avatar"><img v-bind:src="item.author.avatar" alt="" class="comment-avatar-list-img" /></a>

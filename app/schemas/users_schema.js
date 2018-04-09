@@ -19,10 +19,15 @@ module.exports = new mongoose.Schema({
     rewardDesc: String, // 赞赏描述
     type: Number, // 用户注册类型
     follows: Number, // 用户关注数
+    email_verify: Boolean, // 邮箱是否验证
     follow_users: [{ //关注的用户
         // id: String
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'
+    }],
+    article:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Articles'
     }],
     github_id: Number,
     github: {}, //github授权帐号信息

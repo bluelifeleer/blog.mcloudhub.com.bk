@@ -15,10 +15,10 @@ const vm = new Vue({
             github: {
                 html_url: ''
             },
-            article_num:0,
-            world_num:0,
-            like_num:0,
-            follow_num:0
+            article_num: 0,
+            world_num: 0,
+            like_num: 0,
+            follow_num: 0
         },
         remember: true,
         slide_list: {},
@@ -30,31 +30,31 @@ const vm = new Vue({
         articleLists: [],
         article: {
             author: {
-                avatar:'',
+                avatar: '',
                 article: '',
                 name: '',
-                href:''
+                href: ''
             },
-            issue_contents:[]
+            issue_contents: []
         },
         articleComments: '填写您的评论....',
         imgRegexp: /<img [^>]*src=['"]([^'"]+)[^>]*>/gi,
         hasImg: null,
-        collection:{
-            icon:'',
-            icon_html:'<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>',
-            name:'专题名称',
-            describe:'专题描述',
-            admins:[],
-            keyWord:'',
-            push:1,
-            verify:1,
-            href:'',
-            issubscribe: false
+        collection: {
+            icon: '',
+            icon_html: '<span class="collections-icon"><i class="icon iconfont icontext">&#xe603;</i></span>',
+            name: '专题名称',
+            describe: '专题描述',
+            admins: [],
+            keyWord: '',
+            push: 1,
+            verify: 1,
+            href: '',
+            issubscribe: false,
+            searchKeyWord:'',
         },
         collectionLists: [],
-        switchButsNew:0,
-        collectionSearchKeyWord:'',
+        switchButsNew: 0,
         collSubscribe: false,
         collOffset: 1,
         newIncludeArticleLists: [],
@@ -64,14 +64,14 @@ const vm = new Vue({
         showAccountIntroduceEditForm: 'none',
         showAccountIntroduceText: 'block',
         documentLists: null,
-        switchContentsNew:'block',
-        switchContentsDiscuss:'none',
-        switchContentsHot:'none',
+        switchContentsNew: 'block',
+        switchContentsDiscuss: 'none',
+        switchContentsHot: 'none',
         doc: {
-            author:{
-                href:'',
-                name:'',
-                avatar:''
+            author: {
+                href: '',
+                name: '',
+                avatar: ''
             }
         },
         collectionFormNew: true,
@@ -87,7 +87,45 @@ const vm = new Vue({
         changePayMethodText: '更换',
         showPayMethod: 'none',
         payMethodActive: true,
-        payMethod: 'wechat'
+        payMethod: 'wechat',
+        app: {
+          name: '应用名称',
+          region: 'PC应用',
+          avatar: '',
+          desc: '应用描述不多于200字',
+          showAddAppIcon:true
+      },
+        tableData3: [{
+          date: '2016-05-03',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-04',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-01',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-08',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-06',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-07',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }],
+        multipleSelection: [],
+        commentPermissions: '1'
     },
     methods: {
         init: function() {
@@ -98,7 +136,7 @@ const vm = new Vue({
             }
             this.getDocs();
             this.getSlides();
-            this.getAllArticles(0, 20);
+            this.getAllArticles(0, 100);
             this.getArticle();
             if (page_type == 'account') {
                 this.users.uid = quid;
@@ -173,9 +211,9 @@ const vm = new Vue({
             this.$http.get('/api/documents/get?id=' + id).then(doc => {
                 if (doc.body.code && doc.body.ok) {
                     let documents = doc.body.data;
-                    documents.author.href = '/account?uid='+documents.author._id;
-                    documents.article.forEach(item=>{
-                        item.href = '/article/details?id='+item._id;
+                    documents.author.href = '/account?uid=' + documents.author._id;
+                    documents.article.forEach(item => {
+                        item.href = '/article/details?id=' + item._id;
                         item.hasImg = item.contents.search(this.imgRegexp) > 0 ? true : false;
                         item.imgHtml = item.hasImg ? item.contents.match(this.imgRegexp)[0] : '';
                         let content = item.contents.replace(/<[^>]*>/g, "");
@@ -224,9 +262,9 @@ const vm = new Vue({
                     if (!article) throw console.log(article);
                     let articleArr = article.body.data.article;
                     articleArr.author.href = '/account?uid=' + articleArr.author._id;
-                    articleArr.issue_contents.forEach(item=>{
+                    articleArr.issue_contents.forEach(item => {
                         item.add_date = this.formate_date(item.add_date);
-                        item.author.href = '/account?uid='+item.author._id;
+                        item.author.href = '/account?uid=' + item.author._id;
                     })
                     articleArr.issue_contents = articleArr.issue_contents.reverse();
                     articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
@@ -357,12 +395,14 @@ const vm = new Vue({
                     this.$http.post('/api/postDiscuss', {
                         contents: this.articleComments,
                         uid: this.users.uid,
-                        id: id
+                        id: id,
+                        permissions: parseInt(this.commentPermissions)
                     }).then(res => {
                         if (res.body.code && res.body.ok) {
                             this.alertSuccess('评论成功');
+                            this.articleComments = '填写您的评论....';
                         }
-                        this.getDiscuss(id);
+                        this.getArticle(id);
                     });
                 }
 
@@ -386,7 +426,7 @@ const vm = new Vue({
             }
             fileRender.addEventListener('load', function(e) {
                 _this.collection.icon = e.target.result;
-                _this.collection.icon_html = '<img src="'+e.target.result+'">';
+                _this.collection.icon_html = '<img src="' + e.target.result + '">';
             }, false);
         },
         queryAdmins: function(e) {
@@ -455,23 +495,23 @@ const vm = new Vue({
                         let replaceText = platform == 'win32' ? '\r\n' : '\n'; // 根据不同的系统确定换行符
                         collection.describe = collection.describe.replace(/<p>/g, ''); // 将开头的p标签去掉
                         collection.describe = collection.describe.replace(/<\/p>/g, replaceText); // 将结束的p标签替换成换行符
-                        collection.icon_html = '<img src="'+collection.icon+'">';
+                        collection.icon_html = '<img src="' + collection.icon + '">';
                         this.collection = collection;
                     } else {
                         collection.href = '/account/collections/edit?id=' + collection._id;
-                        collection.icon_html = '<img src="'+collection.icon+'">';
-                        collection.article.forEach(item=>{
-                            item.href = '/article/details?id='+item._id;
+                        collection.icon_html = '<img src="' + collection.icon + '">';
+                        collection.article.forEach(item => {
+                            item.href = '/article/details?id=' + item._id;
                             item.hasImg = item.contents.search(this.imgRegexp) > 0 ? true : false;
                             item.imgHtml = item.hasImg ? item.contents.match(this.imgRegexp)[0] : '';
                             let content = item.contents.replace(/<[^>]*>/g, "");
                             item.contents = item.hasImg ? (content.length > 60 ? content.substr(0, 60) + '...' : content) : (content.length > 80 ? content.substr(0, 80) + '...' : content);
                         });
                         collection.subscribe.forEach(item => {
-                            if (item._id == this.users.uid) {
-                                collection.issubscribe = true;
-                            }
-                        })
+                                if (item._id == this.users.uid) {
+                                    collection.issubscribe = true;
+                                }
+                            })
                             // console.log(this.$refs.switchButs);
                         this.swtichFlagShow = 'block';
                         this.swtichFlagLeft = this.$refs.switchButsNew.offsetLeft + 'px';
@@ -521,7 +561,7 @@ const vm = new Vue({
             }
         },
         followButs: function(e, id) {
-            if(this.isSigin){
+            if (this.isSigin) {
                 this.$http.get('/api/collectionFollow?uid=' + this.users.uid + '&id=' + id).then(res => {
                     if (res.body.code && res.body.ok) {
                         this.alertSuccess(res.body.msg);
@@ -529,20 +569,20 @@ const vm = new Vue({
                         this.alertError(res.body.msg);
                     }
                 });
-            }else{
-                window.location.href = '/login?redirect_uri='+window.location.href;
+            } else {
+                window.location.href = '/login?redirect_uri=' + window.location.href;
             }
         },
         collectionPush: function(e, id) {
-            if(this.isSigin){
+            if (this.isSigin) {
                 this.dialogTableVisible = true;
-            }else{
-                window.location.href = '/login?redirect_uri='+window.location.href;
+            } else {
+                window.location.href = '/login?redirect_uri=' + window.location.href;
             }
 
         },
         collectionSearchArticle: function(e) {
-            this.$http.get('/api/allArticles?keyword=' + this.collectionSearchKeyWord).then(lists => {
+            this.$http.get('/api/allArticles?keyword=' + this.collection.searchKeyWord).then(lists => {
                 if (lists.body.code && lists.body.ok) {
                     let articleArr = lists.body.data;
                     articleArr.forEach(item => {
@@ -557,9 +597,9 @@ const vm = new Vue({
         pushActionBut: function(e, article_id, id) {
             this.$http.get('/api/articlePush?uid=' + this.users.uid + '&article_id=' + article_id + '&id=' + id).then(push => {
                 if (push.body.code && push.body.ok) {
-                    if(push.body.code == 1){
+                    if (push.body.code == 1) {
                         this.alertSuccess(push.body.msg);
-                    }else{
+                    } else {
                         this.alertWarning(push.body.msg);
                     }
                 } else {
@@ -700,6 +740,51 @@ const vm = new Vue({
         payAmountActive: function(e) {
             let rewardAmount = this.rewardAmount.substr(1, this.rewardAmount.length);
             alert('支付方式：' + this.payMethod + "；支付金额：" + rewardAmount + '；留言：' + this.rewardMessage);
+        },
+        sendMail: function(e) {
+            this.$http.get('/api/send_maile').then(res => {
+                console.log(res);
+            });
+        },
+        appPauseBut:function(){
+            alert('pause');
+        },
+        appRecoverBut:function(){
+            alert('recover');
+        },
+        appDeleteBut:function(){
+            alert('delete');
+        },
+        uploadAppIcon:function(e){
+            let _this = this;
+            let file = e.target.files[0];
+            let Reader = new FileReader();
+            Reader.addEventListener('load', function(e) {
+                _this.app.showAddAppIcon = false;
+                _this.app.avatar = Reader.result;
+            }, false);
+            Reader.readAsDataURL(file);
+        },
+        appNewFormOnSubmit:function(){
+            console.log('submit!');
+        },
+        appNewResetbut:function(){
+            window.location.href = "/setting/applactions";
+        },
+        toggleSelection(rows) {
+            if (rows) {
+              rows.forEach(row => {
+                this.$refs.multipleTable.toggleRowSelection(row);
+              });
+            } else {
+              this.$refs.multipleTable.clearSelection();
+            }
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        applistpageCurrentChange:function(current){
+            alert(current);
         },
         formate_date: function(date) {
             let MyDate = new Date(date);

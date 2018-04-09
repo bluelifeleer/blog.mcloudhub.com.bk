@@ -67,5 +67,31 @@ router.get('/misc', (req, res, nex) => {
     }
 });
 
+router.get('/applactions', (req, res, next)=>{
+    let redirect_uri = req.protocol + '://' + req.get('host') + req.originalUrl;
+    if (req.session.uid && req.cookies.uid) {
+        res.render('../views/setting/applactions', {
+            uid: req.session.uid && req.cookies.uid,
+            page_type: 'setting_applactions',
+            title: '我的应用'
+        });
+    } else {
+        res.redirect(302, '/login?redirect_uri=' + redirect_uri);
+    }
+});
+
+router.get('/applactions/new', (req, res, next)=>{
+    let redirect_uri = req.protocol + '://' + req.get('host') + req.originalUrl;
+    if (req.session.uid && req.cookies.uid) {
+        res.render('../views/setting/app_new', {
+            uid: req.session.uid && req.cookies.uid,
+            page_type: 'setting_applactions',
+            title: '我的应用'
+        });
+    } else {
+        res.redirect(302, '/login?redirect_uri=' + redirect_uri);
+    }
+})
+
 
 module.exports = router;

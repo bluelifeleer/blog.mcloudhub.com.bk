@@ -407,6 +407,11 @@ const VM = new Vue({
                 this.alertWarning('cookie已失效，请登录！！！')
             }
         },
+        setPermissions:function(e,id,i,type){
+            this.$http.get('/api/article/set_permissions?id='+id+'&&type='+type).then(status=>{
+                console.log(status);
+            });
+        },
         checkSignin:function(){ // 检测是否登录
             this.$http.get('/api/check_signin').then(status=>{
                 this.isSignin = status.body.data.isSignin;

@@ -205,3 +205,45 @@ app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST'] }));
     console.log(res)
   });
 ```
+
+
+#### express-ws
+> 使用express-ws开发即使信息获取功能
+```
+  npm install --save express-ws
+```
+
+#### nodemailer
+> 使用nodemailer实现发送邮件
+```
+  npm install nodemailer
+```
+
+#### node-crontab
+> node下的定时任务
+```
+  npm install node-crontab
+
+  using:
+  const crontab = require('node-crontab');
+  const crontabId = crontab.scheduleJob(date,callback);
+  // Arguments
+  var crontab = require('node-crontab');
+  var jobId = crontab.scheduleJob("* * * * *", function(a){
+      console.log("Hello " + a + "! It's been a minute!");
+  }, ["World"]);
+  // Context
+  var crontab = require('node-crontab');
+  var obj = {a: "World"};
+  var jobId = crontab.scheduleJob("* * * * *", function(){
+      console.log("Hello " + this.a + "! It's been a minute!");
+  }, null, obj);
+  // Killing a job
+  crontab.cancelJob(crontabId);
+  // Suicidal jobs
+  var crontab = require('node-crontab');
+  var jobId = crontab.scheduleJob("* * * * *", function(){
+      console.log("It's been a minute, but this is the last time I run.");
+      crontab.cancelJob(jobId); // Jobs can cancel themselves, too!
+  });
+```

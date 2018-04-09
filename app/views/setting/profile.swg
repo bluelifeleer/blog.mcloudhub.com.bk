@@ -19,6 +19,9 @@
                 <li class="set-menu-list">
                     <a href="/setting/misc" class="setmenu-link"><i class="icon iconfont">&#xe632;</i>&nbsp;&nbsp;帐号管理</a>
                 </li>
+                <li class="set-menu-list">
+                    <a href="/setting/applactions" class="setmenu-link"><i class="icon iconfont">&#xe61b;</i>&nbsp;&nbsp;应用管理</a>
+                </li>
             </ul>
         </div>
         <div class="account-set-body-block">

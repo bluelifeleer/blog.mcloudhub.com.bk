@@ -19,6 +19,9 @@
                 <li class="set-menu-list">
                     <a href="/setting/misc" class="setmenu-link"><i class="icon iconfont">&#xe632;</i>&nbsp;&nbsp;帐号管理</a>
                 </li>
+                <li class="set-menu-list">
+                    <a href="/setting/applactions" class="setmenu-link"><i class="icon iconfont">&#xe61b;</i>&nbsp;&nbsp;应用管理</a>
+                </li>
             </ul>
         </div>
         <div class="account-set-body-block">
@@ -34,7 +37,11 @@
                     </div>
                     <div class="basic-setting-list">
                         <div class="basic-setting-tip">常用邮箱：</div>
-                        <div class="basic-setting-input-box"><input type="email" name="email" id="email" v-model="users.email" class="bgf0"></div>
+                        <div class="basic-setting-input-box" style="width:45%;"><input type="email" name="email" id="email" v-model="users.email" class="bgf0"></div>
+                        <div class="basic-setting-email-verify-status-box">
+                            <span v-if="users.email_verify" class="email-verify-success-buts el-alert__icon el-icon-success">邮箱已验证</span>
+                            <a href="javascript:void(0);" v-else class="email-verify-warning-buts el-alert__icon el-icon-warning" v-on:click="sendMail($event)">邮箱未验证</a>
+                        </div>
                     </div>
                     <div class="basic-setting-list">
                         <div class="basic-setting-tip">手机：</div>
