@@ -205,7 +205,12 @@ app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST'] }));
     console.log(res)
   });
 ```
-
+#### Mongoose分页查询
+```
+object.find().skip().limit()...
+```
+> skip()    跳过的条数
+> limit()   查询的条数
 
 #### express-ws
 > 使用express-ws开发即使信息获取功能
