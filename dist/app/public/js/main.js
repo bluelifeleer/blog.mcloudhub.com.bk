@@ -92,40 +92,15 @@ var vm = new Vue({
         payMethod: 'wechat',
         app: {
             name: '应用名称',
-            region: 'PC应用',
+            type: 'PC应用',
             avatar: '',
             desc: '应用描述不多于200字',
             showAddAppIcon: true
         },
-        tableData3: [{
-            date: '2016-05-03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-            date: '2016-05-02',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-            date: '2016-05-04',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-            date: '2016-05-01',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-            date: '2016-05-08',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-            date: '2016-05-06',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-            date: '2016-05-07',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-        }],
+        appactions: {
+            count: 0,
+            lists: []
+        },
         multipleSelection: [],
         commentPermissions: '1'
     },
@@ -138,11 +113,15 @@ var vm = new Vue({
             }
             this.getDocs();
             this.getSlides();
-            this.getAllArticles(0, 100);
             this.getArticle();
+            if (page_type == 'index') {
+                this.getAllArticles(0, 100);
+            }
             if (page_type == 'account') {
                 this.users.uid = quid;
                 this.getUsers();
+                this.getDocuments();
+                this.getAllArticles(0, 100);
             }
             if (page_type == 'collections_list') {
                 this.getCollections(0, 9);
@@ -151,16 +130,20 @@ var vm = new Vue({
             }
             if (page_type == 'collections_detailes') {
                 this.getCollectionById(coll_id, 'detailes');
+                this.getAllArticles(0, 100);
             }
             if (page_type == 'collections_edit') {
                 this.collectionFormNew = false;
                 this.getCollectionById(coll_id, 'edit');
             }
-            if (page_type == 'account') {
-                this.getDocuments();
-            }
             if (page_type == 'document_detailes') {
                 this.getDoc();
+            }
+            if (page_type == 'setting_applactions') {
+                this.getApplactions();
+            }
+            if (page_type == 'setting_applactions_edit') {
+                this.getApplactionsById(app_id);
             }
         },
         submitForm: function submitForm(e, type) {
@@ -285,6 +268,33 @@ var vm = new Vue({
                 });
             }
         },
+        getApplactions: function getApplactions() {
+            var _this8 = this;
+
+            this.$http.get('/api/apps/list?user_id=' + this.users.uid + '&offset=1&num=10').then(function (res) {
+                console.log(res);
+                if (res.body.code && res.body.ok) {
+                    _this8.appactions.count = res.body.data.count;
+                    var lists = res.body.data.list.reverse();
+                    lists.forEach(function (item) {
+                        item.type = item.type == 1 ? 'PC应用' : 'APP应用';
+                        item.status = item.status == 1 ? '开启' : '暂停';
+                    });
+                    _this8.appactions.lists = lists;
+                }
+            });
+        },
+        getApplactionsById: function getApplactionsById(id) {
+            var _this9 = this;
+
+            this.$http.get('/api/apps/get?id=' + id).then(function (res) {
+                if (res.body.code && res.body.ok) {
+                    var app = res.body.data;
+                    app.type = app.type == 1 ? 'PC应用' : 'APP应用';
+                    _this9.app = app;
+                }
+            });
+        },
         getQueryString: function getQueryString(name) {
             var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
             var r = window.location.search.substr(1).match(reg);
@@ -306,7 +316,7 @@ var vm = new Vue({
             this.navbarSearchHover = !this.navbarSearchHover;
         },
         getUsers: function getUsers() {
-            var _this8 = this;
+            var _this10 = this;
 
             this.$http.get('/api/getUsers?uid=' + this.users.uid).then(function (res) {
                 if (!res) throw console.log(res);
@@ -322,7 +332,7 @@ var vm = new Vue({
                 data.world_num = 0;
                 data.like_num = 0;
                 data.follow_num = data.follows;
-                _this8.users = data;
+                _this10.users = data;
             });
         },
         changeAvatar: function changeAvatar(e) {
@@ -335,7 +345,7 @@ var vm = new Vue({
             Reader.readAsDataURL(file);
         },
         changeUserBasicSubmitForm: function changeUserBasicSubmitForm() {
-            var _this9 = this;
+            var _this11 = this;
 
             this.$http.post('/api/updateUserBasic', {
                 uid: this.users.uid,
@@ -350,12 +360,12 @@ var vm = new Vue({
             }).then(function (res) {
                 if (!res) throw console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this9.alertSuccess(res.body.msg);
+                    _this11.alertSuccess(res.body.msg);
                 }
             });
         },
         changeUserProfileSubmitForm: function changeUserProfileSubmitForm(e) {
-            var _this10 = this;
+            var _this12 = this;
 
             this.$http.post('/api/changeProfile', {
                 uid: this.users.uid,
@@ -365,12 +375,12 @@ var vm = new Vue({
             }).then(function (res) {
                 if (!res) throw console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this10.alertSuccess(res.body.msg);
+                    _this12.alertSuccess(res.body.msg);
                 }
             });
         },
         changeRewardSubmitForm: function changeRewardSubmitForm(e) {
-            var _this11 = this;
+            var _this13 = this;
 
             this.$http.post('/api/changeReward', {
                 uid: this.users.uid,
@@ -379,7 +389,7 @@ var vm = new Vue({
             }).then(function (res) {
                 if (!res) throw console.log(res);
                 if (res.body.code && res.body.ok) {
-                    _this11.alertSuccess(res.body.msg);
+                    _this13.alertSuccess(res.body.msg);
                 }
             });
         },
@@ -387,7 +397,7 @@ var vm = new Vue({
             this.popupLayerBoxShow = 'none';
         },
         downloadAllArticles: function downloadAllArticles() {
-            var _this12 = this;
+            var _this14 = this;
 
             var a = document.createElement('a');
             a.setAttribute('style', 'display:none;');
@@ -399,7 +409,7 @@ var vm = new Vue({
                     a.setAttribute('href', res.body.data.tar_path);
                     a.click();
                     a.parentNode.removeChild(a);
-                    _this12.alertSuccess(res.body.msg);
+                    _this14.alertSuccess(res.body.msg);
                 }
             });
         },
@@ -410,7 +420,7 @@ var vm = new Vue({
             this.articleComments = this.articleComments ? this.articleComments : '填写您的评论....';
         },
         postCommentBut: function postCommentBut(e, id) {
-            var _this13 = this;
+            var _this15 = this;
 
             if (uid !== '') {
                 if (this.articleComments == '' || this.articleComments == '填写您的评论....') {
@@ -424,10 +434,10 @@ var vm = new Vue({
                         permissions: parseInt(this.commentPermissions)
                     }).then(function (res) {
                         if (res.body.code && res.body.ok) {
-                            _this13.alertSuccess('评论成功');
-                            _this13.articleComments = '填写您的评论....';
+                            _this15.alertSuccess('评论成功');
+                            _this15.articleComments = '填写您的评论....';
                         }
-                        _this13.getArticle(id);
+                        _this15.getArticle(id);
                     });
                 }
             } else {
@@ -454,14 +464,14 @@ var vm = new Vue({
             }, false);
         },
         queryAdmins: function queryAdmins(e) {
-            var _this14 = this;
+            var _this16 = this;
 
             this.$http.get('/api/allUsers?keyword=' + this.collectionKeyWord).then(function (users) {
-                _this14.adminArr = users.body.data;
+                _this16.adminArr = users.body.data;
             });
         },
         collectionSubmitForm: function collectionSubmitForm(e, s) {
-            var _this15 = this;
+            var _this17 = this;
 
             var descArr = platform == 'win32' ? this.collection.describe.split('\r\n') : this.collection.describe.split('\n');
             var tmp = '';
@@ -489,14 +499,14 @@ var vm = new Vue({
             };
             this.$http.post(url, data).then(function (res) {
                 if (res.body.code && res.body.ok) {
-                    window.location.href = '/account/collections/detailes?id=' + (s ? res.body.data._id : _this15.collection_id);
+                    window.location.href = '/account/collections/detailes?id=' + res.body.data._id;
                 } else {
-                    _this15.alertError('专题创建失败');
+                    _this17.alertError('专题创建失败');
                 }
             });
         },
         getCollections: function getCollections(offset, num) {
-            var _this16 = this;
+            var _this18 = this;
 
             var query_string = page_type == 'account' ? 'uid=' + quid + '&offset=' + offset + '&num=' + num : 'offset=' + offset + '&num=' + num;
             this.$http.get('/api/get_collections?' + query_string).then(function (res) {
@@ -506,18 +516,18 @@ var vm = new Vue({
                     item.describe = item.describe.replace(/<[^>]*>/g, "");
                     item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
                     item.subscribe.forEach(function (uids) {
-                        if (uids._id == _this16.users.uid) {
+                        if (uids._id == _this18.users.uid) {
                             item.isSubscribed = true;
                         } else {
                             item.isSubscribed = false;
                         }
                     });
                 });
-                _this16.collectionLists = collections;
+                _this18.collectionLists = collections;
             });
         },
         getCollectionById: function getCollectionById(id, type) {
-            var _this17 = this;
+            var _this19 = this;
 
             this.$http.get('/api/getCollectionById?id=' + id).then(function (coll) {
                 if (coll.body.code && coll.body.ok) {
@@ -527,31 +537,32 @@ var vm = new Vue({
                         collection.describe = collection.describe.replace(/<p>/g, ''); // 将开头的p标签去掉
                         collection.describe = collection.describe.replace(/<\/p>/g, replaceText); // 将结束的p标签替换成换行符
                         collection.icon_html = '<img src="' + collection.icon + '">';
-                        _this17.collection = collection;
+                        _this19.collection = collection;
                     } else {
                         collection.href = '/account/collections/edit?id=' + collection._id;
                         collection.icon_html = '<img src="' + collection.icon + '">';
                         collection.article.forEach(function (item) {
                             item.href = '/article/details?id=' + item._id;
-                            item.hasImg = item.contents.search(_this17.imgRegexp) > 0 ? true : false;
-                            item.imgHtml = item.hasImg ? item.contents.match(_this17.imgRegexp)[0] : '';
+                            item.hasImg = item.contents.search(_this19.imgRegexp) > 0 ? true : false;
+                            item.imgHtml = item.hasImg ? item.contents.match(_this19.imgRegexp)[0] : '';
                             var content = item.contents.replace(/<[^>]*>/g, "");
                             item.contents = item.hasImg ? content.length > 60 ? content.substr(0, 60) + '...' : content : content.length > 80 ? content.substr(0, 80) + '...' : content;
                         });
                         collection.subscribe.forEach(function (item) {
-                            if (item._id == _this17.users.uid) {
+                            if (item._id == _this19.users.uid) {
                                 collection.issubscribe = true;
                             }
                         });
+                        collection.article = collection.article.reverse();
                         // console.log(this.$refs.switchButs);
-                        _this17.swtichFlagShow = 'block';
-                        _this17.swtichFlagLeft = _this17.$refs.switchButsNew.offsetLeft + 'px';
-                        _this17.$refs.switchContentsNew.style = 'display:block';
-                        _this17.$refs.switchContentsDiscuss.style = 'display:none';
-                        _this17.$refs.switchContentsHot.style = 'display:none';
-                        _this17.newIncludeArticleLists = collection.articles;
+                        _this19.swtichFlagShow = 'block';
+                        _this19.swtichFlagLeft = _this19.$refs.switchButsNew.offsetLeft + 'px';
+                        _this19.$refs.switchContentsNew.style = 'display:block';
+                        _this19.$refs.switchContentsDiscuss.style = 'display:none';
+                        _this19.$refs.switchContentsHot.style = 'display:none';
+                        _this19.newIncludeArticleLists = collection.articles;
                         console.log(collection);
-                        _this17.collection = collection;
+                        _this19.collection = collection;
                     }
                 }
             });
@@ -592,14 +603,14 @@ var vm = new Vue({
             }
         },
         followButs: function followButs(e, id) {
-            var _this18 = this;
+            var _this20 = this;
 
             if (this.isSigin) {
                 this.$http.get('/api/collectionFollow?uid=' + this.users.uid + '&id=' + id).then(function (res) {
                     if (res.body.code && res.body.ok) {
-                        _this18.alertSuccess(res.body.msg);
+                        _this20.alertSuccess(res.body.msg);
                     } else {
-                        _this18.alertError(res.body.msg);
+                        _this20.alertError(res.body.msg);
                     }
                 });
             } else {
@@ -614,37 +625,37 @@ var vm = new Vue({
             }
         },
         collectionSearchArticle: function collectionSearchArticle(e) {
-            var _this19 = this;
+            var _this21 = this;
 
             this.$http.get('/api/allArticles?keyword=' + this.collection.searchKeyWord).then(function (lists) {
                 if (lists.body.code && lists.body.ok) {
                     var articleArr = lists.body.data;
                     articleArr.forEach(function (item) {
-                        item.add_date = _this19.formate_date(item.add_date);
+                        item.add_date = _this21.formate_date(item.add_date);
                     });
-                    _this19.articleLists = articleArr.reverse();
+                    _this21.articleLists = articleArr.reverse();
                 } else {
-                    _this19.articleLists = [];
+                    _this21.articleLists = [];
                 }
             });
         },
         pushActionBut: function pushActionBut(e, article_id, id) {
-            var _this20 = this;
+            var _this22 = this;
 
             this.$http.get('/api/articlePush?uid=' + this.users.uid + '&article_id=' + article_id + '&id=' + id).then(function (push) {
                 if (push.body.code && push.body.ok) {
                     if (push.body.code == 1) {
-                        _this20.alertSuccess(push.body.msg);
+                        _this22.alertSuccess(push.body.msg);
                     } else {
-                        _this20.alertWarning(push.body.msg);
+                        _this22.alertWarning(push.body.msg);
                     }
                 } else {
-                    _this20.alertError(push.body.msg);
+                    _this22.alertError(push.body.msg);
                 }
             });
         },
         moreCollections: function moreCollections(e) {
-            var _this21 = this;
+            var _this23 = this;
 
             this.collOffset++;
             this.$http.get('/api/get_collections?uid=' + this.users.uid + '&offset=' + this.collOffset + '&num=9').then(function (res) {
@@ -655,13 +666,13 @@ var vm = new Vue({
                         item.describe = item.describe.replace(/<[^>]*>/g, "");
                         item.describe = item.describe.length > 30 ? item.describe.substr(0, 30) + '...' : item.describe;
                         item.subscribe.forEach(function (uids) {
-                            if (uids._id == _this21.users.uid) {
+                            if (uids._id == _this23.users.uid) {
                                 item.isSubscribed = true;
                             } else {
                                 item.isSubscribed = false;
                             }
                         });
-                        _this21.collectionLists.push(item);
+                        _this23.collectionLists.push(item);
                     });
                 }
             });
@@ -671,25 +682,25 @@ var vm = new Vue({
             this.showAccountIntroduceText = 'none';
         },
         accountIntroduceFromSaveBut: function accountIntroduceFromSaveBut(e) {
-            var _this22 = this;
+            var _this24 = this;
 
             this.$http.post('/api/updateIntroduce', {
                 uid: this.users.uid,
                 introduce: this.users.introduce
             }).then(function (res) {
                 if (res.body.code && res.body.ok) {
-                    _this22.introduce = _this22.introduce;
-                    _this22.showAccountIntroduceEditForm = 'none';
-                    _this22.showAccountIntroduceText = 'block';
-                    _this22.popupLayerBoxShow = 'block';
-                    _this22.popupLayerText = res.body.msg;
-                    _this22.popupLayerLeft = parseInt((_this22.winW - 500) / 2) + 'px';
-                    _this22.popupLayerTop = '200px';
+                    _this24.introduce = _this24.introduce;
+                    _this24.showAccountIntroduceEditForm = 'none';
+                    _this24.showAccountIntroduceText = 'block';
+                    _this24.popupLayerBoxShow = 'block';
+                    _this24.popupLayerText = res.body.msg;
+                    _this24.popupLayerLeft = parseInt((_this24.winW - 500) / 2) + 'px';
+                    _this24.popupLayerTop = '200px';
                 } else {
-                    _this22.popupLayerBoxShow = 'block';
-                    _this22.popupLayerText = '个人介绍修改失败';
-                    _this22.popupLayerLeft = parseInt((_this22.winW - 500) / 2) + 'px';
-                    _this22.popupLayerTop = '200px';
+                    _this24.popupLayerBoxShow = 'block';
+                    _this24.popupLayerText = '个人介绍修改失败';
+                    _this24.popupLayerLeft = parseInt((_this24.winW - 500) / 2) + 'px';
+                    _this24.popupLayerTop = '200px';
                 }
             });
         },
@@ -698,24 +709,24 @@ var vm = new Vue({
             this.showAccountIntroduceText = 'block';
         },
         deleteCollection: function deleteCollection(e, id) {
-            var _this23 = this;
+            var _this25 = this;
 
             this.$http.get('/api/collections/delete?id=' + id + '&uid=' + this.users.uid).then(function (res) {
                 if (res.body.code && res.body.ok) {
-                    _this23.alertSuccess(res.body.msg);
+                    _this25.alertSuccess(res.body.msg);
                 } else {
-                    _this23.alertError(res.body.msg);
+                    _this25.alertError(res.body.msg);
                 }
             });
         },
         articlFollowAuthorBut: function articlFollowAuthorBut(e, id) {
-            var _this24 = this;
+            var _this26 = this;
 
             this.$http.get('/api/users/follow?uid=' + this.users.uid + '&follow_id=' + id).then(function (res) {
                 if (res.body.code && res.body.ok) {
-                    _this24.alertSuccess('您已成功关注');
+                    _this26.alertSuccess('您已成功关注');
                 } else {
-                    _this24.alertError('您关注失败');
+                    _this26.alertError('您关注失败');
                 }
             });
         },
@@ -807,18 +818,29 @@ var vm = new Vue({
             }, false);
             Reader.readAsDataURL(file);
         },
-        appNewFormOnSubmit: function appNewFormOnSubmit() {
-            console.log('submit!');
+        appNewFormOnSubmit: function appNewFormOnSubmit(id) {
+            if (id) {
+                this.$http.post('/api/applaction/update', { id: id, app: this.app }).then(function (res) {
+                    window.location.href = "/setting/applactions";
+                });
+            } else {
+                this.$http.post('/api/applaction/new', { app: this.app }).then(function (res) {
+                    window.location.href = "/setting/applactions";
+                });
+            }
         },
         appNewResetbut: function appNewResetbut() {
             window.location.href = "/setting/applactions";
         },
+        applactionEdit: function applactionEdit(i, id) {
+            window.location.href = "/setting/applactions/edit?id=" + id;
+        },
         toggleSelection: function toggleSelection(rows) {
-            var _this25 = this;
+            var _this27 = this;
 
             if (rows) {
                 rows.forEach(function (row) {
-                    _this25.$refs.multipleTable.toggleRowSelection(row);
+                    _this27.$refs.multipleTable.toggleRowSelection(row);
                 });
             } else {
                 this.$refs.multipleTable.clearSelection();

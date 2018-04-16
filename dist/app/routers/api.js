@@ -25,6 +25,7 @@ var Slide = require('../models/Slide_model');
 var Photos = require('../models/Photos_model');
 var Collections = require('../models/Collections_model');
 var OneByDay = require('../models/onebyday_model');
+var Apps = require('../models/Apps');
 var MailGroup = require('../models/mailGroup');
 var MailUser = require('../models/mailUser');
 var emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
@@ -1071,7 +1072,7 @@ router.post('/collection/update', function (req, res, next) {
         output.code = 1;
         output.ok = true;
         output.msg = '专题已修改';
-        output.data = {};
+        output.data = status;
         res.json(output);
     }).catch(function (err) {
         output.code = 0;
@@ -1564,6 +1565,85 @@ router.get('/one_by_day', function (req, res, next) {
         } else {
             res.json(data);
         }
+    });
+});
+
+router.post('/applaction/new', function (req, res, next) {
+    var app = req.body.app;
+    var user_id = req.session.uid && req.cookies.uid;
+    var app_id = NowDate.getTime();
+    var secret_key = md5(NowDate.getTime());
+    app.type = app.type == 'PC应用' ? 1 : 2; // 将APP应用类型由数字转换成数字
+    Users.findById(user_id).then(function (user) {
+        return Promise.all([user]);
+    }).spread(function (user) {
+        new Apps({
+            user_id: user._id,
+            name: app.name,
+            desc: app.desc,
+            avatar: app.avatar,
+            owner: user,
+            type: app.type, // 应用类型，1：pc，2：app
+            app_id: app_id,
+            secret_key: secret_key,
+            status: 1, // 应用状态，1：开启，2：暂停
+            effective: true, // 应用是否有效
+            is_del: false,
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss')
+        }).save().then(function (status) {
+            output.code = 1;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = status;
+            res.json(output);
+        }).catch(function (err) {
+            console.log(err);
+        });
+    });
+});
+
+router.post('/applaction/update', function (req, res, next) {
+    var app = req.body.app;
+    var id = req.body.id;
+    console.log(app);
+    Apps.findByIdAndUpdate(id, { name: app.name, type: parseInt(app.type), desc: app.desc, avatar: app.avatar }, { new: true, runValidators: true }).then(function (status) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = status;
+        res.json(output);
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+router.get('/apps/list', function (req, res, next) {
+    var offset = parseInt(req.query.offset) || 1;
+    var num = parseInt(req.query.num) || 10;
+    var user_id = req.query.user_id;
+    Apps.count(function (err, count) {
+        Apps.find({ user_id: user_id }).skip(offset ? parseInt((offset - 1) * num) : parseInt(offset * num)).limit(num).then(function (apps) {
+            output.code = 1;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = { count: count, list: apps };
+            res.json(output);
+        }).catch(function (err) {
+            console.log(err);
+        });
+    });
+});
+
+router.get('/apps/get', function (req, res, next) {
+    var id = req.query.id;
+    Apps.findById(id).then(function (app) {
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = app;
+        res.json(output);
+    }).catch(function (err) {
+        console.log(err);
     });
 });
 

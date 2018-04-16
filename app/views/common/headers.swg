@@ -29,6 +29,9 @@
         {% if page_type == 'collections_detailes' || page_type == "document_detailes" || page_type == 'collections_edit' %}
         var coll_id = '{{ coll_id }}';
         {% endif %}
+        {% if page_type == 'setting_applactions_edit' %}
+        var app_id = '{{ app_id }}';
+        {% endif %}
     </script>
 </head>
 

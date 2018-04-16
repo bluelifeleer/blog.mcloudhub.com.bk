@@ -87,7 +87,21 @@ router.get('/applactions/new', function (req, res, next) {
     if (req.session.uid && req.cookies.uid) {
         res.render('../views/setting/app_new', {
             uid: req.session.uid && req.cookies.uid,
-            page_type: 'setting_applactions',
+            page_type: 'setting_applactions_new',
+            title: '我的应用'
+        });
+    } else {
+        res.redirect(302, '/login?redirect_uri=' + redirect_uri);
+    }
+});
+
+router.get('/applactions/edit', function (req, res, next) {
+    var redirect_uri = req.protocol + '://' + req.get('host') + req.originalUrl;
+    if (req.session.uid && req.cookies.uid) {
+        res.render('../views/setting/app_new', {
+            uid: req.session.uid && req.cookies.uid,
+            page_type: 'setting_applactions_edit',
+            app_id: req.query.id,
             title: '我的应用'
         });
     } else {

@@ -41,36 +41,37 @@
                 <template>
                     <el-table
                         ref="multipleTable"
-                        :data="tableData3"
+                        :data="appactions.lists"
+                        stripe
                         tooltip-effect="dark"
                         style="width: 100%"
                         @selection-change="handleSelectionChange">
                         <el-table-column
                               type="selection"
-                              width="55">
-                        </el-table-column>
-                        <el-table-column
-                          label="应用名称"
-                          width="120">
-                          <template slot-scope="scope">{{ scope.row.date }}</template>
+                              width="40">
                         </el-table-column>
                         <el-table-column
                           prop="name"
-                          label="APPID"
-                          width="120">
+                          label="应用名称"
+                          show-overflow-tooltip>
                         </el-table-column>
                         <el-table-column
-                          prop="address"
+                          prop="app_id"
+                          label="APPID"
+                          show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column
+                          prop="secret_key"
                           label="应用密钥"
                           show-overflow-tooltip>
                         </el-table-column>
                         <el-table-column
-                          prop="address"
+                          prop="type"
                           label="应用分类"
                           show-overflow-tooltip>
                         </el-table-column>
                         <el-table-column
-                          prop="address"
+                          prop="status"
                           label="状态"
                           show-overflow-tooltip>
                         </el-table-column>
@@ -78,6 +79,11 @@
                           prop="address"
                           label="操作"
                           show-overflow-tooltip>
+                          <template slot-scope="scope">
+                            <el-button
+                              size="mini"
+                            @click="applactionEdit(scope.$index, scope.row._id)">编辑</el-button>
+                          </template>
                         </el-table-column>
                     </el-table>
                 </template>
@@ -86,7 +92,7 @@
                   layout="prev, pager, next"
                   :page-size="10"
                   :current-page="1"
-                  :total="100"
+                  :total="appactions.count"
                   @current-change="applistpageCurrentChange">
                 </el-pagination>
             </div>

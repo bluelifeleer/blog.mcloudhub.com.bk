@@ -164,3 +164,4 @@ body>.el-container {
     margin-left: 20px;
     padding: 6px 5px;
 }
+.el-dialog__wrapper{z-index:10001 !important;}

@@ -91,7 +91,7 @@
                         <el-input v-model="form.name"></el-input>
                     </el-form-item>
                     <el-form-item label="主题：">
-                        <el-input v-model="form.name"></el-input>
+                        <el-input v-model="form.title"></el-input>
                     </el-form-item>
                     <div class="attr-box">
                         <el-upload
@@ -115,29 +115,19 @@
                     </el-form-item>
                     </el-form>
 
-                    <el-dialog title="添加收件人" :visible.sync="dialogFormVisible" width="50%">
-                      <template>
-                        <el-transfer
-                          v-model="value3"
-                          filterable
-                          :left-default-checked="[2, 3]"
-                          :right-default-checked="[1]"
-                          :render-content="renderFunc"
-                          :titles="['Source', 'Target']"
-                          :button-texts="['到左边', '到右边']"
-                          :format="{
-                            noChecked: '${total}',
-                            hasChecked: '${checked}/${total}'
-                          }"
-                          @change="handleChange"
-                          :data="data">
-                          <el-button class="transfer-footer" slot="left-footer" size="small">操作</el-button>
-                          <el-button class="transfer-footer" slot="right-footer" size="small">操作</el-button>
-                        </el-transfer>
-                      </template>
+                    <el-dialog title="添加收件人" :visible.sync="dialogFormVisible" width="39%">
+                        <template>
+                          <el-transfer
+                            filterable
+                            filter-placeholder="请输入收件人名称"
+                            v-model="mailReceiverValue"
+                            :data="mailReceiver">
+                          </el-transfer>
+                        </template>
+
                       <div slot="footer" class="dialog-footer">
                         <el-button @click="dialogFormVisible = false">取 消</el-button>
-                        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                        <el-button type="primary" @click="mailReceiverConfirm">确 定</el-button>
                       </div>
                     </el-dialog>
                 </el-main>

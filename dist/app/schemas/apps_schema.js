@@ -7,8 +7,8 @@ var appsSchema = new mongoose.Schema({
     desc: String,
     avatar: String,
     owner: {
-        type: mongoose.Schema.Types.objectId,
-        ref: 'Users'
+        type: mongoose.Schema.Types.ObjectId,
+        res: 'Users'
     },
     type: Number, // 应用类型，1：pc，2：app
     app_id: Number,

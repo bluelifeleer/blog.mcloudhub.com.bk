@@ -73,18 +73,6 @@
                         <el-breadcrumb-item>活动列表</el-breadcrumb-item>
                         <el-breadcrumb-item>活动详情</el-breadcrumb-item>
                     </el-breadcrumb>
-                    <div class="mail-buts-box">
-                        <div class="input-but-box">
-                            <a href="javascript:void(0);" class="buts-block buts-success"><i class="icon iconfont">&#xe624;</i>发送</a>
-                            <a href="javascript:void(0);" class="buts-block but-info">预览</a>
-                            <a href="javascript:void(0);" class="buts-block but-info">存草稿</a>
-                            <a href="javascript:void(0);" class="buts-block but-info">取消</a>
-                        </div>
-                        <div class="text-but-box">
-                            <el-button type="text">抄送</el-button>
-                            <el-button type="text">密送</el-button>
-                        </div>
-                    </div>
                     <el-table
                     ref="multipleTable"
                     :data="tableData3"

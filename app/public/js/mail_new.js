@@ -6,35 +6,19 @@ const VM = new Vue({
         dialogFormVisible:false,
         mailUsers: [],
         form:{
-            name:''
+            name:'',
+            title:''
         },
         fileList:[],
         formLabelWidth: '120px',
-        value3: [1,3],
-        data:[
-            {
-                key:1,
-                label: `备选项1`
-            },
-            {
-                key:2,
-                label: `备选项2`
-            },
-            {
-                key:3,
-                label: `备选项3`
-            },
-            {
-                key:4,
-                label: `备选项4`,
-                // disabled: 4 % 4 === 0
-            }
-        ]
+        mailReceiverValue: [],
+        mailReceiver:[]
     },
     methods:{
         init:function(){
             this.initEditor(300, 450);
             this.get_mail_users();
+            this.getMailReceivers();
         },
         mailUserSelectionChange(options) {
             this.multipleSelection = options;
@@ -57,6 +41,19 @@ const VM = new Vue({
                         item.group = item.group.name;
                     });
                     this.mailUsers = mail_user;
+                }
+            });
+        },
+        getMailReceivers:function(){
+            this.$http.get('/api/mail/user/list?offset=1&num=100').then(res=>{
+                if(res.body.code && res.body.ok){
+                    this.mailUserTotal = res.body.data.count;
+                    let mail_receiver = res.body.data.list;
+                    let tmp = [];
+                    mail_receiver.forEach(item=>{
+                        tmp.push({key:item.name,label:item.name});
+                    });
+                    this.mailReceiver = tmp;
                 }
             });
         },
@@ -103,6 +100,10 @@ const VM = new Vue({
             // }
             this.wangedit.create();
 
+        },
+        mailReceiverConfirm:function(){
+            this.dialogFormVisible = false;
+            this.form.name = this.mailReceiverValue.join();
         },
         alertInfo(msg) {
             this.$message(msg);

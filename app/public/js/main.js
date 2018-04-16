@@ -90,40 +90,15 @@ const vm = new Vue({
         payMethod: 'wechat',
         app: {
           name: '应用名称',
-          region: 'PC应用',
+          type: 'PC应用',
           avatar: '',
           desc: '应用描述不多于200字',
           showAddAppIcon:true
       },
-        tableData3: [{
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }],
+        appactions:{
+            count:0,
+            lists:[]
+        },
         multipleSelection: [],
         commentPermissions: '1'
     },
@@ -136,11 +111,15 @@ const vm = new Vue({
             }
             this.getDocs();
             this.getSlides();
-            this.getAllArticles(0, 100);
             this.getArticle();
+            if(page_type == 'index'){
+                this.getAllArticles(0, 100);
+            }
             if (page_type == 'account') {
                 this.users.uid = quid;
                 this.getUsers();
+                this.getDocuments();
+                this.getAllArticles(0, 100);
             }
             if (page_type == 'collections_list') {
                 this.getCollections(0, 9);
@@ -149,16 +128,20 @@ const vm = new Vue({
             }
             if (page_type == 'collections_detailes') {
                 this.getCollectionById(coll_id, 'detailes');
+                this.getAllArticles(0, 100);
             }
             if (page_type == 'collections_edit') {
                 this.collectionFormNew = false;
                 this.getCollectionById(coll_id, 'edit');
             }
-            if (page_type == 'account') {
-                this.getDocuments();
-            }
             if (page_type == 'document_detailes') {
                 this.getDoc();
+            }
+            if(page_type == 'setting_applactions'){
+                this.getApplactions();
+            }
+            if(page_type == 'setting_applactions_edit'){
+                this.getApplactionsById(app_id);
             }
         },
         submitForm: function(e, type) {
@@ -271,6 +254,29 @@ const vm = new Vue({
                     this.article = articleArr;
                 });
             }
+        },
+        getApplactions:function(){
+            this.$http.get('/api/apps/list?user_id='+this.users.uid+'&offset=1&num=10').then(res=>{
+                console.log(res);
+                if(res.body.code && res.body.ok){
+                    this.appactions.count = res.body.data.count;
+                    let lists = res.body.data.list.reverse();
+                    lists.forEach(item=>{
+                        item.type = item.type == 1 ? 'PC应用': 'APP应用';
+                        item.status = item.status == 1 ? '开启': '暂停';
+                    });
+                    this.appactions.lists = lists;
+                }
+            });
+        },
+        getApplactionsById:function(id){
+            this.$http.get('/api/apps/get?id='+id).then(res=>{
+                if(res.body.code && res.body.ok){
+                    let app = res.body.data;
+                    app.type = app.type == 1 ? 'PC应用': 'APP应用';
+                    this.app = app;
+                }
+            });
         },
         getQueryString: function(name) {
             let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -461,7 +467,7 @@ const vm = new Vue({
             };
             this.$http.post(url, data).then(res => {
                 if (res.body.code && res.body.ok) {
-                    window.location.href = '/account/collections/detailes?id=' + (s ? res.body.data._id : this.collection_id);
+                    window.location.href = '/account/collections/detailes?id=' + res.body.data._id;
                 } else {
                     this.alertError('专题创建失败');
                 }
@@ -511,7 +517,8 @@ const vm = new Vue({
                                 if (item._id == this.users.uid) {
                                     collection.issubscribe = true;
                                 }
-                            })
+                            });
+                        collection.article = collection.article.reverse();
                             // console.log(this.$refs.switchButs);
                         this.swtichFlagShow = 'block';
                         this.swtichFlagLeft = this.$refs.switchButsNew.offsetLeft + 'px';
@@ -765,11 +772,22 @@ const vm = new Vue({
             }, false);
             Reader.readAsDataURL(file);
         },
-        appNewFormOnSubmit:function(){
-            console.log('submit!');
+        appNewFormOnSubmit:function(id){
+            if(id){
+                this.$http.post('/api/applaction/update',{id:id,app:this.app}).then(res=>{
+                    window.location.href = "/setting/applactions";
+                });
+            }else{
+                this.$http.post('/api/applaction/new',{app:this.app}).then(res=>{
+                    window.location.href = "/setting/applactions";
+                });
+            }
         },
         appNewResetbut:function(){
             window.location.href = "/setting/applactions";
+        },
+        applactionEdit:function(i,id){
+            window.location.href = "/setting/applactions/edit?id="+id;
         },
         toggleSelection(rows) {
             if (rows) {

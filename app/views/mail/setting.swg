@@ -87,10 +87,6 @@
                             <a href="/mail/new" class="buts-block but-info">写信</a>
                             <a href="javascript:void(0);" class="buts-block but-info" @click="deleteMailUserbut">删除</a>
                         </div>
-                        <div class="text-but-box">
-                            <el-button type="text">抄送</el-button>
-                            <el-button type="text">密送</el-button>
-                        </div>
                     </div>
                     <el-table
                     ref="multipleTable"

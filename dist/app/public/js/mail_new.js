@@ -8,30 +8,19 @@ var VM = new Vue({
         dialogFormVisible: false,
         mailUsers: [],
         form: {
-            name: ''
+            name: '',
+            title: ''
         },
         fileList: [],
         formLabelWidth: '120px',
-        value3: [1, 3],
-        data: [{
-            key: 1,
-            label: '\u5907\u9009\u98791'
-        }, {
-            key: 2,
-            label: '\u5907\u9009\u98792'
-        }, {
-            key: 3,
-            label: '\u5907\u9009\u98793'
-        }, {
-            key: 4,
-            label: '\u5907\u9009\u98794'
-            // disabled: 4 % 4 === 0
-        }]
+        mailReceiverValue: [],
+        mailReceiver: []
     },
     methods: {
         init: function init() {
             this.initEditor(300, 450);
             this.get_mail_users();
+            this.getMailReceivers();
         },
         mailUserSelectionChange: function mailUserSelectionChange(options) {
             this.multipleSelection = options;
@@ -57,6 +46,21 @@ var VM = new Vue({
                         item.group = item.group.name;
                     });
                     _this.mailUsers = mail_user;
+                }
+            });
+        },
+        getMailReceivers: function getMailReceivers() {
+            var _this2 = this;
+
+            this.$http.get('/api/mail/user/list?offset=1&num=100').then(function (res) {
+                if (res.body.code && res.body.ok) {
+                    _this2.mailUserTotal = res.body.data.count;
+                    var mail_receiver = res.body.data.list;
+                    var tmp = [];
+                    mail_receiver.forEach(function (item) {
+                        tmp.push({ key: item.name, label: item.name });
+                    });
+                    _this2.mailReceiver = tmp;
                 }
             });
         },
@@ -101,6 +105,10 @@ var VM = new Vue({
             //     // console.log(html)
             // }
             this.wangedit.create();
+        },
+        mailReceiverConfirm: function mailReceiverConfirm() {
+            this.dialogFormVisible = false;
+            this.form.name = this.mailReceiverValue.join();
         },
         alertInfo: function alertInfo(msg) {
             this.$message(msg);

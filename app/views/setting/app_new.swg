@@ -37,7 +37,7 @@
                     <el-input v-model="app.name"></el-input>
                   </el-form-item>
                   <el-form-item label="应用类型：">
-                    <el-select v-model="app.region" placeholder="请选择应用类型">
+                    <el-select v-model="app.type" placeholder="请选择应用类型">
                       <el-option label="PC应用" value="1"></el-option>
                       <el-option label="APP应用" value="2"></el-option>
                     </el-select>
@@ -58,7 +58,7 @@
                     <el-input type="textarea" v-model="app.desc"></el-input>
                   </el-form-item>
                   <el-form-item>
-                    <el-button type="primary" @click="appNewFormOnSubmit">立即创建</el-button>
+                    <el-button type="primary" @click="appNewFormOnSubmit(app._id)">立即创建</el-button>
                     <el-button @click="appNewResetbut">取消</el-button>
                   </el-form-item>
                 </el-form>

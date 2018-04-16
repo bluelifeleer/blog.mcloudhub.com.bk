@@ -23,6 +23,7 @@ const Slide = require('../models/Slide_model');
 const Photos = require('../models/Photos_model');
 const Collections = require('../models/Collections_model');
 const OneByDay = require('../models/onebyday_model');
+const Apps = require('../models/Apps');
 const MailGroup = require('../models/mailGroup');
 const MailUser = require('../models/mailUser');
 const emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
@@ -1077,7 +1078,7 @@ router.post('/collection/update', (req, res, next) => {
         output.code = 1;
         output.ok = true;
         output.msg = '专题已修改';
-        output.data = {};
+        output.data = status;
         res.json(output);
     }).catch(err => {
         output.code = 0;
@@ -1587,6 +1588,85 @@ router.get('/one_by_day', (req, res, next)=>{
         }
     });
 
+});
+
+router.post('/applaction/new', (req, res, next)=>{
+    let app = req.body.app;
+    let user_id = req.session.uid && req.cookies.uid;
+    let app_id = NowDate.getTime();
+    let secret_key = md5(NowDate.getTime());
+    app.type = app.type == 'PC应用' ? 1 : 2;          // 将APP应用类型由数字转换成数字
+    Users.findById(user_id).then(user=>{
+        return Promise.all([user]);
+    }).spread((user)=>{
+        new Apps({
+            user_id: user._id,
+            name: app.name,
+            desc: app.desc,
+            avatar: app.avatar,
+            owner:user,
+            type: app.type,               // 应用类型，1：pc，2：app
+            app_id: app_id,
+            secret_key: secret_key,
+            status: 1,             // 应用状态，1：开启，2：暂停
+            effective: true,         // 应用是否有效
+            is_del: false,
+            add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss')
+        }).save().then(status=>{
+            output.code = 1;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = status;
+            res.json(output);
+        }).catch(err=>{
+            console.log(err);
+        });
+    });
+});
+
+router.post('/applaction/update', (req, res, next)=>{
+    let app = req.body.app;
+    let id = req.body.id;
+    console.log(app);
+    Apps.findByIdAndUpdate(id, {name:app.name,type:parseInt(app.type),desc:app.desc,avatar:app.avatar}, {new:true, runValidators:true}).then(status=>{
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = status;
+        res.json(output);
+    }).catch(err=>{
+        console.log(err);
+    });
+});
+
+router.get('/apps/list', (req, res, next)=>{
+    let offset = parseInt(req.query.offset) || 1;
+    let num = parseInt(req.query.num) || 10;
+    let user_id = req.query.user_id;
+    Apps.count((err,count)=>{
+        Apps.find({user_id:user_id}).skip((offset ? parseInt((offset-1)*num) : parseInt(offset*num))).limit(num).then(apps=>{
+            output.code = 1;
+            output.ok = true;
+            output.msg = 'SUCCESS';
+            output.data = {count:count,list:apps};
+            res.json(output);
+        }).catch(err=>{
+            console.log(err);
+        });
+    });
+});
+
+router.get('/apps/get', (req, res, next)=>{
+    let id = req.query.id;
+    Apps.findById(id).then(app=>{
+        output.code = 1;
+        output.ok = true;
+        output.msg = 'SUCCESS';
+        output.data = app;
+        res.json(output);
+    }).catch(err=>{
+        console.log(err);
+    });
 });
 
 router.get('/mail/group/list', (req, res, next)=>{
