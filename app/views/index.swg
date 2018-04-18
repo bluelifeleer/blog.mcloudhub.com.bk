@@ -121,7 +121,7 @@
                 <div class="model-tag-name">moment</div>
                 <div class="model-contents-box">
                     <ul class="moment-list-box">
-                        <li><a href="#">每个人都有一个死角， 自己走不出来，别人也闯不进去。</a></li>
+                        <li><a href="#">作为工匠，我更愿意把我有限的生命用在作品上，而不是对工具的无止境的学习上。</a></li>
                         <li><a href="#">我把最深沉的秘密放在那里。</a></li>
                         <li><a href="#">你不懂我，我不怪你。</a></li>
                         <li><a href="#">每个人都有一道伤口， 或深或浅，盖上布，以为不存在。</a></li>
