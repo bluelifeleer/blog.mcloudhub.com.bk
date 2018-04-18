@@ -27,10 +27,28 @@
         </div>
         <div class="article-detaile-content-body-box">
             <div class="article-details-contents" v-html="article.contents"></div>
+            <div class="article-page-box" :data-total="article.page.total">
+                <a href="javascript:void(0);" class="article-page-buts prev-buts" :data-offset="article.page.offset" :data-num="article.page.num"><i class="icon iconfont">&#xe639;</i>上一页</a>
+                <a href="javascript:void(0);" class="article-page-buts directory-buts">目录</a>
+                <a href="javascript:void(0);" class="article-page-buts next-buts" :data-offset="article.page.offset" :data-num="article.page.num">下一页<i class="icon iconfont">&#xe638;</i></a>
+            </div>
             <div class="article-reward-but-box" v-if="article.author.rewardStatus">
                 <div class="article-rewar-desc-box">${article.author.rewardDesc}</div>
                 <div class="article-rewar-but-boc"><a href="javascript:void(0);" class="reward-buts" @click="dialogVisible = true">赞赏支持</a></div>
                 <div class="article-rewar-authors-list-box"></div>
+            </div>
+            <div class="article-share-box">
+                <div class="article-share-like-box" :data-id="article._id" @click="articleLikeButs($event,article._id)">
+                    <i class="icon iconfont">&#xe65c;</i>
+                    <span class="article-share-like-text">喜欢</span>
+                    <span class="article-share-like-number-box">233</span>
+                </div>
+                <div class="article-share-list-box">
+                    <a href="javascript:void(0);" class="article-share-more-buts more-buts">更多分享</a>
+                    <a href="javascript:void(0);" class="article-share-buts picture-buts" :data-id="article._id" @click="articleShareButs($event,'picture',article._id)"><i class="icon iconfont iconfont-picture">&#xe67b;</i></a>
+                    <a href="javascript:void(0);" class="article-share-buts sina-buts" :data-id="article._id" @click="articleShareButs($event,'sina',article._id)"><i class="icon iconfont iconfont-sina">&#xe6b8;</i></a>
+                    <a href="javascript:void(0);" class="article-share-buts wechat-buts" :data-id="article._id" @click="articleShareButs($event,'wechat',article._id)"><i class="icon iconfont iconfont-wechat">&#xe640;</i></a>
+                </div>
             </div>
         </div>
         <!--评论列表-->

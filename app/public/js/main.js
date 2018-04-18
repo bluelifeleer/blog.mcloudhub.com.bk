@@ -244,6 +244,11 @@ const vm = new Vue({
                 this.$http.get('/api/getArticle?id=' + id).then(article => {
                     if (!article) throw console.log(article);
                     let articleArr = article.body.data.article;
+                    articleArr.page = {
+                        total:article.body.data.total,
+                        offset:article.body.data.offset,
+                        num:article.body.data.num
+                    };
                     articleArr.author.href = '/account?uid=' + articleArr.author._id;
                     articleArr.issue_contents.forEach(item => {
                         item.add_date = this.formate_date(item.add_date);
@@ -251,6 +256,7 @@ const vm = new Vue({
                     })
                     articleArr.issue_contents = articleArr.issue_contents.reverse();
                     articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
+
                     this.article = articleArr;
                 });
             }
@@ -803,6 +809,12 @@ const vm = new Vue({
         },
         applistpageCurrentChange:function(current){
             alert(current);
+        },
+        articleLikeButs:function(e,id){
+            alert(id);
+        },
+        articleShareButs:function(e,type,id){
+            alert(type+':'+id);
         },
         formate_date: function(date) {
             let MyDate = new Date(date);

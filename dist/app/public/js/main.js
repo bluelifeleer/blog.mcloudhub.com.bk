@@ -257,6 +257,11 @@ var vm = new Vue({
                 this.$http.get('/api/getArticle?id=' + id).then(function (article) {
                     if (!article) throw console.log(article);
                     var articleArr = article.body.data.article;
+                    articleArr.page = {
+                        total: article.body.data.total,
+                        offset: article.body.data.offset,
+                        num: article.body.data.num
+                    };
                     articleArr.author.href = '/account?uid=' + articleArr.author._id;
                     articleArr.issue_contents.forEach(function (item) {
                         item.add_date = _this7.formate_date(item.add_date);
@@ -264,6 +269,7 @@ var vm = new Vue({
                     });
                     articleArr.issue_contents = articleArr.issue_contents.reverse();
                     articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
+
                     _this7.article = articleArr;
                 });
             }
@@ -852,6 +858,12 @@ var vm = new Vue({
 
         applistpageCurrentChange: function applistpageCurrentChange(current) {
             alert(current);
+        },
+        articleLikeButs: function articleLikeButs(e, id) {
+            alert(id);
+        },
+        articleShareButs: function articleShareButs(e, type, id) {
+            alert(type + ':' + id);
         },
         formate_date: function formate_date(date) {
             var MyDate = new Date(date);

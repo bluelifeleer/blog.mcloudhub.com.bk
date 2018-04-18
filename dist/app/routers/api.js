@@ -270,42 +270,47 @@ router.get('/getArticleLists', function (req, res, next) {
 
 router.get('/getArticle', function (req, res, next) {
     var id = req.query.id;
-    Articles.findById(id).populate([{
-        path: 'document',
-        select: 'name'
-    }, {
-        path: 'author',
-        select: 'name nick avatar rewardStatus rewardDesc'
-    }, {
-        path: 'issue_contents',
-        select: 'contents add_date permissions',
-        populate: {
+    Articles.count(function (err, count) {
+        Articles.findById(id).populate([{
+            path: 'document',
+            select: 'name'
+        }, {
             path: 'author',
-            select: 'name nick avatar'
-        }
-    }]).exec().then(function (article) {
-        if (article) {
-            article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
-            if (!req.cookies[id]) {
-                //增加阅读数
-                article.watch++;
-                article.save();
-                res.cookie(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
+            select: 'name nick avatar rewardStatus rewardDesc'
+        }, {
+            path: 'issue_contents',
+            select: 'contents add_date permissions',
+            populate: {
+                path: 'author',
+                select: 'name nick avatar'
             }
-            output.code = 1;
-            output.msg = 'success';
-            output.ok = true;
-            output.data = {
-                'article': article
-            };
-            res.json(output);
-        } else {
-            output.code = 0;
-            output.msg = 'error';
-            output.ok = false;
-            output.data = {};
-            res.json(output);
-        }
+        }]).exec().then(function (article) {
+            if (article) {
+                article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
+                if (!req.cookies[id]) {
+                    //增加阅读数
+                    article.watch++;
+                    article.save();
+                    res.cookie(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
+                }
+                output.code = 1;
+                output.msg = 'success';
+                output.ok = true;
+                output.data = {
+                    'article': article,
+                    'total': count,
+                    'offset': 2,
+                    'num': 1
+                };
+                res.json(output);
+            } else {
+                output.code = 0;
+                output.msg = 'error';
+                output.ok = false;
+                output.data = {};
+                res.json(output);
+            }
+        });
     });
 });
 
