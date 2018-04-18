@@ -29,13 +29,19 @@ const vm = new Vue({
         popupLayerText: '',
         articleLists: [],
         article: {
+            start: 0,
             author: {
                 avatar: '',
                 article: '',
                 name: '',
                 href: ''
             },
-            issue_contents: []
+            issue_contents: [],
+            page:{
+                total:0,
+                offset:0,
+                num:0
+            }
         },
         articleComments: '填写您的评论....',
         imgRegexp: /<img [^>]*src=['"]([^'"]+)[^>]*>/gi,
@@ -811,7 +817,16 @@ const vm = new Vue({
             alert(current);
         },
         articleLikeButs:function(e,id){
-            alert(id);
+            this.$http.get('/api/article/start?id='+id).then(res=>{
+                if(res.body.ok && res.body.code == 1){
+                    this.article.start = res.body.data.start;
+                    this.alertSuccess("点赞成功");
+                }else if(res.body.ok && res.body.code == 3){
+                    window.location.href = '/login?redirect_uri=' + window.location.href;
+                }else{
+                    this.alertError('点赞失败');
+                }
+            });
         },
         articleShareButs:function(e,type,id){
             alert(type+':'+id);

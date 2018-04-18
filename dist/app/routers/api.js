@@ -314,6 +314,42 @@ router.get('/getArticle', function (req, res, next) {
     });
 });
 
+router.get('/article/start', function (req, res, next) {
+    if (req.session.uid && req.cookies.uid) {
+        var user_id = req.session.uid || req.cookies.uid;
+        var id = req.query.id;
+        Users.findById(user_id).then(function (user) {
+            var article = Articles.findById(id);
+            return Promise.all([user, article]);
+        }).spread(function (u, a) {
+            a.start++;
+            a.start_users.push(u);
+            a.save().then(function (status) {
+                console.log(status);
+                if (status) {
+                    output.code = 1;
+                    output.msg = 'success';
+                    output.ok = true;
+                    output.data = {
+                        start: a.start
+                    };
+                    res.json(output);
+                }
+            }).catch(function (err) {
+                console.log(err);
+            });
+        }).catch(function (err) {
+            console.log(err);
+        });
+    } else {
+        output.code = 3;
+        output.msg = 'success';
+        output.ok = true;
+        output.data = {};
+        res.json(output);
+    }
+});
+
 router.post('/signin', function (req, res, next) {
     // let redirect = req.body.redirect ? req.body.redirect : '';
     var name = req.body.name;

@@ -41,7 +41,7 @@
                 <div class="article-share-like-box" :data-id="article._id" @click="articleLikeButs($event,article._id)">
                     <i class="icon iconfont">&#xe65c;</i>
                     <span class="article-share-like-text">喜欢</span>
-                    <span class="article-share-like-number-box">233</span>
+                    <span class="article-share-like-number-box">${article.start}</span>
                 </div>
                 <div class="article-share-list-box">
                     <a href="javascript:void(0);" class="article-share-more-buts more-buts">更多分享</a>

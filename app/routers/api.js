@@ -320,6 +320,41 @@ router.get('/getArticle', (req, res, next) => {
     });
 });
 
+router.get('/article/start', (req, res, next)=>{
+    if(req.session.uid && req.cookies.uid){
+        let user_id = req.session.uid || req.cookies.uid;
+        let id = req.query.id;
+        Users.findById(user_id).then(user=>{
+            let article = Articles.findById(id);
+            return Promise.all([user,article]);
+        }).spread((u,a)=>{
+            a.start++;
+            a.start_users.push(u);
+            a.save().then(status=>{
+                if(status) {
+                    output.code = 1;
+                    output.msg = 'success';
+                    output.ok = true;
+                    output.data = {
+                        start:a.start
+                    };
+                    res.json(output);
+                }
+            }).catch(err=>{
+                console.log(err);
+            });
+        }).catch(err=>{
+            console.log(err);
+        });
+    }else{
+        output.code = 3;
+        output.msg = 'success';
+        output.ok = true;
+        output.data = {};
+        res.json(output);
+    }
+})
+
 router.post('/signin', (req, res, next) => {
     // let redirect = req.body.redirect ? req.body.redirect : '';
     let name = req.body.name;
