@@ -203,6 +203,12 @@ app.use('/oauth', require(path.join(__dirname, '/app/routers/oauth')));
 
 // 处理404请求
 
+app.get('*', function (req, res) {
+    res.render(path.join(__dirname, '/app/views/404'), {
+        title: 'No Found'
+    });
+});
+
 // 处理500请求
 
 //连接数据库
