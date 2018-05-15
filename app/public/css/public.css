@@ -2,6 +2,8 @@
  * public style
  */
 
+html{font-size:15px;}
+
 body {
     background: #FFF;
     font-family: Helvetica, sans-serif, -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, Blender, sans-serif !important;
@@ -81,7 +83,7 @@ textarea {
 
 blockquote {
     border-left: #eee solid 5px;
-    padding: 0 0 0 5px
+    padding: 0 0 0 15px
 }
 
 blockquote p {

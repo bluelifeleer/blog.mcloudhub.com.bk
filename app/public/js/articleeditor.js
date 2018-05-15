@@ -13,6 +13,8 @@ const VM = new Vue({
         wangedit: null,
         editorsWidth: "100%",
         editorsHeight: "100%",
+        editorsArticlListHeight:'100%',
+        editorsArticlBoxHeight:'100%',
         wangEditor: 'block',
         markdownEditor: 'none',
         imgSrc: '',
@@ -42,7 +44,7 @@ const VM = new Vue({
                 this.uid = uid;
                 this.getUser();
                 this.isSignin = true;
-                this.autoSaveArticle(null);
+                // this.autoSaveArticle(null);
             }
         },
         initMarked: function(w, h) {
@@ -144,6 +146,7 @@ const VM = new Vue({
         getUser: function() {
             let winH = document.body.clientHeight || document.documentElement.clientHeight;
             this.editorsHeight = winH + 'px';
+            this.editorsArticlBoxHeight = parseInt(winH-50)+'px';
             this.$http.get('/api/getUsers?uid=' + this.uid).then(res => {
                 if (!res) throw console.log(res);
                 this.uid = res.body.data._id;
@@ -177,6 +180,7 @@ const VM = new Vue({
             this.$http.get('/api/getArticleLists?doc_id=' + this.doc_id).then(res => {
                 if (!res) throw console.log(res);
                 let articleLsts = res.body.data;
+                this.editorsArticlListHeight = parseInt(60*articleLsts.length)+'px';
                 if (articleLsts.length > 0) {
                     if(!type){
                         articleLsts[0].active = true;

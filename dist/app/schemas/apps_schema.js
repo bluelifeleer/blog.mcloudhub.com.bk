@@ -5,6 +5,7 @@ var appsSchema = new mongoose.Schema({
     user_id: String,
     name: String,
     desc: String,
+    redirect_uri: String, // 回调地址
     avatar: String,
     owner: {
         type: mongoose.Schema.Types.ObjectId,

@@ -14,6 +14,8 @@ module.exports = new mongoose.Schema({
     encoding: String, //上传文件编码方式
     mimetype: String, //上传文件类型
     size: Number, //上传文件大小
+    width: Number, // 上传图片宽度
+    height: Number, // 上传图片高度
     add_date: Date, //上传文件时间
     isDel: Number //上传文件是否删除
 });

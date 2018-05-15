@@ -57,8 +57,8 @@
         </div>
         <div class="article-editor-layout-center">
             <div class="create-article-but-block"><a href="javascript:void(0);" class="create-article-but" v-on:click="createArticle($event)"><i class="icon iconfont">&#xe6a3;</i>&nbsp;&nbsp;创建文章&nbsp;&nbsp;<span class="loading-box" v-bind:style="{display:showLoadBut}"></span></a></div>
-            <div class="article-list-group-block">
-                <ul class="article-list-group-box">
+            <div class="article-list-group-block" v-bind:style="{height:editorsArticlBoxHeight}">
+                <ul class="article-list-group-box" v-bind:style="{height:editorsArticlListHeight}">
                     <!--article-list-default-->
                     <li class="article-list-box" v-for="(article,$index) in articleLsts" v-on:click.stop="selectArticleBut($event,article,$index)" v-bind:class="{'article-active':article.active,'article-unactive':!article.active}">
                         <i class="icon iconfont article-iconfont">&#xe62e;</i>

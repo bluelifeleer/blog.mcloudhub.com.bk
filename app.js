@@ -219,42 +219,41 @@ mongoose.connect('mongodb://localhost:27017/blog', (err, res) => {
         http.createServer(app).listen(80);
         // https.createServer(options, app).listen(443);
         const server = http2.createServer(options, app);
-        const wss = new webSocket.Server({ server });
+        // const wss = new webSocket.Server({ server });
 
+        // if (supportsColor.stdout) {
+        //     console.log('Terminal stdout supports color');
+        // }
 
-        if (supportsColor.stdout) {
-            console.log('Terminal stdout supports color');
-        }
+        // if (supportsColor.stderr.has16m) {
+        //     console.log('Terminal stderr supports 16 million colors (truecolor)');
+        // }
 
-        if (supportsColor.stderr.has16m) {
-            console.log('Terminal stderr supports 16 million colors (truecolor)');
-        }
+        // if (supportsColor.stdout.has256) {
+        //     console.log('Terminal stdout supports 256 colors');
+        // }
 
-        if (supportsColor.stdout.has256) {
-            console.log('Terminal stdout supports 256 colors');
-        }
-
-        if(debug.enabled){
-            debug('server is `starting` listen `443` project `blog` run_model DEBUG');
-        }
+        // if(debug.enabled){
+        //     debug('server is `starting` listen `443` project `blog` run_model DEBUG');
+        // }
 
         // 返回进程环境信息
         // console.log(process.env);
 
-        wss.on('connection', function connection(ws, req) {
-            console.log(req);
-            console.log(ws);
-            // const location = url.parse(req.url, true);
-              // You might use location.query.access_token to authenticate or share sessions
-              // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+        // wss.on('connection', function connection(ws, req) {
+        //     console.log(req);
+        //     console.log(ws);
+        //     // const location = url.parse(req.url, true);
+        //       // You might use location.query.access_token to authenticate or share sessions
+        //       // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
 
-            ws.on('message', function incoming(message) {
-                ws.send(message);
-                console.log('received: %s', message);
-            });
+        //     ws.on('message', function incoming(message) {
+        //         ws.send(message);
+        //         console.log('received: %s', message);
+        //     });
 
-            ws.send('something');
-        });
+        //     ws.send('something');
+        // });
         server.listen(443);
 
     }

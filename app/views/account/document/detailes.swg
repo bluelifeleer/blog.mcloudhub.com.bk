@@ -8,7 +8,7 @@
                 <div class="collections-icon-box"><img src="/public/images/avatar-notebook-default-640f7dde88592bdf6417d8ce1902636e.png" alt=""></div>
                 <div class="collections-title-box">
                     <p class="collections-title">${doc.name}</p>
-                    <p class="collections-info">收录了<span>0</span>篇文章 · <span>0</span>人关注</p>
+                    <p class="collections-info">收录了<span>${doc.article_nums}</span>篇文章 · <span>0</span>人关注</p>
                 </div>
             </div>
             <div class="collections-detailes-contents-block">
@@ -45,7 +45,7 @@
                         <div class="article-list" v-else>
                             <a target="_blank" v-bind:href="article.href">
                                 <div class="article-title"><span href="javascript:void(0);">${article.title}</span></div>
-                                <div class="article-author"><span class="article-tags">${article.doc_name}</span><span class="article-author">@${article.author}</span><span class="article-date">${article.add_date}</span></div>
+                                <div class="article-author"><span class="article-tags">${article.document.name}</span><span class="article-author">@${article.author.name}</span><span class="article-date">${article.add_date}</span></div>
                                 <div class="article-contents">${article.contents}</div>
                             </a>
                             <p class="ctr-buts-block">

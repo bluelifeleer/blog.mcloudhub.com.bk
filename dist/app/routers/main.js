@@ -149,5 +149,12 @@ router.get('/mail/setting', function (req, res, next) {
     });
 });
 
+router.get('/qrcode', function (req, res, next) {
+    res.render('../views/qrcode', {
+        page_type: 'qrcode',
+        title: '二维码生成'
+    });
+});
+
 module.exports = router;
 //# sourceMappingURL=main.js.map

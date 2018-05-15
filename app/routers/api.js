@@ -8,8 +8,10 @@ const requestPromise = require('request-promise');
 const md5 = require('md5');
 const sillyDateTime = require('silly-datetime');
 const multer = require('multer');
+const imageSize = require('image-size');
 const Geetest = require('gt3-sdk');
 const nodemailer = require('nodemailer');
+const QRCode = require('qrcode');
 const salt = require('../libs/salt');
 const crt_token = require('../libs/ctr_token');
 const tools = require('../libs/tools');
@@ -195,57 +197,46 @@ router.get('/allArticles', (req, res, next) => {
         all = true;
     }
     let where = all ? { isDel: 0, permissions:1 } : { user_id: uid, isDel: 0 };
-    Articles.find(where).skip((offset ? (parseInt(offset-1)*num) :offset)).limit(num)
-        .populate([{
-            path: 'document',
-            select: 'name'
-        }, {
-            path: 'author',
-            select: 'name nick avatar'
-        }])
-        .exec()
-        .then(articles => {
-            if (articles) {
-                articles.forEach(item => {
-                    item.add_date = sillyDateTime.format(item.add_date, 'YYYY-MM-DD HH:mm:ss');
-                });
-                output.code = 1;
-                output.msg = 'success';
-                output.ok = true;
-                output.data = articles;
-                res.json(output);
-            } else {
-                output.code = 0;
-                output.msg = 'error';
-                output.ok = false;
-                output.data = {};
-                res.json(output);
-            }
-        });
-    // Articles.find(where).skip((offset == 0 ? offset : (offset - 1))).limit(num).then(alls => {
-    //     if (alls) {
-    //         alls.forEach(item => {
-    //             item.add_date = sillyDateTime.format(item.add_date, 'YYYY-MM-DD HH:mm:ss');
-    //         });
-    //         output.code = 1;
-    //         output.msg = 'success';
-    //         output.ok = true;
-    //         output.data = alls;
-    //         res.json(output);
-    //     } else {
-    //         output.code = 0;
-    //         output.msg = 'error';
-    //         output.ok = false;
-    //         output.data = {};
-    //         res.json(output);
-    //     }
-    // });
+    Articles.count((err, count)=>{
+        Articles.find(where).skip((offset ? (parseInt(offset-1)*num) :offset)).limit(num)
+            .populate([{
+                path: 'document',
+                select: 'name'
+            }, {
+                path: 'author',
+                select: 'name nick avatar'
+            }])
+            .exec()
+            .then(articles => {
+                if (articles) {
+                    articles.forEach(item => {
+                        item.add_date = sillyDateTime.format(item.add_date, 'YYYY-MM-DD HH:mm:ss');
+                    });
+                    output.code = 1;
+                    output.msg = 'success';
+                    output.ok = true;
+                    output.data = {
+                        articles: articles,
+                        count: count,
+                        offset: offset,
+                        num: num
+                    };
+                    res.json(output);
+                } else {
+                    output.code = 0;
+                    output.msg = 'error';
+                    output.ok = false;
+                    output.data = {};
+                    res.json(output);
+                }
+            });
+    });
 })
 
 router.get('/getArticleLists', (req, res, next) => {
     let doc_id = req.query.doc_id;
     let offset = req.query.offset ? req.query.offset: 0;
-    let num = req.query.num ? req.query.num : 10;
+    let num = req.query.num ? req.query.num : 20;
     Articles.find({
         doc_id: doc_id,
         isDel: 0,
@@ -272,51 +263,103 @@ router.get('/getArticleLists', (req, res, next) => {
 
 router.get('/getArticle', (req, res, next) => {
     let id = req.query.id;
-    Articles.count((err,count)=>{
-        Articles.findById(id).populate([{
-            path: 'document',
-            select: 'name'
+    Articles.findById(id).populate([{
+        path: 'document',
+        select: 'name'
+    },
+        {
+            path: 'author',
+            select: 'name nick avatar rewardStatus rewardDesc'
         },
-            {
+        {
+            path: 'issue_contents',
+            select: 'contents add_date permissions',
+            populate: {
                 path: 'author',
-                select: 'name nick avatar rewardStatus rewardDesc'
-            },
-            {
-                path: 'issue_contents',
-                select: 'contents add_date permissions',
-                populate: {
-                    path: 'author',
-                    select: 'name nick avatar'
-                }
+                select: 'name nick avatar'
             }
-        ]).exec().then(article => {
-            if (article) {
-                article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
-                if (!req.cookies[id]) {
-                    //增加阅读数
-                    article.watch++;
-                    article.save();
-                    res.cookie(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
-                }
-                output.code = 1;
-                output.msg = 'success';
-                output.ok = true;
-                output.data = {
-                    'article': article,
-                    'total': count,
-                    'offset': 2,
-                    'num': 1
-                };
-                res.json(output);
+        }
+    ]).exec().then(article => {
+        if (article) {
+            article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
+            if (!req.cookies[id]) {
+                //增加阅读数
+                article.watch++;
+                article.save();
+                res.cookie(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
+            }
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = {
+                'article': article
+            };
+            res.json(output);
 
-            } else {
-                output.code = 0;
-                output.msg = 'error';
-                output.ok = false;
-                output.data = {};
-                res.json(output);
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+        }
+    });
+});
+
+router.get('/article/get', (req, res, next)=>{
+    let id = req.query.id ? req.query.id : '';
+    let page = req.query.page ? req.query.page : 'next';
+    let where = {};
+    let sort = {};
+    if(page == 'next'){
+        where = {'_id' :{ "$gt" :id} };
+        sort = {_id:1};
+    }else{
+        where = {'_id' :{ "$lt" :id} };
+        sort = {_id:-1};
+    }
+    Articles.findOne(where).limit(1).sort(sort).populate([{
+        path: 'document',
+        select: 'name'
+    },
+        {
+            path: 'author',
+            select: 'name nick avatar rewardStatus rewardDesc'
+        },
+        {
+            path: 'issue_contents',
+            select: 'contents add_date permissions',
+            populate: {
+                path: 'author',
+                select: 'name nick avatar'
             }
-        });
+        }
+    ]).exec().then(article=>{
+        if (article) {
+            article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
+            if (!req.cookies[id]) {
+                //增加阅读数
+                article.watch++;
+                article.save();
+                res.cookie(id, 'on', { maxAge: 1000 * 3600 * 10, expires: 1000 * 3600 * 10 });
+            }
+            output.code = 1;
+            output.msg = 'success';
+            output.ok = true;
+            output.data = {
+                'article': article
+            };
+            res.json(output);
+
+        } else {
+            output.code = 0;
+            output.msg = 'error';
+            output.ok = false;
+            output.data = {};
+            res.json(output);
+        }
+    }).catch(err=>{
+        console.log(err);
     });
 });
 
@@ -1004,6 +1047,11 @@ router.post('/uploader', uoloader.single('editormd-image-file'), (req, res, next
     fs.existsSync(dirname) || fs.mkdirSync(dirname); // 目录不存在创建目录
     fs.writeFile(dirname + filename, req.file.buffer, err => {
         if (!err) {
+            // util
+            // 计算上传的图片宽度和高度
+            let dimensions = imageSize(dirname + filename);    // 使用绝对路径，也可以使用url，使用url要转换成buffer
+            let width = dimensions.width;
+            let height = dimensions.height;
             Users.findById(uid).then(user => {
                 new Photos({
                     user_id: user._id,
@@ -1015,6 +1063,8 @@ router.post('/uploader', uoloader.single('editormd-image-file'), (req, res, next
                     encoding: req.file.encoding,
                     mimetype: req.file.mimetype,
                     size: req.file.size,
+                    width: width,
+                    height: height,
                     add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
                     isDel: 0
                 }).save().then(insert => {
@@ -1443,7 +1493,7 @@ router.get('/github', (req, res, next) => {
             json: true
         }
         requestPromise(getGithubUsersOptaions).then(github => {
-            console.log(github);
+            // console.log(github);
             if (github) {
                 Users.findOne({ github_id: github.id }).then(user => {
                     if (!user) {
@@ -1642,6 +1692,7 @@ router.post('/applaction/new', (req, res, next)=>{
         new Apps({
             user_id: user._id,
             name: app.name,
+            redirect_uri:app.redirect_uri,
             desc: app.desc,
             avatar: app.avatar,
             owner:user,
@@ -1667,8 +1718,9 @@ router.post('/applaction/new', (req, res, next)=>{
 router.post('/applaction/update', (req, res, next)=>{
     let app = req.body.app;
     let id = req.body.id;
-    console.log(app);
-    Apps.findByIdAndUpdate(id, {name:app.name,type:parseInt(app.type),desc:app.desc,avatar:app.avatar}, {new:true, runValidators:true}).then(status=>{
+    app.type = app.type == 'PC应用' ? 1 : 2;          // 将APP应用类型由数字转换成数字
+    // console.log(app);
+    Apps.findByIdAndUpdate(id, { name:app.name, redirect_uri:app.redirect_uri, type:parseInt(app.type), desc:app.desc, avatar:app.avatar }, { new:true, runValidators:true }).then(status=>{
         output.code = 1;
         output.ok = true;
         output.msg = 'SUCCESS';
@@ -1841,6 +1893,17 @@ router.get('/mail/user/delete', (req, res, next)=>{
     }).catch(err=>{
         console.log(err);
     });
+});
+
+router.post('/qrcode', (req, res, next)=>{
+    let options = {
+        errorCorrectionLevel: 'H',
+        version: 2,
+        modes: 'auto'
+    };
+    QRCode.toDataURL('I am a pony!', options, function (err, url) {
+        console.log(url)
+    })
 });
 
 module.exports = router;

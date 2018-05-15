@@ -78,7 +78,8 @@ const vm = new Vue({
                 href: '',
                 name: '',
                 avatar: ''
-            }
+            },
+            article_nums:0
         },
         collectionFormNew: true,
         collection_id: '',
@@ -98,6 +99,7 @@ const vm = new Vue({
           name: '应用名称',
           type: 'PC应用',
           avatar: '',
+          redirect_uri: 'http://|https://',
           desc: '应用描述不多于200字',
           showAddAppIcon:true
       },
@@ -134,7 +136,6 @@ const vm = new Vue({
             }
             if (page_type == 'collections_detailes') {
                 this.getCollectionById(coll_id, 'detailes');
-                this.getAllArticles(0, 100);
             }
             if (page_type == 'collections_edit') {
                 this.collectionFormNew = false;
@@ -201,6 +202,7 @@ const vm = new Vue({
                 if (doc.body.code && doc.body.ok) {
                     let documents = doc.body.data;
                     documents.author.href = '/account?uid=' + documents.author._id;
+                    documents.article_nums = documents.article.length;
                     documents.article.forEach(item => {
                         item.href = '/article/details?id=' + item._id;
                         item.hasImg = item.contents.search(this.imgRegexp) > 0 ? true : false;
@@ -231,7 +233,7 @@ const vm = new Vue({
             this.$http.get('/api/allArticles?' + query_string).then(all => {
                 let ArticleArrs = [];
                 if (all.body.code && all.body.ok) {
-                    ArticleArrs = all.body.data;
+                    ArticleArrs = all.body.data.articles;
                     ArticleArrs.forEach(item => {
                         item.href = '/article/details?id=' + item._id;
                         item.hasImg = item.contents.search(this.imgRegexp) > 0 ? true : false;
@@ -248,22 +250,18 @@ const vm = new Vue({
             if (window.location.pathname == '/article/details') {
                 let id = this.getQueryString('id');
                 this.$http.get('/api/getArticle?id=' + id).then(article => {
-                    if (!article) throw console.log(article);
-                    let articleArr = article.body.data.article;
-                    articleArr.page = {
-                        total:article.body.data.total,
-                        offset:article.body.data.offset,
-                        num:article.body.data.num
-                    };
-                    articleArr.author.href = '/account?uid=' + articleArr.author._id;
-                    articleArr.issue_contents.forEach(item => {
-                        item.add_date = this.formate_date(item.add_date);
-                        item.author.href = '/account?uid=' + item.author._id;
-                    })
-                    articleArr.issue_contents = articleArr.issue_contents.reverse();
-                    articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
+                    if(article.body.code && article.body.ok){
+                        let articleArr = article.body.data.article;
+                        articleArr.author.href = '/account?uid=' + articleArr.author._id;
+                        articleArr.issue_contents.forEach(item => {
+                            item.add_date = this.formate_date(item.add_date);
+                            item.author.href = '/account?uid=' + item.author._id;
+                        })
+                        articleArr.issue_contents = articleArr.issue_contents.reverse();
+                        articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
 
-                    this.article = articleArr;
+                        this.article = articleArr;
+                    }
                 });
             }
         },
@@ -594,6 +592,7 @@ const vm = new Vue({
         },
         collectionPush: function(e, id) {
             if (this.isSigin) {
+                this.getAllArticles(0, 100);
                 this.dialogTableVisible = true;
             } else {
                 window.location.href = '/login?redirect_uri=' + window.location.href;
@@ -830,6 +829,38 @@ const vm = new Vue({
         },
         articleShareButs:function(e,type,id){
             alert(type+':'+id);
+        },
+        articlePrevBut:function(e,id){
+            this.$http.get('/api/article/get?id='+id+'&page=prev').then(res=>{
+                if(res.body.code && res.body.ok){
+                    let articleArr = res.body.data.article;
+                    articleArr.author.href = '/account?uid=' + articleArr.author._id;
+                    articleArr.issue_contents.forEach(item => {
+                        item.add_date = this.formate_date(item.add_date);
+                        item.author.href = '/account?uid=' + item.author._id;
+                    })
+                    articleArr.issue_contents = articleArr.issue_contents.reverse();
+                    articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
+                    this.article = articleArr;
+                }
+            });
+        },
+        articleNextBut:function(e,id){
+            this.$http.get('/api/article/get?id='+id+'&page=next').then(res=>{
+                if(res.body.code && res.body.ok){
+                    if(res.body.code && res.body.ok){
+                        let articleArr = res.body.data.article;
+                        articleArr.author.href = '/account?uid=' + articleArr.author._id;
+                        articleArr.issue_contents.forEach(item => {
+                            item.add_date = this.formate_date(item.add_date);
+                            item.author.href = '/account?uid=' + item.author._id;
+                        })
+                        articleArr.issue_contents = articleArr.issue_contents.reverse();
+                        articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
+                        this.article = articleArr;
+                    }
+                }
+            });
         },
         formate_date: function(date) {
             let MyDate = new Date(date);

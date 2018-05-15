@@ -147,4 +147,18 @@ router.get('/mail/setting', (req, res, next) => {
     });
 });
 
+router.get('/qrcode', (req, res, next)=>{
+    res.render('../views/qrcode', {
+        page_type: 'qrcode',
+        title: '二维码生成'
+    });
+});
+
+
+router.get('/vuetest', (req, res, next)=>{
+    res.render('../views/vuetest', {
+        title: 'Vue测试'
+    });
+});
+
 module.exports = router;

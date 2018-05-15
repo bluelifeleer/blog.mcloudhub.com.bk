@@ -100,6 +100,7 @@ var vm = new Vue({
             name: '应用名称',
             type: 'PC应用',
             avatar: '',
+            redirect_uri: 'http://|https://',
             desc: '应用描述不多于200字',
             showAddAppIcon: true
         },
@@ -136,7 +137,6 @@ var vm = new Vue({
             }
             if (page_type == 'collections_detailes') {
                 this.getCollectionById(coll_id, 'detailes');
-                this.getAllArticles(0, 100);
             }
             if (page_type == 'collections_edit') {
                 this.collectionFormNew = false;
@@ -242,7 +242,7 @@ var vm = new Vue({
             this.$http.get('/api/allArticles?' + query_string).then(function (all) {
                 var ArticleArrs = [];
                 if (all.body.code && all.body.ok) {
-                    ArticleArrs = all.body.data;
+                    ArticleArrs = all.body.data.articles;
                     ArticleArrs.forEach(function (item) {
                         item.href = '/article/details?id=' + item._id;
                         item.hasImg = item.contents.search(_this6.imgRegexp) > 0 ? true : false;
@@ -261,22 +261,18 @@ var vm = new Vue({
             if (window.location.pathname == '/article/details') {
                 var id = this.getQueryString('id');
                 this.$http.get('/api/getArticle?id=' + id).then(function (article) {
-                    if (!article) throw console.log(article);
-                    var articleArr = article.body.data.article;
-                    articleArr.page = {
-                        total: article.body.data.total,
-                        offset: article.body.data.offset,
-                        num: article.body.data.num
-                    };
-                    articleArr.author.href = '/account?uid=' + articleArr.author._id;
-                    articleArr.issue_contents.forEach(function (item) {
-                        item.add_date = _this7.formate_date(item.add_date);
-                        item.author.href = '/account?uid=' + item.author._id;
-                    });
-                    articleArr.issue_contents = articleArr.issue_contents.reverse();
-                    articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
+                    if (article.body.code && article.body.ok) {
+                        var articleArr = article.body.data.article;
+                        articleArr.author.href = '/account?uid=' + articleArr.author._id;
+                        articleArr.issue_contents.forEach(function (item) {
+                            item.add_date = _this7.formate_date(item.add_date);
+                            item.author.href = '/account?uid=' + item.author._id;
+                        });
+                        articleArr.issue_contents = articleArr.issue_contents.reverse();
+                        articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
 
-                    _this7.article = articleArr;
+                        _this7.article = articleArr;
+                    }
                 });
             }
         },
@@ -631,6 +627,7 @@ var vm = new Vue({
         },
         collectionPush: function collectionPush(e, id) {
             if (this.isSigin) {
+                this.getAllArticles(0, 100);
                 this.dialogTableVisible = true;
             } else {
                 window.location.href = '/login?redirect_uri=' + window.location.href;
@@ -881,6 +878,42 @@ var vm = new Vue({
         },
         articleShareButs: function articleShareButs(e, type, id) {
             alert(type + ':' + id);
+        },
+        articlePrevBut: function articlePrevBut(e, id) {
+            var _this29 = this;
+
+            this.$http.get('/api/article/get?id=' + id + '&page=prev').then(function (res) {
+                if (res.body.code && res.body.ok) {
+                    var articleArr = res.body.data.article;
+                    articleArr.author.href = '/account?uid=' + articleArr.author._id;
+                    articleArr.issue_contents.forEach(function (item) {
+                        item.add_date = _this29.formate_date(item.add_date);
+                        item.author.href = '/account?uid=' + item.author._id;
+                    });
+                    articleArr.issue_contents = articleArr.issue_contents.reverse();
+                    articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
+                    _this29.article = articleArr;
+                }
+            });
+        },
+        articleNextBut: function articleNextBut(e, id) {
+            var _this30 = this;
+
+            this.$http.get('/api/article/get?id=' + id + '&page=next').then(function (res) {
+                if (res.body.code && res.body.ok) {
+                    if (res.body.code && res.body.ok) {
+                        var articleArr = res.body.data.article;
+                        articleArr.author.href = '/account?uid=' + articleArr.author._id;
+                        articleArr.issue_contents.forEach(function (item) {
+                            item.add_date = _this30.formate_date(item.add_date);
+                            item.author.href = '/account?uid=' + item.author._id;
+                        });
+                        articleArr.issue_contents = articleArr.issue_contents.reverse();
+                        articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
+                        _this30.article = articleArr;
+                    }
+                }
+            });
         },
         formate_date: function formate_date(date) {
             var MyDate = new Date(date);

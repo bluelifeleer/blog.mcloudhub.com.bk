@@ -274,3 +274,19 @@ app.use(function(err, req, res, next) {
 ```
 
 [http://www.expressjs.com.cn/starter/faq.html](http://www.expressjs.com.cn/starter/faq.html "http://www.expressjs.com.cn/starter/faq.html")
+
+#### 获取上传图片大小
+
+> 获取上传图片大小，使用包：image-size
+
+使用：
+
+```
+    const imageSize = require('image-size');
+    let dimensions = imageSize('path'); // 也可以使用url,使用url要转换成buffer
+    let width = dimensions.width;
+    let height = dimensions.height;
+
+```
+
+

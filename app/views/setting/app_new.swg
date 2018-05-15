@@ -54,11 +54,15 @@
                             </div>
                         </div>
                   </div>
+                  <el-form-item label="回调地址：">
+                    <el-input v-model="app.redirect_uri"></el-input>
+                  </el-form-item>
                   <el-form-item label="应用描述：">
                     <el-input type="textarea" v-model="app.desc"></el-input>
                   </el-form-item>
                   <el-form-item>
-                    <el-button type="primary" @click="appNewFormOnSubmit(app._id)">立即创建</el-button>
+                    <el-button type="primary" v-if="app._id" @click="appNewFormOnSubmit(app._id)">更新应用</el-button>
+                    <el-button type="primary" v-else @click="appNewFormOnSubmit()">立即创建</el-button>
                     <el-button @click="appNewResetbut">取消</el-button>
                   </el-form-item>
                 </el-form>
