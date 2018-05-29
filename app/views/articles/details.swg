@@ -13,10 +13,19 @@
             <div class="author-account-info-block">
                 <div class="author-account-info-top">
                     <span class="article-authorn-name-box"><a v-bind:href="article.author.href" class="author-name">${article.author.name}</a></span>
-                    <a href="javascript:void(0);" class="account-follow-buts" v-on:click="articlFollowAuthorBut($event,article.author._id)"><i class="icon iconfont">&#xe628;</i>关注</a>
+                    <a href="javascript:void(0);" class="account-follow-buts" v-on:click="articlFollowAuthorBut($event,article.author._id)"><i class="icon iconfont" style="float:left">&#xe628;</i><span style="display:block;float:left;width:auto;height:16px;line-height:16px;font-size:12px;font-style: normal;">关注</span></a>
                 </div>
                 <div class="author-account-info-bottom">
-                    <span class="article-date"><element>${article.add_date}</element></span>
+                    <span class="article-date"><el-tooltip class="item" effect="dark" placement="bottom">
+                      <div slot="content" v-if="article.last_update_date">
+                          最后编辑于：${article.last_update_date}
+                      </div>
+                      <div slot="content" v-else>
+                          最后编辑于：${article.add_date}
+                      </div>
+                      <element>${article.add_date}</element>
+                    </el-tooltip></span>
+                    <!-- <span class="article-date"><element>${article.add_date}</element></span> -->
                     <span class="article-wordage">字数<element>${article.wordNumbers}</element></span>
                     <span class="article-view-count">阅读<element>${article.watch}</element></span>
                     <span class="article-comment-count">评论<element>${article.issue}</element></span>

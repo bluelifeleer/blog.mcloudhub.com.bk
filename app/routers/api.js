@@ -705,7 +705,7 @@ router.post('/saveArticle', (req, res, next) => {
         article_date.markDownText = markDownText;
     }
 
-    Articles.findByIdAndUpdate(id, { title: title, contents: contents, markDownText: markDownText }, { runValidators: true }).then(status => {
+    Articles.findByIdAndUpdate(id, { title: title, contents: contents, markDownText: markDownText, last_update_date:sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss') }, { runValidators: true }).then(status => {
         if (!status) throw console.log(status);
         output.code = 1;
         output.ok = true;

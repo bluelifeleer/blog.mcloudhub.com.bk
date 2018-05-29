@@ -237,7 +237,6 @@ const vm = new Vue({
                     ArticleArrs.forEach(item => {
                         item.href = '/article/details?id=' + item._id;
                         item.hasImg = item.contents.search(this.imgRegexp) > 0 ? true : false;
-
                         item.imgHtml = item.hasImg ? item.contents.match(this.imgRegexp)[0] : '';
                         let content = item.contents.replace(/<[^>]*>/g, "");
                         item.contents = item.hasImg ? (content.length > 60 ? content.substr(0, 60) + '...' : content) : (content.length > 80 ? content.substr(0, 80) + '...' : content);
@@ -254,6 +253,9 @@ const vm = new Vue({
                         let articleArr = article.body.data.article;
                         articleArr.author.href = '/account?uid=' + articleArr.author._id;
                         articleArr.issue_contents.forEach(item => {
+                            if(item.last_update_date){
+                                item.last_update_date = this.formate_date(item.last_update_date);
+                            }
                             item.add_date = this.formate_date(item.add_date);
                             item.author.href = '/account?uid=' + item.author._id;
                         })

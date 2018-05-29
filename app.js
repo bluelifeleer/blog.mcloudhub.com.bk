@@ -25,6 +25,7 @@ const webSocket = require('ws');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csurf = require('csurf');
 const swig = require('swig');
+const config = require('./config/config');
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 const bodyParser = require('body-parser');

@@ -37,9 +37,9 @@
                                 <p class="article-list-describe-text">${article.contents}</p>
                         </a>
                         <p class="ctr-buts-block">
-                            <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                            <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                            <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
+                            <a href="javascript:void(0);" :data-id="article._id" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
+                            <a href="javascript:void(0);" :data-id="article._id" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
+                            <a href="javascript:void(0);" :data-id="article._id" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
                         </p>
                         </div>
                         <div class="clear-both"></div>
@@ -51,9 +51,9 @@
                             <div class="article-contents">${article.contents}</div>
                         </a>
                         <p class="ctr-buts-block">
-                            <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                            <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                            <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
+                            <a href="javascript:void(0);" :data-id="article._id" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
+                            <a href="javascript:void(0);" :data-id="article._id" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
+                            <a href="javascript:void(0);" :data-id="article._id" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
                         </p>
                     </div>
                 </div>
@@ -121,6 +121,8 @@
                 <div class="model-tag-name">moment</div>
                 <div class="model-contents-box">
                     <ul class="moment-list-box">
+                        <li><a href="#">生命很脆弱，失去了就回不来了。留下生命，就是对生命最大的尊重。</a></li>
+                        <li><a href="#">世界太荒芜了，需要种一些情话。</a></li>
                         <li><a href="#">作为工匠，我更愿意把我有限的生命用在作品上，而不是对工具的无止境的学习上。</a></li>
                         <li><a href="#">我把最深沉的秘密放在那里。</a></li>
                         <li><a href="#">你不懂我，我不怪你。</a></li>
