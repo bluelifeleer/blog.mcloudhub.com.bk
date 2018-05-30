@@ -83,7 +83,7 @@
         {% block content %}{% endblock %}
         <footer class="footer-bar"></footer>
     </div>
-    <script type="text/javascript" src="/public/js/canvas-nest.min.js"></script>
+    <script type="text/javascript" color="0,0,255" opacity='0.7' zIndex="-1" count="99" src="/public/js/canvas-nest.min.js"></script>
 </body>
 <script type="text/javascript" src="/public/js/main.js"></script>
 
