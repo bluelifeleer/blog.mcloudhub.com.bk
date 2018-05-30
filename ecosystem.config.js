@@ -2,7 +2,7 @@ module.exports = {
     apps: [{
         name: "blog",
         script: "./app.js",
-	cwd : "/Users/bluelife/www/node/blog",
+        cwd: process.cwd(),
         watch: true,
         env: {
             "PORT": 443,
@@ -15,6 +15,6 @@ module.exports = {
         instances: 'max', // 可以指定进程数，如4：表示
         exec_mode: 'fork' // mode to start your app, can be “cluster” or “fork”, default fork
     }]
-}
+};
 
 //pm2 start ecosystem.config.js --env production
