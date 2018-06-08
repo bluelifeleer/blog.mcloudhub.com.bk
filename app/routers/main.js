@@ -161,4 +161,10 @@ router.get('/vuetest', (req, res, next)=>{
     });
 });
 
+router.get('/socket', (eq, res, next)=>{
+    res.render('../views/socket', {
+        title: 'socket'
+    });
+});
+
 module.exports = router;

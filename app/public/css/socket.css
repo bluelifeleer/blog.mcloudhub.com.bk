@@ -1,0 +1,97 @@
+body{width:100%;height:850px;padding:0;margin:0;background:url("/public/images/slides_02.jpg") no-repeat 0 0;background-size: 100% 100%;}
+.socket-app-block{width:980px;height:710px;border-radius:5px;overflow:hidden;position:absolute;left:50%;top:50%;}
+.socket-app-nume-box{float:left;width:80px;height:100%;background:#353636;position:relative;}
+.app-buts-box{width:100%;height:30px;}
+.app-buts{display:block;float:left;width:15px;height:15px;border-radius:50%;margin:10px 0;}
+.clost-but{background:#ee6b5f;margin-left:10px;}
+.reset-but-min{background:#f6bf4f;margin-left:10px;}
+.reset-but-max{background:#60c655;margin-left:10px;}
+
+.user-avatar-icon-box{width:100%;height:80px;margin:50px 0 20px 0;}
+.user-avatar-icon-box img{display:block;width:50px;height:50px;border-radius:5px;margin:10px 15px;}
+.massage-icon-box{width:100%;height:80px;position:relative;}
+.massage-icon,.users-icon{display:block;width:50px;height:50px;line-height:50px;text-align:center;margin:10px 15px;}
+.iconfont-msg{font-size:30px;color:#52b737;}
+.massage-nums-icon{display:block;width:20px;height:20px;line-height:20px;text-align:center;background:#e2483c;border-radius:50%;color:#FFF;position:absolute;left:45px;top:3px;}
+.iconfont-user{font-size:30px;color:#888987;}
+.iconfont-more{font-size:30px;color:#888987;}
+
+.socket-app-user-list-box{float:left;width:300px;height:100%;background:#f8f7f7;}
+.search-ox{width:100%;height:60px;}
+.users-list-box{width:100%;height:670px;overflow:auto;}
+.user-list-item-box{width:100%;height:70px;}
+.user-list-item-box:hover{cursor:pointer;background:#d2d2d1;}
+.user-list-items{width:92%;height:70px;margin:0 4%;border-bottom:1px solid #eaeaea;}
+.user-list-avatar-box{float:left;width:50px;height:70px;position:relative;}
+.user-list-avatar-img{display:block;width:50px;height:50px;}
+.user-list-avatar-img img{display:block;width:40px;height:40px;border-radius:3px;margin:15px 0;}
+.user-list-avatar-msg-nums{display:block;width:15px;height:15px;line-height:15px;text-align:center;background:#e2483c;border-radius:50%;color:#FFF;position:absolute;left:32px;top:8px;font-size:10px;}
+.user-list-info-box{float:left;width:225px;height:40px;margin:10px 0;}
+.user-list-info{width:100%;height:30px;line-height:30px;}
+.user-list-info-name{display:block;float:left;width:auto;height:30px;line-height:30px;font-size:16px;}
+.user-list-info-timer{display:block;float:right;width:auto;height:30px;line-height:30px;font-size:13px;color:#b2b2b2;}
+.user-list-last-msg{width:100%;height:10px;line-height:10px;font-size:13px;color:#b2b2b2;}
+
+.socket-app-massage-box{float:left;width:600px;height:100%;background:#f3f3f3;}
+.socket-app-massage-box-header{width:100%;height:60px;border-bottom:1px solid #e2e2e2;}
+.socket-app-massage-box-header-user-name{float:left;width:auto;height:60px;line-height:60px;margin:0 0 0 20px;font-size:20px;}
+.socket-app-massage-box-header-user-info-icon{float:right;width:auto;height:60px;line-height:60px;}
+.massage-header-user-info{display:block;width:80px;height:60px;line-height:60px;text-align:center;}
+.socket-app-massage-box-body{width:92%;height:470px;overflow:auto;padding:0 4%;}
+.msg-info-group-box{width:100%;height:auto;}
+.msg-info-item-box{width:100%;height:auto;overflow:hidden;margin:0 0 20px 0;}
+.msg-info-date-box{width:100%;height:30px;line-height:30px;text-align:center;color:#b2b2b2;margin:30px 0;}
+.msg-info-friend-box,.msg-info-self-box{width:100%;height:auto;position:relative;}
+.msg-info-friend-box .msg-info-friend-avatar{display:block;float:left;width:45px;height:30px;}
+.msg-info-friend-box .msg-info-friend-avatar img{display:block;width:30px;height:30px;border-radius:3px;}
+.msg-info-friend-box .msg-info-massage{display:block;float:left;width:300px;height:auto;line-height:30px;background:#FFF;border-radius:3px;padding:10px;}
+.msg-info-friend-box .msg-info-massage:before{
+	content:'';
+	position:absolute;
+	left:37px;
+	top:9px;
+	border-top: 5px solid transparent;
+	border-right: 8px solid #FFF;
+  	border-bottom: 8px solid transparent;
+    width: 0px;
+    height: 0px;
+}
+
+.msg-info-self-box .msg-info-friend-avatar{display:block;float:right;width:45px;height:30px;}
+.msg-info-self-box .msg-info-friend-avatar img{display:block;width:30px;height:30px;border-radius:3px;margin:0 0 0 15px;}
+.msg-info-self-box .msg-info-massage{display:block;float:right;width:300px;height:auto;line-height:30px;background:#afe46e;border-radius:3px;padding:10px;}
+.msg-info-self-box .msg-info-massage:before{
+	content:'';
+	position:absolute;
+	left:507px;
+	top:9px;
+	border-top: 5px solid transparent;
+  	border-bottom: 8px solid transparent;
+  	border-left: 8px solid #afe46e;
+    width: 0px;
+    height: 0px;
+}
+
+.socket-app-massage-box-footer{width:100%;height:180px;border-top:1px solid #e2e2e2;box-sizing: border-box;}
+/*.masg-send-buts{width:100%;height:50px;}
+.masg-send-content-input{width:100%;height:130px;}
+.masg-send-content-input textarea{width:100%;height:130px;padding:0 20px;margin:0;border:none;background:#f3f3f3;resize:none;box-sizing:border-box;}*/
+.ql-toolbar{border:none !important;}
+#editor{width:100%;height:137px;border:none;}
+
+
+
+.login-marke-layer{width:100%;height:100%;background:#252323;opacity: .8;position:fixed;left:0;top:0;z-index:10;transition: .8s;}
+.ligin-form-layer{width:480px;height:380px;background:#fff;border-radius:3px;position:fixed;left:50%;top:50%;z-index:11;margin-left:-240px;margin-top:-190px;transition: .8s;}
+.login-form-layer-header{width:100%;height:30px;}
+.login-form-form{width:80%;height:auto;padding:20% 10%;}
+.form-item-box{width:100%;height:40px;margin:0 0 20px 0;}
+.form-item-box label{display:block;float:left;width:80px;height:40px;line-height:40px;font-size:14px;text-align:right;}
+.form-item-box input{display:block;float:left;width:292px;height:38px;line-height:38px;border:1px solid #c1c1c1;border-radius:3px;font-size:14px;padding:0 0 0 10px;}
+.login-submit{display:block;width:100%;height:38px;line-height:38px;border:1px solid #52b737;border-radius:3px;background:#52b737;color:#fff;text-align:center;font-size:14px;}
+.login-submit:hover{color:#fff;}
+
+
+
+
+

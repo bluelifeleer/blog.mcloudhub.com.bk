@@ -5,6 +5,7 @@ const os = require('os');
 const path = require('path');
 const assert = require('assert');
 const express = require('express');
+const httpConcat = require('http-concat');
 const debug = require('debug')('blog:server')
 const supportsColor = require('supports-color');
 const favicon = require('serve-favicon');
@@ -34,6 +35,7 @@ const serveIndex = require('serve-index');
 const uuidv4 = require('uuid/v4');
 const expressRequestId = require('express-request-id')();
 const expressCurl = require('express-curl');
+const md5 = require('md5');
 const app = express();
 
 // const expressWS = require('express-ws')(app);
@@ -169,6 +171,11 @@ if (start_log) {
 // 设置ftp路由
 app.use('/ftp', express.static(path.join(__dirname, '/app/ftp')), serveIndex(path.join(__dirname, '/app/ftp'), { 'icons': true }));
 
+app.use(httpConcat({
+    base: path.join(__dirname, 'public'),
+    path: '/'
+}));
+
 // Listen
 // app.listen(3000)
 //设置响应头
@@ -213,48 +220,34 @@ app.get('*',(req, res)=>{
 //连接数据库
 mongoose.connect('mongodb://localhost:27017/blog', (err, res) => {
     if (err) {
-        console.log(err);
+        debug(err);
     } else {
         // 数据库连接成功后监听80/443端口
         // app.listen(80);
         http.createServer(app).listen(80);
         // https.createServer(options, app).listen(443);
         const server = http2.createServer(options, app);
-        // const wss = new webSocket.Server({ server });
-
-        // if (supportsColor.stdout) {
-        //     console.log('Terminal stdout supports color');
-        // }
-
-        // if (supportsColor.stderr.has16m) {
-        //     console.log('Terminal stderr supports 16 million colors (truecolor)');
-        // }
-
-        // if (supportsColor.stdout.has256) {
-        //     console.log('Terminal stdout supports 256 colors');
-        // }
-
-        // if(debug.enabled){
-        //     debug('server is `starting` listen `443` project `blog` run_model DEBUG');
-        // }
-
         // 返回进程环境信息
         // console.log(process.env);
+        let userArr = [];
+        const io = require('socket.io')(server);
+        io.on('connection', socket =>{
+            // console.log(socket);
+            
+            socket.emit('status', {'connected':true,'msg':'this socket is connected'});
+            socket.on('user', json=>{
+                let id = md5(new Date().getTime());
+                userArr.push({id:id,name:json.name});
+                socket.lastName = json.name;
+                socket.emit('logins',{logins:userArr});
+                socket.emit('loginUser',{id:id,name:json.name});
 
-        // wss.on('connection', function connection(ws, req) {
-        //     console.log(req);
-        //     console.log(ws);
-        //     // const location = url.parse(req.url, true);
-        //       // You might use location.query.access_token to authenticate or share sessions
-        //       // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+                socket.on('msg', json=>{
+                    console.log(json);
+                })
+            });
 
-        //     ws.on('message', function incoming(message) {
-        //         ws.send(message);
-        //         console.log('received: %s', message);
-        //     });
-
-        //     ws.send('something');
-        // });
+        });
         server.listen(443);
 
     }
