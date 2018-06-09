@@ -17,7 +17,7 @@
     -moz-border-radius: 20px;
     border-radius: 20px;}
 #doc-reset-but{display:inline-block;width:30%;height:30px;line-height:30px;color:#999;background:#404040;border:none;}
-.documents-list-group-block{{width:100%;height:auto;overflow:auto;}}
+.documents-list-group-block{width:100%;height:auto;overflow:auto;}
 .documents-list-group-box{width:100%;height:auto;}
 .documents-list-box{width:100%;height:40px;background:#666;border-left:3px solid #666;margin:0 0 8px 0;position:relative;box-sizing: border-box;}
 .documents-list-box:hover{cursor:pointer;border-left:3px solid #ec7259;}
