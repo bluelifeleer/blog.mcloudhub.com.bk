@@ -10,7 +10,7 @@
 .author-account-info-block{float:left;width:auto;height:50px;line-height:50px;}
 .author-account-info-top{width:auto;height:30px;line-height:30px;font-size: 20px;}
 .article-authorn-name-box{display:block;float:left;width:auto;height:30px;line-height:30px;padding:0 10px;}
-.account-follow-buts{display:block;float:left;width:auto;height:20px;line-height:15px;padding:1px 8px 1px 0px;margin:5px 0;font-size:12px;color:#FFF !important;background:#3db922;border:1px solid #3db922;
+.account-follow-buts{display:block;float:left;width:auto;height:20px;line-height:15px;padding:1px 10px 1px 8px;margin:5px 0;font-size:12px;color:#FFF !important;background:#3db922;border:1px solid #3db922;
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
     border-radius:20px;
