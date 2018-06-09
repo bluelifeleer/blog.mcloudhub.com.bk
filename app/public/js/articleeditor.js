@@ -15,6 +15,7 @@ const VM = new Vue({
         editorsHeight: "100%",
         editorsArticlListHeight:'100%',
         editorsArticlBoxHeight:'100%',
+        editorsDocumentBoxHeight: '100%',
         wangEditor: 'block',
         markdownEditor: 'none',
         imgSrc: '',
@@ -147,6 +148,7 @@ const VM = new Vue({
             let winH = document.body.clientHeight || document.documentElement.clientHeight;
             this.editorsHeight = winH + 'px';
             this.editorsArticlBoxHeight = parseInt(winH-50)+'px';
+            this.editorsDocumentBoxHeight = parseInt(winH-120)+'px';
             this.$http.get('/api/getUsers?uid=' + this.uid).then(res => {
                 if (!res) throw console.log(res);
                 this.uid = res.body.data._id;

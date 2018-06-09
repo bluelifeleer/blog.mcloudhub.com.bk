@@ -36,7 +36,7 @@
                     </div>
                 </form>
             </div>
-            <div class="documents-list-group-block" v-bind:style="{height:editorsArticlBoxHeight}">
+            <div class="documents-list-group-block" v-bind:style="{height:editorsDocumentBoxHeight}">
                 <ul class="documents-list-group-box">
                     <!--document-list-default-->
                     <li class="documents-list-box" v-for="(doc,$index) in docList" v-on:click.stop="selectDocumentButs($event,doc,$index)" v-bind:class="{'document-active':doc.active,'document-unactive':!doc.active}">
