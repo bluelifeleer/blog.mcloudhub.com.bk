@@ -29,7 +29,7 @@
             <div class="article-list-groups">
                 <div class="article-list-box" v-for="(article,$index) in articleLists" v-bind:class="{'has-img':article.hasImg}" v-if="article.permissions == 1">
                     <div class="article-list" v-if="article.hasImg">
-                        <a target="_blank" v-bind:href="article.href">
+                        <a v-bind:href="article.href">
                             <div class="article-list-img-box" v-html="article.imgHtml"></div>
                             <div class="article-list-describe-box">
                                 <div class="article-list-describe-author"><span class="article-tags">${article.document.name}</span><span class="article-author">@${article.author.name}</span><span class="article-date">${article.add_date}</span></div>
@@ -45,7 +45,7 @@
                         <div class="clear-both"></div>
                     </div>
                     <div class="article-list" v-else>
-                        <a target="_blank" v-bind:href="article.href">
+                        <a v-bind:href="article.href">
                             <div class="article-title"><span href="javascript:void(0);">${article.title}</span></div>
                             <div class="article-author"><span class="article-tags">${article.document.name}</span><span class="article-author">@${article.author.name}</span><span class="article-date">${article.add_date}</span></div>
                             <div class="article-contents">${article.contents}</div>
