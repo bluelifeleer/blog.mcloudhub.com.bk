@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no" />
     <title>{{ title }}</title>
     <link rel="icon" href="/public/images/favicon.ico" type="image/x-icon" />
-    <link rel="shortcut icon" href="/public/images/favicon.ico" type="image/x-icon" sizes="any" /> 
-    <link rel="stylesheet" href="https://bootswatch.com/4/simplex/bootstrap.min.css">
+    <link rel="shortcut icon" href="/public/images/favicon.ico" type="image/x-icon" sizes="any" />
+    <link rel="stylesheet" href="/public/css//bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="/public/js/marked/css/editormd.css">
     <!--<link rel="stylesheet" href="/public/js/marked/css/editormd.preview.css">-->

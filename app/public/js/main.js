@@ -108,7 +108,13 @@ const vm = new Vue({
             lists:[]
         },
         multipleSelection: [],
-        commentPermissions: '1'
+        commentPermissions: '1',
+        scroller: {
+            width:0,
+            height:0,
+            top:0,
+            left:0
+        }
     },
     methods: {
         init: function() {
@@ -122,6 +128,7 @@ const vm = new Vue({
             this.getArticle();
             if(page_type == 'index'){
                 this.getAllArticles(0, 100);
+                this.pageScroller();
             }
             if (page_type == 'account') {
                 this.users.uid = quid;
@@ -864,6 +871,16 @@ const vm = new Vue({
                 }
             });
         },
+        pageScroller: function(){
+            this.scroller.width = document.body.scrollWidth;
+            this.scroller.height = window.innerHeight;
+            this.scroller.left = document.body.scrollLeft;
+            this.scroller.top = document.body.scrollTop;
+            console.log(this.scroller);
+            window.onscroll = function(){
+                console.log("检测到页面滚动事件:"+window.pageXOffset+" "+window.pageYOffset);
+            }
+        },
         formate_date: function(date) {
             let MyDate = new Date(date);
             return MyDate.getFullYear() + '-' + ((MyDate.getMonth() + 1) <= 9 ? '0' + (MyDate.getMonth() + 1) : (MyDate.getMonth() + 1)) + '-' + (MyDate.getDate() <= 9 ? '0' + MyDate.getDate() : MyDate.getDate()) + ' ' + (MyDate.getHours() <= 9 ? '0' + MyDate.getHours() : MyDate.getHours()) + ':' + (MyDate.getMinutes() <= 9 ? '0' + MyDate.getMinutes() : MyDate.getMinutes()) + ':' + (MyDate.getSeconds() <= 9 ? '0' + MyDate.getSeconds() : MyDate.getSeconds());
@@ -894,6 +911,10 @@ const vm = new Vue({
                 message: msg,
                 type: 'error'
             });
+        },
+        getAttrComputedStyle:function(el,attr){
+            let computed = document.defaultView === window ? window.getComputedStyle : document.defaultView.getComputedStyle;
+            return attr == 'width' || attr == 'height' || attr == 'left' || attr == 'top' ? parseInt(computed(el,null)[attr]) : computed(el,null)[attr];
         }
     }
 });
