@@ -1043,7 +1043,7 @@ router.post('/uploader', uoloader.single('editormd-image-file'), (req, res, next
     let ext = req.file.mimetype.split('/')[1];
     let filename = sillyDateTime.format(new Date(), 'YYYYMMMDDHHmmss') + '_' + crt_token() + '.' + ext;
     let now_timer = sillyDateTime.format(new Date(), 'YYYYMMMDD');
-    let dirname = '/Users/bluelife/www/node/blog/app/public/images/uploads/' + now_timer + '/';
+    let dirname = '/home/wwwroot/node/blog.mcloudhub.com/app/public/images/uploads/' + now_timer + '/';
     fs.existsSync(dirname) || fs.mkdirSync(dirname); // 目录不存在创建目录
     fs.writeFile(dirname + filename, req.file.buffer, err => {
         if (!err) {
