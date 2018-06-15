@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>添加文章</title>
-    <link rel="stylesheet" href="/public/css//bootstrap.min.css" />
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="/public/css/public.css" />
     <link rel="stylesheet" href="/public/js/marked/css/editormd.min.css" />

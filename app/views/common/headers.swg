@@ -8,7 +8,7 @@
     <title>{{ title }}</title>
     <link rel="icon" href="/public/images/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="/public/images/favicon.ico" type="image/x-icon" sizes="any" />
-    <link rel="stylesheet" href="/public/css//bootstrap.min.css" />
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
     <link rel="stylesheet" href="/public/js/marked/css/editormd.css">
     <!--<link rel="stylesheet" href="/public/js/marked/css/editormd.preview.css">-->

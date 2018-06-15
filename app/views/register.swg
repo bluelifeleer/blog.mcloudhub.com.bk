@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>{{ title }}</title>
     <!-- <link rel="stylesheet" href="https://bootswatch.com/4/simplex/bootstrap.min.css" /> -->
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/public/css/public.css" />
     <link rel="stylesheet" href="/public/css/login.css" />
     <script type="text/javascript" src="/public/js/vue.js"></script>
