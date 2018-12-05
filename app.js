@@ -218,7 +218,7 @@ app.get('*',(req, res)=>{
 // 处理500请求
 
 //连接数据库
-mongoose.connect('mongodb://localhost:27017/blog', (err, res) => {
+mongoose.connect('mongodb://localhost:27017/blog', { useNewUrlParser: true }, (err, res) => {
     if (err) {
         debug(err);
     } else {
