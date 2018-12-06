@@ -131,8 +131,8 @@ app.use(function(req, res, next) {
     }
     // 将系统类型添加到cookies和请求头中;
     // os.platform return now node runing systems : darwin=>MAC win32=>windows
-    res.cookie('platform', '');
-    req.platform = '';
+    res.cookie('platform', 'undefined');
+    req.platform = 'undefined';
     next();
 });
 
