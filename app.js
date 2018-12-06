@@ -224,31 +224,31 @@ mongoose.connect('mongodb://localhost:27017/blog', { useNewUrlParser: true }, (e
     } else {
         // 数据库连接成功后监听80/443端口
         // app.listen(80);
-        http.createServer(app).listen(80);
+        http.createServer(app).listen(3002);
         // https.createServer(options, app).listen(443);
-        const server = http2.createServer(options, app);
+        // const server = http2.createServer(options, app);
         // 返回进程环境信息
         // console.log(process.env);
-        let userArr = [];
-        const io = require('socket.io')(server);
-        io.on('connection', socket =>{
+        // let userArr = [];
+        // const io = require('socket.io')(server);
+        // io.on('connection', socket =>{
             // console.log(socket);
             
-            socket.emit('status', {'connected':true,'msg':'this socket is connected'});
-            socket.on('user', json=>{
-                let id = md5(new Date().getTime());
-                userArr.push({id:id,name:json.name});
-                socket.lastName = json.name;
-                socket.emit('logins',{logins:userArr});
-                socket.emit('loginUser',{id:id,name:json.name});
+            // socket.emit('status', {'connected':true,'msg':'this socket is connected'});
+            // socket.on('user', json=>{
+            //     let id = md5(new Date().getTime());
+            //     userArr.push({id:id,name:json.name});
+            //     socket.lastName = json.name;
+            //     socket.emit('logins',{logins:userArr});
+            //     socket.emit('loginUser',{id:id,name:json.name});
 
-                socket.on('msg', json=>{
-                    console.log(json);
-                })
-            });
+            //     socket.on('msg', json=>{
+            //         console.log(json);
+            //     })
+            // });
 
-        });
-        server.listen(443);
+        // });
+        // server.listen(443);
 
     }
 });
