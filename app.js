@@ -24,6 +24,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const webSocket = require('ws');
 const MongoDBStore = require('connect-mongodb-session')(session);
+const cors = require('cors');
 const csurf = require('csurf');
 const swig = require('swig');
 const config = require('./config/config');
@@ -135,7 +136,7 @@ app.use(function(req, res, next) {
     req.platform = 'undefined';
     next();
 });
-
+app.use(cors())
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST'] }));
 app.use(function(err, req, res, next) {
     if (err.code !== 'EBADCSRFTOKEN') return next(err)
