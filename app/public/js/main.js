@@ -8,6 +8,7 @@ const vm = new Vue({
         navbarUsersInfoDropdownShow: 'none',
         dropdownToggle: false,
         users: {
+            uid: '',
             name: '',
             password: '',
             avatar: '',
@@ -114,6 +115,36 @@ const vm = new Vue({
             height:0,
             top:0,
             left:0
+        },
+        showAdvModel: false,
+        adv:{
+            slides:[
+                {
+                    url:'',
+                    link:'',
+                    remark:''
+                },
+                {
+                    url:'',
+                    link:'',
+                    remark:''
+                },
+                {
+                    url:'',
+                    link:'',
+                    remark:''
+                },
+                {
+                    url:'',
+                    link:'',
+                    remark:''
+                },
+                {
+                    url:'',
+                    link:'',
+                    remark:''
+                }
+            ]
         }
     },
     methods: {
@@ -880,6 +911,35 @@ const vm = new Vue({
             window.onscroll = function(){
                 console.log("检测到页面滚动事件:"+window.pageXOffset+" "+window.pageYOffset);
             }
+        },
+        showAdvBody: function(){
+            this.showAdvModel = !this.showAdvModel;
+        },
+        uploadPictures: function(e, index){
+            let _this = this;
+            let file = e.target.files[0];
+            let Reader = new FileReader();
+            Reader.addEventListener('load', function(e) {
+                _this.$http.post('/api/adv/picture/upload',{uid: _this.users.uid, name: file.name, size: file.size, type: file.type, base_data: Reader.result}).then(res=>{
+                    if(res.body.code && res.body.ok){
+                        _this.adv.slides[index].url = res.body.data.url;
+                    }
+                }).catch(err=>{
+                    console.log(err)
+                })
+            }, false);
+            Reader.readAsDataURL(file);
+        },
+        advModelSildeFormSubmit: function(){
+            console.log(this.adv.slides)
+            this.$http.post('/api/adv/silde/add',{uid:this.users.uid, slides: this.adv.slides}).then(res=>{
+
+            }).catch(err=>{
+
+            })
+        },
+        advModelSildeFormReset: function(){
+
         },
         formate_date: function(date) {
             let MyDate = new Date(date);

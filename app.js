@@ -37,6 +37,10 @@ const uuidv4 = require('uuid/v4');
 const expressRequestId = require('express-request-id')();
 const expressCurl = require('express-curl');
 const md5 = require('md5');
+const colors = require('colors');
+const winston = require('winston');
+const expressWinston = require('express-winston');
+const flash = require('flash');
 const app = express();
 
 // const expressWS = require('express-ws')(app);
@@ -113,7 +117,7 @@ app.use(session({
     secret: 'session_id', // 与cookieParser中的一致
     resave: true,
     store: store, // 将session保存到mongodb中
-    saveUninitialized: true,
+    saveUninitialized: false,   // 是否保存未初始化的session
     cookie: {
         secure: true,
         maxAge: 1800000,
@@ -132,10 +136,14 @@ app.use(function(req, res, next) {
     }
     // 将系统类型添加到cookies和请求头中;
     // os.platform return now node runing systems : darwin=>MAC win32=>windows
-    res.cookie('platform', 'undefined');
-    req.platform = 'undefined';
+    res.cookie('platform', os.platform);
+    req.platform = os.platform;
+    // flash a message
+    // req.flash('info', 'hello!');
     next();
 });
+
+
 app.use(cors())
 app.use(csurf({ cookie: true, ignoreMethods: ['GET', 'POST'] }));
 app.use(function(err, req, res, next) {
@@ -144,6 +152,20 @@ app.use(function(err, req, res, next) {
     res.status(403)
     res.send('form tampered with')
 });
+
+app.use(expressWinston.logger({
+    transports: [
+        // new winston.transports.Console(),
+        new winston.transports.File({ filename: path.join(__dirname, 'logs/error.log'), level: 'error' }),
+        new winston.transports.File({ filename: path.join(__dirname, 'logs/combined.log') })
+    ],
+    format: winston.format.combine(winston.format.colorize(), winston.format.json()),
+    meta: true, // optional: control whether you want to log the meta data about the request (default to true)
+    msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
+    expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+    colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+    ignoreRoute: function (req, res) { return false; } // optional: allows to skip some log messages based on request and/or response
+}));
 
 // 记录访问日志
 if (start_log) {
@@ -224,10 +246,10 @@ mongoose.connect('mongodb://localhost:27017/blog', { useNewUrlParser: true }, (e
         debug(err);
     } else {
         // 数据库连接成功后监听80/443端口
-        // app.listen(80);
-        http.createServer(app).listen(3002);
+        app.listen(80);
+        // http.createServer(app).listen(3002);
         // https.createServer(options, app).listen(443);
-        // const server = http2.createServer(options, app);
+        const server = http2.createServer(options, app);
         // 返回进程环境信息
         // console.log(process.env);
         // let userArr = [];
@@ -249,7 +271,7 @@ mongoose.connect('mongodb://localhost:27017/blog', { useNewUrlParser: true }, (e
             // });
 
         // });
-        // server.listen(443);
+        server.listen(443);
 
     }
 });

@@ -107,5 +107,19 @@ router.get('/applactions/edit', (req, res, next)=>{
     }
 });
 
+router.get('/adv', (req, res, next)=>{
+    let redirect_uri = req.protocol + '://' + req.get('host') + req.originalUrl;
+    if (req.session.uid && req.cookies.uid) {
+        res.render('../views/setting/adv', {
+            uid: req.session.uid && req.cookies.uid,
+            page_type: 'avd',
+            app_id : req.query.id,
+            title: '广告设置'
+        });
+    } else {
+        res.redirect(302, '/login?redirect_uri=' + redirect_uri);
+    }
+});
+
 
 module.exports = router;

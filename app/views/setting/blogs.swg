@@ -10,9 +10,9 @@
                 <li class="set-menu-list">
                     <a href="/setting/profile" class="setmenu-link"><i class="icon iconfont">&#xe611;</i>&nbsp;&nbsp;个人资料</a>
                 </li>
-                <li class="set-menu-list menu-default">
-                    <a href="/setting/blogs" class="setmenu-link"><i class="icon iconfont">&#xe64b;</i>&nbsp;&nbsp;微博认证</a>
-                </li>
+                <!--li class="set-menu-list">
+                    <a href="/setting/blog;" class="setmenu-link"><i class="icon iconfont">&#xe64b;</i>&nbsp;&nbsp;微博认证</a>
+                </li-->
                 <li class="set-menu-list">
                     <a href="/setting/reward" class="setmenu-link"><i class="icon iconfont">&#xe606;</i>&nbsp;&nbsp;赞赏设置</a>
                 </li>
@@ -21,6 +21,9 @@
                 </li>
                 <li class="set-menu-list">
                     <a href="/setting/applactions" class="setmenu-link"><i class="icon iconfont">&#xe61b;</i>&nbsp;&nbsp;应用管理</a>
+                </li>
+                <li class="set-menu-list menu-default">
+                    <a href="/setting/adv" class="setmenu-link"><i class="icon iconfont">&#xe62c;</i>&nbsp;&nbsp;广告设置</a>
                 </li>
             </ul>
         </div>

@@ -454,3 +454,168 @@
     width:555px;
     height:160px;
 }
+
+.adv-seting-title{
+    width:100%;
+    height:50px;
+    line-height: 50px;
+    font-weight: bold;
+    margin:0 0 20px 0;
+}
+
+.adv-modles-box{
+    width:100%;
+    height:auto;
+    border-radius:4px;
+    border:1px solid #eaeefb;
+    color:#5e6d82;
+    margin:0 0 20px 0;
+}
+
+.adv-modle-header{
+    width:100%;
+    height:40px;
+    background:#fafafa;
+}
+
+.adv-modle-header:hover{
+    cursor: pointer;
+}
+
+.adv-modle-title{
+    float:left;
+    width:48%;
+    height:40px;
+    line-height:40px;
+    background:#fafafa;
+    padding:0 0 0 2%;
+}
+
+.adv-model-icon{
+    float:right;
+    width:48%;
+    height:40px;
+    line-height:40px;
+    text-align: right;
+    background:#fafafa;
+    padding:0 2% 0 0;
+}
+
+.adv-modle-body{
+    display:none;
+    width:96%;
+    height:auto;
+    padding:2%;
+}
+
+.adv-modle-active{
+    display:block;
+}
+
+.adv-model-slide-items{
+    width:100%;
+    height:auto;
+    overflow: hidden;
+}
+
+.adv-modle-slide-title{
+    width:100%;
+    height:40px;
+    line-height: 40px;
+}
+
+.adv-modle-slide-form{
+    width:100%;
+    height:auto;
+}
+
+.adv-modle-slide-form-item{
+    width:100%;
+    height:auto;
+    overflow: hidden;
+}
+
+.adv-modle-slide-form-item label{
+    display:block;
+    float:left;
+    width:100px;
+    height:40px;
+    line-height: 40px;
+    text-align: right;
+}
+
+.silde-picture-input,.silde-click-link-input{
+    display:block;
+    float:left;
+    width:480px;
+    height:38px;
+    line-height: 38px;
+    border:1px solid #dcdfe6;
+    border-radius:4px;
+    color:#606266;
+    padding:0 0 0 10px;
+}
+
+.adv-modle-slide-form-item a{
+    display:block;
+    float:left;
+    width:40px;
+    height:40px;
+    line-height: 40px;
+    color:#606266;
+    margin:0 0 0 10px;
+}
+
+.adv-modle-slide-form-item textarea{
+    display:block;
+    float:left;
+    width:480px;
+    height:98px;
+    line-height: 38px;
+    border:1px solid #dcdfe6;
+    border-radius:4px;
+    color:#606266;
+    padding:10px;
+}
+
+.adv-model-silde-form-submit{
+    display:block;
+    float:left;
+    width:180px;
+    height:38px;
+    line-height: 38px;
+    text-align: center;
+    border:1px solid #3bc21db3;
+    border-radius:4px;
+    background:#3bc21db3;
+    color:#fff;
+    margin:20px 0 20px 120px;
+}
+
+.adv-model-silde-form-reset{
+    display:block;
+    float:left;
+    width:180px;
+    height:38px;
+    line-height: 38px;
+    text-align: center;
+    color:#606266;
+    margin:20px;
+}
+
+.upload-picture-but{
+    position:relative;
+}
+
+.upload-pictures{
+    display:block;
+    float:left;
+    width:40px;
+    height:40px;
+    position:absolute;
+    left:0;
+    top:0;
+    opacity:0;
+    filter:alpha(opacity:0);
+    z-index:10;
+}

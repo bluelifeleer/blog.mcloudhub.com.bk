@@ -1906,4 +1906,80 @@ router.post('/qrcode', (req, res, next)=>{
     })
 });
 
+router.post('/adv/picture/upload', (req, res, next) => {
+    // console.log(req.body)
+    let uid = req.body.uid;
+    let name = req.body.name;
+    let type = req.body.type;
+    let size = req.body.size;
+    let base_data = req.body.base_data;
+    let ext = type.split('/')[1];
+    let data = base_data.replace(/^data:image\/\w+;base64,/, '');
+    let dataBuffer = new Buffer(data, 'base64');
+    let path = '/Users/bluelifeleer/www/node/blog.mcloudhub.com/app/public/images/adv';
+    Users.findById(uid).then(user=>{
+        console.log(user)
+        let dirname = path+'/'+user._id;
+        fs.existsSync(dirname) || fs.mkdirSync(dirname); // 下载目录不存在创建目录
+        let filename = md5(NowDate.getTime())+ '.'+ext;
+        fs.writeFile(dirname+'/'+filename,dataBuffer,function(err){
+            if(err){
+                console.log(err)
+            }else{
+                // 计算上传的图片宽度和高度
+                    let dimensions = imageSize(dirname +'/'+ filename);    // 使用绝对路径，也可以使用url，使用url要转换成buffer
+                    let width = dimensions.width;
+                    let height = dimensions.height;
+                new Photos({
+                    user_id: user._id,
+                    author: user,
+                    originalname: name,
+                    filename: filename,
+                    path: dirname,
+                    fullpath: dirname + '/' + filename,
+                    encoding: '',
+                    mimetype: type,
+                    size: size,
+                    width: width,
+                    height: height,
+                    add_date: sillyDateTime.format(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+                    isDel: 0
+                }).save().then(insert => {
+                    if (!insert) throw console.log(insert);
+                    res.json({
+                        code: 1,
+                        message: '图片上传成功',
+                        ok: true,
+                        data:{
+                            url: 'https://blog.mcloudhub.com/public/images/adv/' + user._id + '/' + filename,
+                        }
+                    });
+                });
+            }
+        });
+    }).catch(err=>{
+        console.log(err)
+    })
+});
+
+router.post('/adv/silde/add', (req, res, next) => {
+    let uid = req.body.uid;
+    let slides = req.body.slides;
+    Users.findById(uid).then(user=>{
+        slides.forEach(slide=>{
+            new Slide({
+                uid: user._id,
+                own: user,
+                path: slide.url,
+                // title: slide,
+                describe: slide.remark,
+                add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+                isDel: 0,
+            }).save()
+        });
+    }).catch(err=>{
+        console.log(err)
+    })
+});
+
 module.exports = router;
