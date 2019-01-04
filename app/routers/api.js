@@ -107,12 +107,17 @@ router.get('/docs', (req, res, next) => {
  * 获取幻灯片
  */
 router.get('/slides', (req, res, next) => {
-	Slide.find().then(slides => {
-		if (slides) {
+	let uid = req.query.uid;
+	Slide.find({
+		uid: uid
+	}).then(slides => {
+		if (slides.length) {
 			output.code = 1;
 			output.msg = 'success';
 			output.ok = true;
-			output.data = slides;
+			output.data = {
+				adv: slides[0].adv
+			};
 			res.json(output);
 			return;
 		} else {
@@ -1124,7 +1129,7 @@ router.get('/getDiscuss', (req, res, next) => {
 	Discuss.find({
 		article_id: id
 	}).then(discuss => {
-		if (!discuss) throw console.log(discuss);
+        if (!discuss) throw console.log(discuss);
 		output.code = 1;
 		output.ok = true;
 		output.msg = 'SUCCESS';
@@ -2096,6 +2101,9 @@ router.post('/adv/picture/upload', (req, res, next) => {
 						ok: true,
 						data: {
 							url: 'https://blog.mcloudhub.com/public/images/adv/' + user._id + '/' + filename,
+							width: width,
+							height: height,
+							size: width + 'x' + height
 						}
 					});
 				});
@@ -2110,21 +2118,48 @@ router.post('/adv/silde/add', (req, res, next) => {
 	let uid = req.body.uid;
 	let slides = req.body.slides;
 	Users.findById(uid).then(user => {
-		slides.forEach(slide => {
-			if (slide.url) {
-				new Slide({
-					uid: user._id,
-					own: user,
-					url: slide.url,
-					link: slide.link,
-					title: '',
-					click: 0,
-					describe: slide.remark,
-					add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
-					isDel: 0,
-				}).save()
-			}
-		});
+		if (user) {
+			Slide.findOne({
+				uid: uid
+			}).then(slide => {
+				if (slide) {
+					slide.adv.slides = slides;
+					slide.save().then(status => {
+						if (status) {
+							output.code = 1;
+							output.ok = true;
+							output.msg = 'SUCCESS';
+							output.data = null;
+							res.json(output);
+							return;
+						}
+					}).catch(err => {
+						console.log(err)
+					})
+				} else {
+					new Slide({
+						uid: user._id,
+						own: user,
+						adv: {
+							slides: slides
+						}
+					}).save().then(insert => {
+						if (insert) {
+							output.code = 1;
+							output.ok = true;
+							output.msg = 'SUCCESS';
+							output.data = null;
+							res.json(output);
+							return;
+						}
+					}).catch(err => {
+						console.log(err)
+					})
+				}
+			}).catch(err => {
+				console.log(err)
+			})
+		}
 	}).catch(err => {
 		console.log(err)
 	})

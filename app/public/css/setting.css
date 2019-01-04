@@ -544,7 +544,7 @@
     text-align: right;
 }
 
-.silde-picture-input,.silde-click-link-input{
+.silde-picture-input,.silde-click-link-input,.silde-title-input{
     display:block;
     float:left;
     width:480px;

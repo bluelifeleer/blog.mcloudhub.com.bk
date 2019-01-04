@@ -8,9 +8,11 @@
 .el-carousel{width:1024px;margin:0 auto;}
 .slide-img-block{float:left;width:1024px;height:380px;}
 .slide-img-block img{display:block;width:100%;height:380px;}
-.slide-text-block{width:680px;height:220px;background:#FFF;position:absolute;left:172px;top:80px;border-radius:10px;opacity: 0.9;
+.slide-text-box{width:680px;height:220px;background:#FFF;position:absolute;left:172px;top:80px;border-radius:10px;opacity: 0.9;
     -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=90);
-    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=90);font-size:40px;font-weight:bold;line-height:180px;text-align:center;}
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=90);}
+.slide-title-block{width:100%;height:80px;line-height: 80px;font-size:30px;font-weight:bold;text-align:center;}
+.slide-text-block{width:100%;height:140px;line-height: 30px;font-size:15px;font-weight:bold;text-align:center;}
 .prev-incofont,.next-incofont{font-size:30px;color:#FFF;}
 #say-something-block{width:1024px;height:200px;margin:0 auto;margin-top:20px;}
 .say-something-title{width:100%;height:40px;line-height:40px;font-family: "WBswficon" !important;}

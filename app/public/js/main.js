@@ -121,23 +121,43 @@ const vm = new Vue({
 			slides: [{
 				url: '',
 				link: '',
-				remark: ''
+				title: '',
+				remark: '',
+				width: 0,
+				height: 0,
+				size: ''
 			}, {
 				url: '',
 				link: '',
-				remark: ''
+				title: '',
+				remark: '',
+				width: 0,
+				height: 0,
+				size: ''
 			}, {
 				url: '',
 				link: '',
-				remark: ''
+				title: '',
+				remark: '',
+				width: 0,
+				height: 0,
+				size: ''
 			}, {
 				url: '',
 				link: '',
-				remark: ''
+				title: '',
+				remark: '',
+				width: 0,
+				height: 0,
+				size: ''
 			}, {
 				url: '',
 				link: '',
-				remark: ''
+				title: '',
+				remark: '',
+				width: 0,
+				height: 0,
+				size: ''
 			}]
 		}
 	},
@@ -210,15 +230,22 @@ const vm = new Vue({
 			});
 		},
 		getSlides: function() {
-			this.$http.get('/api/slides').then(res => {
+			this.$http.get('/api/slides?uid=' + this.users.uid).then(res => {
 				if (res.data.code && res.data.ok) {
-					let slides = res.body.data
-					this.slide_list = slides;
-					slides.forEach((slide, index) => {
-						this.adv.slides[index].url = slide.url;
-						this.adv.slides[index].link = slide.link;
-						this.adv.slides[index].remark = slide.describe;
-					});
+					let slides = res.body.data.adv.slides;
+					let advs = res.body.data.adv.advs;
+					if (slides.length) {
+						this.slide_list = slides;
+						slides.forEach((slide, index) => {
+							this.adv.slides[index].url = slide.url;
+							this.adv.slides[index].link = slide.link;
+							this.adv.slides[index].remark = slide.remark;
+							this.adv.slides[index].title = slide.title;
+							this.adv.slides[index].width = slide.width;
+							this.adv.slides[index].height = slide.height;
+							this.adv.slides[index].size = slide.size;
+						});
+					}
 				}
 			});
 		},

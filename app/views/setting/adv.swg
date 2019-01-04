@@ -53,6 +53,10 @@
                                     <a href="javascript:void(0);" class="" title="点击查看连接"><i class="icon iconfont">&#xe6bc;</i></a>
                                 </div>
                                 <div class="adv-modle-slide-form-item">
+                                    <label for="silde-title">标题：</label>
+                                    <input type="text" name="silde-title" class="silde-title-input" placeholder="标题" v-model="adv.slides[0].title">
+                                </div>
+                                <div class="adv-modle-slide-form-item">
                                     <label for="silde-remark">描述：</label>
                                     <textarea name="silde-remark" id="silde-remark" cols="30" rows="10" v-model="adv.slides[0].remark">描述</textarea>
                                 </div>
@@ -73,6 +77,10 @@
                                     <label for="silde-remark">点击连接：</label>
                                     <input type="text" name="silde-prictue" class="silde-click-link-input" placeholder="点击连接：https://|http://" v-model="adv.slides[1].link">
                                     <a href="javascript:void(0);" class="" title="点击查看连接"><i class="icon iconfont">&#xe6bc;</i></a>
+                                </div>
+                                <div class="adv-modle-slide-form-item">
+                                    <label for="silde-title">标题：</label>
+                                    <input type="text" name="silde-title" class="silde-title-input" placeholder="标题" v-model="adv.slides[1].title">
                                 </div>
                                 <div class="adv-modle-slide-form-item">
                                     <label for="silde-remark">描述：</label>
@@ -97,6 +105,10 @@
                                     <a href="javascript:void(0);" class="" title="点击查看连接"><i class="icon iconfont">&#xe6bc;</i></a>
                                 </div>
                                 <div class="adv-modle-slide-form-item">
+                                    <label for="silde-title">标题：</label>
+                                    <input type="text" name="silde-title" class="silde-title-input" placeholder="标题" v-model="adv.slides[2].title">
+                                </div>
+                                <div class="adv-modle-slide-form-item">
                                     <label for="silde-remark">描述：</label>
                                     <textarea name="silde-remark" id="silde-remark" cols="30" rows="10" v-model="adv.slides[2].remark">描述</textarea>
                                 </div>
@@ -119,6 +131,10 @@
                                     <a href="javascript:void(0);" class="" title="点击查看连接"><i class="icon iconfont">&#xe6bc;</i></a>
                                 </div>
                                 <div class="adv-modle-slide-form-item">
+                                    <label for="silde-title">标题：</label>
+                                    <input type="text" name="silde-title" class="silde-title-input" placeholder="标题" v-model="adv.slides[3].title">
+                                </div>
+                                <div class="adv-modle-slide-form-item">
                                     <label for="silde-remark">描述：</label>
                                     <textarea name="silde-remark" id="silde-remark" cols="30" rows="10" v-model="adv.slides[3].remark">描述</textarea>
                                 </div>
@@ -139,6 +155,10 @@
                                     <label for="silde-remark">点击连接：</label>
                                     <input type="text" name="silde-prictue" class="silde-click-link-input" placeholder="点击连接：https://|http://" v-model="adv.slides[4].link">
                                     <a href="javascript:void(0);" class="" title="点击查看连接"><i class="icon iconfont">&#xe6bc;</i></a>
+                                </div>
+                                <div class="adv-modle-slide-form-item">
+                                    <label for="silde-title">标题：</label>
+                                    <input type="text" name="silde-title" class="silde-title-input" placeholder="标题" v-model="adv.slides[4].title">
                                 </div>
                                 <div class="adv-modle-slide-form-item">
                                     <label for="silde-remark">描述：</label>
