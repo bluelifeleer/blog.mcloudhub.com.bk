@@ -11,3 +11,5 @@ logs/
 dist/
 #package-lock.json
 package-lock.json
+app/public/images/adv
+app/public/images/uploads
