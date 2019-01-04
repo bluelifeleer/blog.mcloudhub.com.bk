@@ -289,4 +289,28 @@ app.use(function(err, req, res, next) {
 
 ```
 
+#### Buffer
 
+> node最新版中new Buffer()已废弃，使用Buffer不需要使用new Buffer()可以直接使用Buffer.form(),BUffer.alloc(),Buffer.compare()
+
+
+#### 在node中将base64的数据转换成图片。
+
+> 在计算机中任何数据最终都是以进进制形式存在的，图片也是二进制数据，在node中提供了直接操作二进制数据的方法Buffer,所以将base64的数据转换成图片可以使用Buffer进行转换，然后调用fs文件操作接口将图片保存到指定位置，详细操作如下：
+
+```
+let ext = type.split('/')[1];
+let data = base_data.replace(/^data:image\/\w+;base64,/, '');
+let dataBuffer = Buffer.from(data, 'base64');
+let path = 'C:/web/www/node/blog.mcloudhub.com/app/public/images/adv';
+let dirname = path + '/' + user._id;
+fs.existsSync(dirname) || fs.mkdirSync(dirname); // 下载目录不存在创建目录
+let filename = md5(new Date().getTime()) + '.' + ext;
+fs.writeFile(dirname + '/' + filename, dataBuffer, function(err) {
+  if (err) {
+    console.log(err)
+  } else {
+    console.log('file save successed !!')
+  }
+});
+```

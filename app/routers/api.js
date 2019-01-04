@@ -2056,16 +2056,16 @@ router.post('/adv/picture/upload', (req, res, next) => {
 	let base_data = req.body.base_data;
 	let ext = type.split('/')[1];
 	let data = base_data.replace(/^data:image\/\w+;base64,/, '');
-	let dataBuffer = new Buffer(data, 'base64');
+	let dataBuffer = Buffer.from(data, 'base64');
 	// Linux
 	// let path = '/Users/bluelifeleer/www/node/blog.mcloudhub.com/app/public/images/adv';
 	// Window
 	let path = 'C:/web/www/node/blog.mcloudhub.com/app/public/images/adv';
 	Users.findById(uid).then(user => {
-		console.log(user)
+		// console.log(user)
 		let dirname = path + '/' + user._id;
 		fs.existsSync(dirname) || fs.mkdirSync(dirname); // 下载目录不存在创建目录
-		let filename = md5(NowDate.getTime()) + '.' + ext;
+		let filename = md5(new Date().getTime()) + '.' + ext;
 		fs.writeFile(dirname + '/' + filename, dataBuffer, function(err) {
 			if (err) {
 				console.log(err)
@@ -2111,15 +2111,17 @@ router.post('/adv/silde/add', (req, res, next) => {
 	let slides = req.body.slides;
 	Users.findById(uid).then(user => {
 		slides.forEach(slide => {
-			new Slide({
-				uid: user._id,
-				own: user,
-				path: slide.url,
-				// title: slide,
-				describe: slide.remark,
-				add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
-				isDel: 0,
-			}).save()
+			if (slide.url) {
+				new Slide({
+					uid: user._id,
+					own: user,
+					path: slide.url,
+					// title: slide,
+					describe: slide.remark,
+					add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
+					isDel: 0,
+				}).save()
+			}
 		});
 	}).catch(err => {
 		console.log(err)

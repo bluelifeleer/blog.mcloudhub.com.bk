@@ -19,6 +19,7 @@
     <!--<script type="text/javascript" src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>-->
     <script type="text/javascript" src="/public/js/vue-resource.js"></script>
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script type="text/javascript" src="/public/js/bdtj.js"></script>
     <script type="text/javascript">
         var page_type = '{{ page_type }}';
         var uid = '{{ uid }}';
