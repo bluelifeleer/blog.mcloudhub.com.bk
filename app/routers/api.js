@@ -2115,8 +2115,10 @@ router.post('/adv/silde/add', (req, res, next) => {
 				new Slide({
 					uid: user._id,
 					own: user,
-					path: slide.url,
-					// title: slide,
+					url: slide.url,
+					link: slide.link,
+					title: '',
+					click: 0,
 					describe: slide.remark,
 					add_date: sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss'),
 					isDel: 0,

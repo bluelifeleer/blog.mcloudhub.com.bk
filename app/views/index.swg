@@ -1,14 +1,16 @@
 {% extends './common/headers.swg' %} {% block content %}
 <section class="contents-bar">
     <template>
-          <el-carousel :interval="5000" arrow="always" height="380px">
+        <el-carousel :interval="5000" arrow="always" height="380px" v-if="slide_list.length">
             <el-carousel-item v-for="item in slide_list" :key="item">
-              <div class="slide-img-block"><img v-bind:src="item.path" alt="" class="slide-img-block"></div>
-              <div class="slide-title-block">${item.title}</div>
-              <div class="slide-text-block">${item.describe}</div>
+                <a :href="item.link" target="_blank" class="">
+                    <div class="slide-img-block"><img v-bind:src="item.url" alt="" class="slide-img-block"></div>
+                    <div class="slide-title-block">${item.title}</div>
+                    <div class="slide-text-block">${item.describe}</div>
+                </a>
             </el-carousel-item>
-          </el-carousel>
-        </template>
+        </el-carousel>
+    </template>
     <!-- <div id="say-something-block">
         <h5 class="say-something-title">说些什么吧：</h5>
         <div class="something-contents-block"><textarea name="" id="" cols="30" rows="10" class="something-textarea"></textarea></div>
