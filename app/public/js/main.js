@@ -42,9 +42,9 @@ const vm = new Vue({
 				total: 0,
 				offset: 0,
 				num: 0
-			},
-			qrcode:''
+			}
 		},
+		ArticleQRCcode:'',
 		articleComments: '填写您的评论....',
 		imgRegexp: /<img [^>]*src=['"]([^'"]+)[^>]*>/gi,
 		hasImg: null,
@@ -347,10 +347,8 @@ const vm = new Vue({
 				type: 'href',
 				id: id
 			}).then(res=>{
-				console.log(res)
 				if(res.body.code && res.body.ok){
-					this.article.qrcode = res.body.data.url;
-					console.log(this.article.qrcode)
+					this.ArticleQRCcode = res.body.data.url;
 				}
 			}).catch(err=>{
 				console.log(err)
