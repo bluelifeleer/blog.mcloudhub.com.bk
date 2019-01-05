@@ -2044,13 +2044,41 @@ router.get('/mail/user/delete', (req, res, next) => {
 });
 
 router.post('/qrcode', (req, res, next) => {
+	let id = req.body.id;
+	let key = req.body.key;
+	let type = req.body.type;
+	let text = '';
 	let options = {
 		errorCorrectionLevel: 'H',
 		version: 2,
 		modes: 'auto'
 	};
-	QRCode.toDataURL('I am a pony!', options, function(err, url) {
+	switch(key){
+		case 'article':
+		text = 'https://blog.mcloudhub.com/article/details?id='+id;
+		break;
+		default: 
+		break;
+	}
+	QRCode.toDataURL(text, options, function(err, url) {
 		console.log(url)
+		if(err){
+			output.code = 0;
+			output.ok = false;
+			output.msg = 'ERROR';
+			output.data = null;
+			res.json(output);
+			return;
+		}else{
+			output.code = 1;
+			output.ok = true;
+			output.msg = 'SUCCESS';
+			output.data = {
+				url: url
+			};
+			res.json(output);
+			return;
+		}
 	})
 });
 

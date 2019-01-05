@@ -124,7 +124,7 @@
             <div class="article-details-aside-model">
                 <div class="article-details-aside-model-title">文章二维码</div>
                 <div class="article-details-aside-model-body">
-                    <img src="" title="文章二维码" />
+                    <img :src="article.qrcode" title="文章二维码" v-if="article.qrcode"/>
                 </div>
             </div>
         </div>

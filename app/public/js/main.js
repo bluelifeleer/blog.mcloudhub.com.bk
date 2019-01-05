@@ -42,7 +42,8 @@ const vm = new Vue({
 				total: 0,
 				offset: 0,
 				num: 0
-			}
+			},
+			qrcode:''
 		},
 		articleComments: '填写您的评论....',
 		imgRegexp: /<img [^>]*src=['"]([^'"]+)[^>]*>/gi,
@@ -171,6 +172,7 @@ const vm = new Vue({
 			this.getDocs();
 			this.getSlides();
 			this.getArticle();
+			this.getArticleQRCode();
 			if (page_type == 'index') {
 				this.getAllArticles(0, 100);
 				this.pageScroller();
@@ -333,11 +335,24 @@ const vm = new Vue({
 						})
 						articleArr.issue_contents = articleArr.issue_contents.reverse();
 						articleArr['wordNumbers'] = articleArr.contents.replace(/<[^>]*>/g, "").length;
-
 						this.article = articleArr;
 					}
 				});
 			}
+		},
+		getArticleQRCode: function(){
+			let id = this.getQueryString('id');
+			this.$http.post('/api/qrcode',{
+				key: 'article',
+				type: 'href',
+				id: id
+			}).then(res=>{
+				if(res.data.code && res.data.ok){
+					this.article.qrcode = res.data.url;
+				}
+			}).catch(err=>{
+				console.log(err)
+			})
 		},
 		getApplactions: function() {
 			this.$http.get('/api/apps/list?user_id=' + this.users.uid + '&offset=1&num=10').then(res => {
