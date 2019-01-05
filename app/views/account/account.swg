@@ -26,9 +26,9 @@
                 <div class="account-content-switch-contents-box">
                     <div class="account-article-box" ref="article">
                         <div class="article-list-groups">
-                            <div class="article-list-box" v-for="(article,$index) in articleLists" v-bind:class="{'has-img':article.hasImg}">
-                                <div class="article-list" v-if="article.hasImg">
-                                    <a target="_blank" v-bind:href="article.href">
+                            <div class="article-list-box" v-for="(article,$index) in articleLists" v-bind:class="{'has-img':article.hasImg}" :key="$index">
+                                <div class="article-list" v-if="article.hasImg" :data-id="article._id">
+                                    <a target="_blank" v-bind:href="article.href" :data-id="article._id">
                                         <div class="article-list-img-box" v-html="article.imgHtml"></div>
                                         <div class="article-list-describe-box">
                                             <div class="article-list-describe-author"><span class="article-tags">${article.document.name}</span><span class="article-author">@${article.author.name}</span><span class="article-date">${article.add_date}</span></div>
@@ -36,23 +36,23 @@
                                             <p class="article-list-describe-text">${article.contents}</p>
                                     </a>
                                     <p class="ctr-buts-block">
-                                        <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                                        <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                                        <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
+                                        <a href="javascript:void(0);" :data-id="article._id" class="share-but-box" @click="shart($event, article._id)"><i class="icon iconfont">&#xe61f;</i></a>
+                                        <a href="javascript:void(0);" :data-id="article._id" class="liked-but-box" @click="linked($event, article._id)"><i class="icon iconfont">&#xe630;</i></a>
+                                        <a href="javascript:void(0);" :data-id="article._id" class="collection-but-box" @click="stars($event, article._id)"><i class="icon iconfont">&#xe605;</i></a>
                                     </p>
                                     </div>
                                     <div class="clear-both"></div>
                                 </div>
-                                <div class="article-list" v-else>
-                                    <a target="_blank" v-bind:href="article.href">
+                                <div class="article-list" v-else :data-id="article._id">
+                                    <a target="_blank" v-bind:href="article.href" :data-id="article._id">
                                         <div class="article-title"><span href="javascript:void(0);">${article.title}</span></div>
                                         <div class="article-author"><span class="article-tags">${article.document.name}</span><span class="article-author">@${article.author.name}</span><span class="article-date">${article.add_date}</span></div>
                                         <div class="article-contents">${article.contents}</div>
                                     </a>
                                     <p class="ctr-buts-block">
-                                        <a href="javascript:void(0);" class="share-but-box"><i class="icon iconfont">&#xe61f;</i></a>
-                                        <a href="javascript:void(0);" class="liked-but-box"><i class="icon iconfont">&#xe630;</i></a>
-                                        <a href="javascript:void(0);" class="collection-but-box"><i class="icon iconfont">&#xe605;</i></a>
+                                        <a href="javascript:void(0);" :data-id="article._id" class="share-but-box" @click="shart($event, article._id)"><i class="icon iconfont">&#xe61f;</i></a>
+                                        <a href="javascript:void(0);" :data-id="article._id" class="liked-but-box" @click="linked($event, article._id)"><i class="icon iconfont">&#xe630;</i></a>
+                                        <a href="javascript:void(0);" :data-id="article._id" class="collection-but-box" @click="stars($event, article._id)"><i class="icon iconfont">&#xe605;</i></a>
                                     </p>
                                 </div>
                             </div>
