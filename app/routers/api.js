@@ -34,7 +34,7 @@ const emailRegexp = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+
 const phoneRegexp = /^((13[0-9])|(14[5|7])|(15([0-3]|[5-9]))|(18[0,5-9]))\\d{8}$/;
 const uoloader = multer(); //{dest: 'uploads/'}设置dest表示上传文件的目录，如果不设置上传的文件永远在内存之中不会保存到磁盘上。在此处为了在内存中取出文件并重命名所以不设置文件上传路径
 const NowDate = new Date();
-const downloadBasecDir = '/Users/bluelife/www/node/blog/app/download/';
+const downloadBasecDir = '/home/wwwroot/node/blog.mcloudhub.com/app/download/';
 let output = {};
 
 router.use(function(req, res, next) {
@@ -829,7 +829,7 @@ router.get('/downloadAllArticles', (req, res, next) => {
 	fs.existsSync(dirname) || fs.mkdirSync(dirname); // 下载目录不存在创建目录
 	allArticles.then(all => {
 		all.forEach(article => {
-			fs.writeFile('/Users/bluelife/www/node/blog/app/download/' + uid + '/' + article.title + '.md', article.markDownText, 'utf8', err => {
+			fs.writeFile('/home/wwwroot/node/blog.mcloudhub.com/app/download/' + uid + '/' + article.title + '.md', article.markDownText, 'utf8', err => {
 				if (err) throw err;
 			});
 		});
@@ -2064,7 +2064,7 @@ router.post('/adv/picture/upload', (req, res, next) => {
 	let data = base_data.replace(/^data:image\/\w+;base64,/, '');
 	let dataBuffer = Buffer.from(data, 'base64');
 	// Linux
-	let path = '/Users/bluelifeleer/www/node/blog.mcloudhub.com/app/public/images/adv';
+	let path = '/home/wwwroot/node/blog.mcloudhub.com/app/public/images/adv';
 	// Window
 	// let path = 'C:/web/www/node/blog.mcloudhub.com/app/public/images/adv';
 	Users.findById(uid).then(user => {
