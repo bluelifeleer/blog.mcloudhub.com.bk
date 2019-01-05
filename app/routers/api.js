@@ -2061,7 +2061,6 @@ router.post('/qrcode', (req, res, next) => {
 		break;
 	}
 	QRCode.toDataURL(text, options, function(err, url) {
-		console.log(url)
 		if(err){
 			output.code = 0;
 			output.ok = false;
