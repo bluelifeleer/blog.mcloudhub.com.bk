@@ -3,7 +3,8 @@
 .article-details-aside{float:left;width:220px;height:auto;margin:0 0 0 20px;}
 .article-details-aside-model{width:100%;height:auto;margin:0 0 20px 0;}
 .article-details-aside-model-title{width:100%;height:40px;line-height:40px;text-align:center;}
-.article-details-aside-model-body{width:100%;height:40px;padding:2%;border:1px solid #c1c1c1;box-sizing: border-box;}
+.article-details-aside-model-body{width:218px;height:40px;padding:2%;border:1px solid #c1c1c1;box-sizing: border-box;}
+.article-details-aside-model-body img{display:block;width:100%;}
 .article-details-title{width:100%;height:60px;line-height:60px;font-weight:bold;font-size:30px;text-align: center;color:#4d4f53;}
 .article-details-author{width:100%;height:50px;}
 .author-avatar-block{float:left;width:50px;height:50px;line-heihgt:50px;}
