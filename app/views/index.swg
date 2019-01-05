@@ -6,8 +6,8 @@
                 <a :href="item.link" target="_blank" class="">
                     <div class="slide-img-block"><img v-bind:src="item.url" alt="" class="slide-img-block"></div>
                     <div class="slide-text-box">
-                        <div class="slide-title-block">${item.title}</div>
-                        <div class="slide-text-block">${item.remark}</div>
+                        <div class="slide-title-block" v-if="item.title">${item.title}</div>
+                        <div class="slide-text-block" v-if="item.remark">${item.remark}</div>
                     </div>
                 </a>
             </el-carousel-item>
