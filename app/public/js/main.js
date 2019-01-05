@@ -347,8 +347,10 @@ const vm = new Vue({
 				type: 'href',
 				id: id
 			}).then(res=>{
+				console.log(res)
 				if(res.data.code && res.data.ok){
 					this.article.qrcode = res.data.url;
+					console.log(this.article.qrcode)
 				}
 			}).catch(err=>{
 				console.log(err)
