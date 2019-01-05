@@ -318,14 +318,21 @@ router.get('/getArticle', (req, res, next) => {
 					expires: 1000 * 3600 * 10
 				});
 			}
-			output.code = 1;
-			output.msg = 'success';
-			output.ok = true;
-			output.data = {
-				'article': article
-			};
-			res.json(output);
-
+			QRCode.toDataURL('https://blog.mcloudhub.com/article/details?id='+id, {errorCorrectionLevel: 'H'}, (err, url)=>{
+				if(err){
+					console.log(err)
+				}else{
+					article.qrcode = url;
+					output.code = 1;
+					output.msg = 'success';
+					output.ok = true;
+					output.data = {
+						'article': article
+					};
+					res.json(output);
+					return;
+				}
+			});
 		} else {
 			output.code = 0;
 			output.msg = 'error';
