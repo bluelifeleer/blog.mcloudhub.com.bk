@@ -34,7 +34,7 @@
     text-align:center;
 }
 
-#body-content{width:1024px;height:auto;margin:2% auto;background:#FFF;}
+#body-content{width:1024px;height:auto;margin:6% auto;background:#FFF;}
 .body-layout-l{float:left;width:70%;height:auto;}
 .body-layout-r{float:left;width:30%;height:auto;}
 .collections-group-block{width:100%;height:auto;overflow:hidden;}
