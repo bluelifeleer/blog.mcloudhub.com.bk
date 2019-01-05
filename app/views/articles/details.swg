@@ -1,7 +1,8 @@
  {% extends '../common/headers.swg' %} {% block content %}
 <section class="contents-bar">
     <link rel="stylesheet" href="/public/css/article.css">
-    <div class="article-details-block">
+    <div class="article-details-content-box">
+        <div class="article-details-block">
         <div class="article-details-title">
             ${article.title}
         </div>
@@ -117,6 +118,15 @@
                 </div>
             </div>
         </div>
+        </div>
+        </div>
+        <div class="article-details-aside">
+            <div class="article-details-aside-model">
+                <div class="article-details-aside-model-title">文章二维码</div>
+                <div class="article-details-aside-model-body">
+                    <img src="" title="文章二维码" />
+                </div>
+            </div>
         </div>
     </div>
     <el-dialog title="" :visible.sync="dialogVisible" width="40%" center>
