@@ -308,7 +308,6 @@ router.get('/getArticle', (req, res, next) => {
 		}
 	}]).exec().then(article => {
 		if (article) {
-			let data = {};
 			article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
 			if (!req.cookies[id]) {
 				//增加阅读数
@@ -326,7 +325,7 @@ router.get('/getArticle', (req, res, next) => {
 				'article': article
 			};
 			res.json(output);
-			return;
+
 		} else {
 			output.code = 0;
 			output.msg = 'error';
