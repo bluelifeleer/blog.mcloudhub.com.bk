@@ -348,8 +348,8 @@ const vm = new Vue({
 				id: id
 			}).then(res=>{
 				console.log(res)
-				if(res.data.code && res.data.ok){
-					this.article.qrcode = res.data.url;
+				if(res.body.code && res.body.ok){
+					this.article.qrcode = res.body.data.url;
 					console.log(this.article.qrcode)
 				}
 			}).catch(err=>{
