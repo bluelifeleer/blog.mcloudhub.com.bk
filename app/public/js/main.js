@@ -976,14 +976,16 @@ const vm = new Vue({
 			Reader.readAsDataURL(file);
 		},
 		advModelSildeFormSubmit: function() {
-			console.log(this.adv.slides)
 			this.$http.post('/api/adv/silde/add', {
 				uid: this.users.uid,
 				slides: this.adv.slides
 			}).then(res => {
-
+				if(res.data.code && res.data.ok){
+					this.alertSuccess('轮播设置成功');
+					this.getSlides();
+				}
 			}).catch(err => {
-
+				console.log(err)
 			})
 		},
 		advModelSildeFormReset: function() {

@@ -1689,6 +1689,7 @@ router.get('/check_signin', (req, res, next) => {
 
 
 router.get('/send_maile', (req, res, next) => {
+	let uid = req.query.uid || req.session.uid;
 	// Generate test SMTP service account from ethereal.email
 	// Only needed if you don't have a real mail account for testing
 	// nodemailer.createTestAccount((err, account) => {
@@ -1719,7 +1720,7 @@ router.get('/send_maile', (req, res, next) => {
 	let html_str = '<a href="' + href + '" style="font-size:16px;font-weight:700;padding:15px 40px;color:#fff;background-color:#2595ff;border-color:#0b89ff;text-decoration:none;display:inline-block;margin-bottom: 0;text-align: center;vertical-align: middle;touch-action: manipulation;cursor: pointer;background-image: none;border: 1px solid transparent;white-space: nowrap;line-height: 1.428571429;border-radius: 4px;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;">请验证您的邮箱地址</a>';
 	// setup email data with unicode symbols
 	let mailOptions = {
-		from: '"thebulelife@163.com', // sender address
+		from: 'thebulelife@163.com', // sender address
 		to: '703294267@qq.com', // list of receivers
 		subject: '邮箱验证', // Subject line
 		text: '您好：', // plain text body
@@ -2063,9 +2064,9 @@ router.post('/adv/picture/upload', (req, res, next) => {
 	let data = base_data.replace(/^data:image\/\w+;base64,/, '');
 	let dataBuffer = Buffer.from(data, 'base64');
 	// Linux
-	// let path = '/Users/bluelifeleer/www/node/blog.mcloudhub.com/app/public/images/adv';
+	let path = '/Users/bluelifeleer/www/node/blog.mcloudhub.com/app/public/images/adv';
 	// Window
-	let path = 'C:/web/www/node/blog.mcloudhub.com/app/public/images/adv';
+	// let path = 'C:/web/www/node/blog.mcloudhub.com/app/public/images/adv';
 	Users.findById(uid).then(user => {
 		// console.log(user)
 		let dirname = path + '/' + user._id;
