@@ -2049,8 +2049,8 @@ router.post('/qrcode', (req, res, next) => {
 	let type = req.body.type;
 	let text = '';
 	let options = {
-		errorCorrectionLevel: 'H',
-		version: 8,
+		errorCorrectionLevel: 'L',
+		version: 20,
 		modes: 'auto'
 	};
 	switch(key){
