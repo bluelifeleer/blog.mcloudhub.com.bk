@@ -2050,7 +2050,7 @@ router.post('/qrcode', (req, res, next) => {
 	let text = '';
 	let options = {
 		errorCorrectionLevel: 'L',
-		version: 20,
+		version: 8,
 		modes: 'auto'
 	};
 	switch(key){
