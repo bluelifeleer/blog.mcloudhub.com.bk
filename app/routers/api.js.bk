@@ -308,7 +308,6 @@ router.get('/getArticle', (req, res, next) => {
 		}
 	}]).exec().then(article => {
 		if (article) {
-			let data = {};
 			article.add_date = sillyDateTime.format(article.add_date, 'YYYY-MM-DD HH:mm:ss');
 			if (!req.cookies[id]) {
 				//增加阅读数
@@ -319,23 +318,14 @@ router.get('/getArticle', (req, res, next) => {
 					expires: 1000 * 3600 * 10
 				});
 			}
-			data = article;
-			QRCode.toDataURL('https://blog.mcloudhub.com/article/details?id='+id, {errorCorrectionLevel: 'H'}, (err, url)=>{
-				if(err){
-					console.log(err)
-				}else{
-					data['qrcode'] = url;
-					console.log(data)
-					output.code = 1;
-					output.msg = 'success';
-					output.ok = true;
-					output.data = {
-						'article': data
-					};
-					res.json(output);
-					return;
-				}
-			});
+			output.code = 1;
+			output.msg = 'success';
+			output.ok = true;
+			output.data = {
+				'article': article
+			};
+			res.json(output);
+
 		} else {
 			output.code = 0;
 			output.msg = 'error';
