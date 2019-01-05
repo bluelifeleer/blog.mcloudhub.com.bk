@@ -1,6 +1,6 @@
-.article-details-content-box{width:990px;height:auto;margin:0 auto;margin-top:50px;}
-.article-details-block{width:750px;height:auto;}
-.article-details-aside{width:220px;height:auto;margin:0 0 0 20px;}
+.article-details-content-box{width:990px;height:auto;margin:0 auto;margin-top:50px;overflow: hidden;}
+.article-details-block{float:left;width:750px;height:auto;}
+.article-details-aside{float:left;width:220px;height:auto;margin:0 0 0 20px;}
 .article-details-aside-model{width:100%;height:auto;margin:0 0 20px 0;}
 .article-details-aside-model-title{width:100%;height:40px;line-height:40px;text-align:center;}
 .article-details-aside-model-body{width:96%;height:40px;padding:2%;border:1px solid #c1c1c1;box-sizing: border-box;}
