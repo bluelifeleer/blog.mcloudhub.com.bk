@@ -61,7 +61,7 @@
 .article-list-describe-author{width:100%;height:20px;line-height:20px;font-size:13px;}
 .article-tags,.article-author,.article-date{margin-right:10px;}
 .article-list-describe-title{width:100%;height:40px;line-height:40px;font-weight:bold;font-size: 20px;}
-.article-list-describe-text{width:100%;height:40px;font-size:14px;font-weight:bold;}
+.article-list-describe-text{width:100%;height:40px;font-size:14px;font-weight:bold;font-size:13px;color:#999;}
 .clear-both{clear:both;}
 .has-img{}
 .article-title{width:100%;height:40px;line-height:40px;font-weight:bold;font-size:17px;}
