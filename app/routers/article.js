@@ -20,5 +20,13 @@ router.get('/details', (req, res, nex) => {
     });
 });
 
+router.get('/m/details', (req, res, nex) => {
+    res.render('../views/articles/mobile/details', {
+        token: req.token,
+        uid: req.session.uid && req.cookies.uid,
+        page_type: 'article_mobile_details',
+        title: '文章详情'
+    });
+});
 
 module.exports = router;

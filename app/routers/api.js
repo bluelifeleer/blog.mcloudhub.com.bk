@@ -212,11 +212,11 @@ router.get('/getDocLists', (req, res, next) => {
 	});
 });
 
-router.get('/allArticles', (req, res, next) => {
-	let uid = req.query.uid ? req.query.uid : (req.cookies.token && req.cookies.uid);
+router.get('/articles', (req, res, next) => {
+	let uid = req.query.uid || (req.cookies.token && req.cookies.uid);
 	let all = false;
-	let offset = req.query.offset ? parseInt(req.query.offset) : 0;
-	let num = req.query.num ? parseInt(req.query.num) : 10;
+	let offset = parseInt(req.query.offset) || 1;
+	let num = parseInt(req.query.num) || 10;
 	if (!uid) {
 		all = true;
 	}
@@ -249,7 +249,8 @@ router.get('/allArticles', (req, res, next) => {
 						articles: articles,
 						count: count,
 						offset: offset,
-						num: num
+						num: num,
+						size: Math.ceil(count/num)
 					};
 					res.json(output);
 				} else {
@@ -1144,7 +1145,8 @@ router.post('/uploader', uoloader.single('editormd-image-file'), (req, res, next
 	let ext = req.file.mimetype.split('/')[1];
 	let filename = sillyDateTime.format(new Date(), 'YYYYMMMDDHHmmss') + '_' + crt_token() + '.' + ext;
 	let now_timer = sillyDateTime.format(new Date(), 'YYYYMMMDD');
-	let dirname = '/home/wwwroot/node/blog.mcloudhub.com/app/public/images/uploads/' + now_timer + '/';
+	// let dirname = '/home/wwwroot/node/blog.mcloudhub.com/app/public/images/uploads/' + now_timer + '/';
+	let dirname = '/Users/bluelifeleer/www/node/blog.mcloudhub.com/app/public/images/uploads/'+ now_timer + '/';
 	fs.existsSync(dirname) || fs.mkdirSync(dirname); // 目录不存在创建目录
 	fs.writeFile(dirname + filename, req.file.buffer, err => {
 		if (!err) {
@@ -1172,7 +1174,7 @@ router.post('/uploader', uoloader.single('editormd-image-file'), (req, res, next
 					if (!insert) throw console.log(insert);
 					res.json({
 						message: '图片上传成功',
-						url: 'https://blog.mcloudhub.com/public/images/uploads/' + now_timer + '/' + filename,
+						url: 'https://blog.mcloudhub.com/public/images/uploads/' + now_timer + '/' + filename+'?w='+width+'&h='+height,
 						success: 1
 					});
 				});

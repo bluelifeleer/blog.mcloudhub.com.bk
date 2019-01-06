@@ -31,7 +31,7 @@
                 <a href="https://blog.mcloudhub.com/account/collections/lists" class="more-collections">更多热门专题&nbsp;<i class="icon iconfont">&#xe6c4;</i></a>
             </div>
             <div class="article-list-groups" ref="articleListGroups">
-                <div class="article-list-box" v-for="(article,$index) in articleLists" v-bind:class="{'has-img':article.hasImg}" v-if="article.permissions == 1" :key="$index">
+                <div class="article-list-box" v-for="(article,$index) in articles.list" v-bind:class="{'has-img':article.hasImg}" v-if="article.permissions == 1" :key="$index">
                     <div class="article-list" v-if="article.hasImg" :data-id="article._id">
                         <a v-bind:href="article.href" :data-id="article._id">
                             <div class="article-list-img-box" v-html="article.imgHtml"></div>
@@ -61,6 +61,7 @@
                         </p>
                     </div>
                 </div>
+                <div class="loader-more"><a href="javascript:void(0);" class="load-more-but" :data-num="articles.num" :data-total="articles.count" :data-size="articles.size" :data-offset="articles.offset" @click="loadMoreArticle">加载更多</a></div>
             </div>
         </div>
         <div class="body-layout-r">

@@ -28,7 +28,13 @@ const vm = new Vue({
 		accountBox: 'none',
 		popupLayerBoxShow: 'none',
 		popupLayerText: '',
-		articleLists: [],
+		articles: {
+			list:[],
+			count: 0,
+			offset: 1,
+			size: 0,
+			num: 10
+		},
 		article: {
 			start: 0,
 			author: {
@@ -37,12 +43,7 @@ const vm = new Vue({
 				name: '',
 				href: ''
 			},
-			issue_contents: [],
-			page: {
-				total: 0,
-				offset: 0,
-				num: 0
-			}
+			issue_contents: []
 		},
 		ArticleQRCcode:'',
 		articleComments: '填写您的评论....',
@@ -174,14 +175,14 @@ const vm = new Vue({
 			this.getArticle();
 			this.getArticleQRCode();
 			if (page_type == 'index') {
-				this.getAllArticles(0, 100);
+				this.getArticles();
 				this.pageScroller();
 			}
 			if (page_type == 'account') {
 				this.users.uid = quid;
 				this.getUsers();
 				this.getDocuments();
-				this.getAllArticles(0, 100);
+				this.getArticles();
 			}
 			if (page_type == 'collections_list') {
 				this.getCollections(0, 9);
@@ -295,29 +296,51 @@ const vm = new Vue({
 				}
 			});
 		},
-		getAllArticles: function(offset, num) {
+		getArticles: function() {
 			let query_string = '';
 			if (page_type == 'account') {
-				query_string = 'uid=' + quid + '&offset=' + offset + '&num=' + num;
+				query_string = 'uid=' + quid + '&offset=' + this.articles.offset + '&num=' + this.articles.num;
 			} else if (page_type == 'collections_detailes') {
-				query_string = 'uid=' + this.users.uid + '&offset=' + offset + '&num=' + num;
+				query_string = 'uid=' + this.users.uid + '&offset=' + this.articles.offset + '&num=' + this.articles.num;
 			} else {
-				query_string = 'offset=' + offset + '&num=' + num;
+				query_string = 'offset=' + this.articles.offset + '&num=' + this.articles.num;
 			}
-			this.$http.get('/api/allArticles?' + query_string).then(all => {
-				let ArticleArrs = [];
-				if (all.body.code && all.body.ok) {
-					ArticleArrs = all.body.data.articles;
-					ArticleArrs.forEach(item => {
-						item.href = '/article/details?id=' + item._id;
-						item.hasImg = item.contents.search(this.imgRegexp) > 0 ? true : false;
-						item.imgHtml = item.hasImg ? item.contents.match(this.imgRegexp)[0] : '';
-						let content = item.contents.replace(/<[^>]*>/g, "");
-						item.contents = item.hasImg ? (content.length > 60 ? content.substr(0, 60) + '...' : content) : (content.length > 80 ? content.substr(0, 80) + '...' : content);
-					});
-					this.articleLists = ArticleArrs.reverse();
+			this.$http.get('/api/articles?' + query_string).then(res => {
+				let articles = [];
+				if (res.body.code && res.body.ok) {
+					articles = res.body.data.articles;
+					if(articles.length){
+						articles.forEach(item => {
+							item.href = '/article/details?id=' + item._id;
+							item.hasImg = item.contents.search(this.imgRegexp) > 0 ? true : false;
+							item.imgHtml = item.hasImg ? item.contents.match(this.imgRegexp)[0] : '';
+							let content = item.contents.replace(/<[^>]*>/g, "");
+							item.contents = item.hasImg ? (content.length > 60 ? content.substr(0, 60) + '...' : content) : (content.length > 80 ? content.substr(0, 80) + '...' : content);
+						});
+						this.articles.list = this.articles.list.concat(articles.reverse());
+						this.articles.num = res.body.data.num;
+						this.articles.offset = res.body.data.offset;
+						this.articles.count = res.body.data.count;
+						this.articles.size = res.body.data.size;
+						console.log(this.articles)
+					}
 				}
 			});
+		},
+		loadMoreArticle: function(e){
+			let size = e.target.getAttribute('data-size');
+			let num = e.target.getAttribute('data-num');
+			if(num >= size){
+				this.alertWarning('文章已加载完！！！')
+			}else{
+				if(this.articles.offset < size){
+					this.articles.offset++;
+					this.getArticles();
+				}else{
+					this.alertWarning('文章已加载完！！！')
+					return false;
+				}
+			}
 		},
 		getArticle: function() {
 			if (window.location.pathname == '/article/details') {
@@ -681,7 +704,7 @@ const vm = new Vue({
 		},
 		collectionPush: function(e, id) {
 			if (this.isSigin) {
-				this.getAllArticles(0, 100);
+				this.getArticles();
 				this.dialogTableVisible = true;
 			} else {
 				window.location.href = '/login?redirect_uri=' + window.location.href;

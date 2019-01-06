@@ -26,7 +26,7 @@
                 <div class="account-content-switch-contents-box">
                     <div class="account-article-box" ref="article">
                         <div class="article-list-groups">
-                            <div class="article-list-box" v-for="(article,$index) in articleLists" v-bind:class="{'has-img':article.hasImg}" :key="$index">
+                            <div class="article-list-box" v-for="(article,$index) in articles.list" v-bind:class="{'has-img':article.hasImg}" :key="$index">
                                 <div class="article-list" v-if="article.hasImg" :data-id="article._id">
                                     <a target="_blank" v-bind:href="article.href" :data-id="article._id">
                                         <div class="article-list-img-box" v-html="article.imgHtml"></div>
@@ -57,6 +57,7 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="loader-more"><a href="javascript:void(0);" class="load-more-but" :data-num="articles.num" :data-total="articles.count" :data-size="articles.size" :data-offset="articles.offset" @click="loadMoreArticle">加载更多</a></div>
                     </div>
                 </div>
             </div>
