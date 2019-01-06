@@ -213,7 +213,7 @@ router.get('/getDocLists', (req, res, next) => {
 });
 
 router.get('/articles', (req, res, next) => {
-	let uid = req.query.uid || (req.cookies.token && req.cookies.uid);
+	let uid = req.query.uid||'';
 	let all = false;
 	let offset = parseInt(req.query.offset) || 1;
 	let num = parseInt(req.query.num) || 10;
