@@ -597,6 +597,7 @@ router.post('/signup', (req, res, next) => {
 				user.name = name;
 				user.type = 1;
 			}
+			user.phone = phone;
 			user.name = name;
 			user.salt = t_salt;
 			user.password = md5(password + t_salt);
