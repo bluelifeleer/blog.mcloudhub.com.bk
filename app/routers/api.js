@@ -484,12 +484,16 @@ router.post('/signin', (req, res, next) => {
 					maxAge: 1800000
 				});
 				req.session.uid = user._id;
+				req.session.name = user.name;
 				if (remember) {
+					res.cookie('remember', remember, {
+						maxAge: 1800000 * 24 * 7
+					});
 					res.cookie('name', name, {
-						maxAge: 3600000 * 24 * 7
+						maxAge: 1800000 * 24 * 7
 					});
 					res.cookie('password', password, {
-						maxAge: 3600000 * 24 * 7
+						maxAge: 1800000 * 24 * 7
 					});
 				}
 				output.code = 1;
@@ -1716,43 +1720,48 @@ router.get('/send_maile', (req, res, next) => {
 		}
 	});
 
-	// var htmlstream = fs.createReadStream('');
-	let verify_code = md5(NowDate.getTime());
-	req.session.verify_code = verify_code;
-	let verify_data = sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss');
-	let href = encodeURI('https://blog.mcloudhub.com/api/verify_email?u=' + req.session.uid + '&code=' + verify_code + '&data=' + verify_data);
-	let html_str = '<a href="' + href + '" style="font-size:16px;font-weight:700;padding:15px 40px;color:#fff;background-color:#2595ff;border-color:#0b89ff;text-decoration:none;display:inline-block;margin-bottom: 0;text-align: center;vertical-align: middle;touch-action: manipulation;cursor: pointer;background-image: none;border: 1px solid transparent;white-space: nowrap;line-height: 1.428571429;border-radius: 4px;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;">请验证您的邮箱地址</a>';
-	// setup email data with unicode symbols
-	let mailOptions = {
-		from: 'thebulelife@163.com', // sender address
-		to: '703294267@qq.com', // list of receivers
-		subject: '邮箱验证', // Subject line
-		text: '您好：', // plain text body
-		html: html_str // html body
-	};
+	Users.findById(uid).then(user=>{
+		if(user.email){
+			// var htmlstream = fs.createReadStream('');
+			let verify_code = md5(NowDate.getTime());
+			req.session.verify_code = verify_code;
+			let verify_data = sillyDateTime.format(new Date(), 'YYYY-MMM-DD HH:mm:ss');
+			let href = encodeURI('https://blog.mcloudhub.com/api/verify_email?u=' + req.session.uid + '&code=' + verify_code + '&data=' + verify_data);
+			let html_str = '<a href="' + href + '" style="font-size:16px;font-weight:700;padding:15px 40px;color:#fff;background-color:#2595ff;border-color:#0b89ff;text-decoration:none;display:inline-block;margin-bottom: 0;text-align: center;vertical-align: middle;touch-action: manipulation;cursor: pointer;background-image: none;border: 1px solid transparent;white-space: nowrap;line-height: 1.428571429;border-radius: 4px;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;">请验证您的邮箱地址</a>';
+			// setup email data with unicode symbols
+			let mailOptions = {
+				from: 'thebulelife@163.com', // sender address
+				to: user.email, // list of receivers
+				subject: '邮箱验证', // Subject line
+				text: '您好：', // plain text body
+				html: html_str // html body
+			};
 
-	// send mail with defined transport object
-	transporter.sendMail(mailOptions, (error, info) => {
-		if (error) {
-			return console.log(error);
+			// send mail with defined transport object
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+					return console.log(error);
+				}
+				output.code = 1;
+				output.ok = true;
+				output.msg = 'SUCCESS';
+				output.data = null;
+				res.json(output);
+				// console.log(info);
+				// console.log('Message sent: %s', info.messageId);
+				// // Preview only available when sending through an Ethereal account
+				// console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+
+				// Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+				// Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+			});
+
+			transporter.close();
+			// });
 		}
-		output.code = 1;
-		output.ok = true;
-		output.msg = 'SUCCESS';
-		output.data = null;
-		res.json(output);
-		// console.log(info);
-		// console.log('Message sent: %s', info.messageId);
-		// // Preview only available when sending through an Ethereal account
-		// console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-
-		// Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-		// Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+	}).catch(err=>{
+		console.log(err)
 	});
-
-	transporter.close();
-	// });
-
 });
 
 router.get('/verify_email', (req, res, next) => {
