@@ -201,6 +201,7 @@ const VM = new Vue({
 					}
 				}
 				this.articleLsts = articleLsts;
+				console.log(this.articleLsts)
 			});
 		},
 		getArticle: function() {
