@@ -4,12 +4,12 @@
     <div class="account-block">
         <div class="account-layout-left">
             <div class="account-header-block">
-                <div class="account-icon-box"><img v-bind:src="users.avatar" alt=""></div>
+                <div class="account-icon-box"><img v-bind:src="articleUser.avatar" alt=""></div>
                 <div class="account-info-box">
-                    <p class="account-name-box">${users.name}</p>
+                    <p class="account-name-box">${articleUser.name}</p>
                     <p class="account-fn-box">
                         <span class="account-info-labels account-info-follw-box"><element>0</element><br/>关注</span>
-                        <span class="account-info-labels account-info-article-box"><element>${users.article_num}</element><br/>文章</span>
+                        <span class="account-info-labels account-info-article-box"><element>${articleUser.article_num}</element><br/>文章</span>
                         <span class="account-info-labels account-info-keyword-nums-box"><element>0</element><br/>字数</span>
                         <span class="account-info-labels account-info-likes-box"><element>0</element><br/>喜欢</span>
                     </p>

@@ -271,7 +271,7 @@ const vm = new Vue({
 			});
 		},
 		getDocuments: function() {
-			let query_string = page_type == 'account' ? 'uid=' + quid + '&offset=1&num=10' : 'offset=1&num=10';
+			let query_string = page_type == 'account' ? 'uid=' + this.articleUser.uid + '&offset=1&num=10' : 'offset=1&num=10';
 			this.$http.get('/api/getDocLists?' + query_string).then(doc => {
 				if (doc.body.code && doc.body.ok) {
 					if (doc.body.data.length > 0) {
@@ -317,7 +317,7 @@ const vm = new Vue({
 		getArticles: function() {
 			let query_string = '';
 			if (page_type == 'account') {
-				query_string = 'uid=' + quid + '&offset=' + this.articles.offset + '&num=' + this.articles.num;
+				query_string = 'uid=' + this.articleUser.uid + '&offset=' + this.articles.offset + '&num=' + this.articles.num;
 			} else if (page_type == 'collections_detailes') {
 				query_string = 'uid=' + this.users.uid + '&offset=' + this.articles.offset + '&num=' + this.articles.num;
 			} else {
@@ -633,7 +633,7 @@ const vm = new Vue({
 
 		},
 		getCollections: function(offset, num) {
-			let query_string = page_type == 'account' ? 'uid=' + quid + '&offset=' + offset + '&num=' + num : 'offset=' + offset + '&num=' + num
+			let query_string = page_type == 'account' ? 'uid=' + this.articleUser.uid + '&offset=' + offset + '&num=' + num : 'offset=' + offset + '&num=' + num
 			this.$http.get('/api/get_collections?' + query_string).then(res => {
 				let collections = res.body.data;
 				collections.forEach(item => {
