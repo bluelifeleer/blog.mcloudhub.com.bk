@@ -1029,6 +1029,11 @@ const vm = new Vue({
 		advModelSildeFormReset: function() {
 
 		},
+		accountContentToggle: function(index){
+			console.log(this.$refs.accountContentFlg)
+			console.log(this.$refs.accountContentFlg.styke.width)
+			this.$refs.accountContentFlg.style.left = parseInt(120*num)+'px';
+		},
 		shart: function(e, id){
 			console.log(id)
 		},

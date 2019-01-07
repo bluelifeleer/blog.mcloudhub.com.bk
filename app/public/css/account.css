@@ -15,7 +15,7 @@
 .account-content-switch-buts-box{width:100%;height:40px;margin:20px 0 0 0;border-bottom:1px solid #f0f0f0;position:relative;}
 .account-content-switch-buts-box li{float:left;width:120px;height:40px;line-height:40px;font-weight:bold;font-size:16px;text-align:center;}
 .account-content-switch-buts-box li a{color:#969696 !important;}
-.account-content-switch-buts-flang{display:block;width:120px;height:2px;background:#646464;position:absolute;left:0;top:38px;}
+.account-content-switch-buts-flag{display:block;width:120px;height:2px;background:#646464;position:absolute;left:0;top:38px;}
 .account-content-switch-contents-box{width:100%;height:auto;}
 .account-article-box{width:100%;height:auto;}
 .account-article-box .article-list-describe-box{width:480px;}

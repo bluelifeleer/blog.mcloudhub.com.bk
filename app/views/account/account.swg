@@ -17,11 +17,11 @@
             </div>
             <div class="account-content-block">
                 <ul class="account-content-switch-buts-box">
-                    <li><a href=""><i class="icon iconfont">&#xe607;</i>&nbsp;文章</a></li>
-                    <li><a href=""><i class="icon iconfont">&#xe618;</i>&nbsp;动态</a></li>
-                    <li><a href=""><i class="icon iconfont">&#xe626;</i>&nbsp;最新评论</a></li>
-                    <li><a href=""><i class="icon iconfont">&#xe634;</i>&nbsp;热门</a></li>
-                    <span class="account-content-switch-buts-flang"></span>
+                    <li><a href="javascript:void(0);" @click="accountContentToggle(0)"><i class="icon iconfont">&#xe607;</i>&nbsp;文章</a></li>
+                    <li><a href="javascript:void(0);" @click="accountContentToggle(1)"><i class="icon iconfont">&#xe618;</i>&nbsp;动态</a></li>
+                    <li><a href="javascript:void(0);" @click="accountContentToggle(2)"><i class="icon iconfont">&#xe626;</i>&nbsp;最新评论</a></li>
+                    <li><a href="javascript:void(0);" @click="accountContentToggle(3)"><i class="icon iconfont">&#xe634;</i>&nbsp;热门</a></li>
+                    <span class="account-content-switch-buts-flag" ref="accountContentFlg"></span>
                 </ul>
                 <div class="account-content-switch-contents-box">
                     <div class="account-article-box" ref="article">
