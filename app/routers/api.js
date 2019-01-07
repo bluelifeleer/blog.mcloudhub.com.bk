@@ -1147,7 +1147,7 @@ router.post('/uploader', uoloader.single('editormd-image-file'), (req, res, next
 	let filename = sillyDateTime.format(new Date(), 'YYYYMMMDDHHmmss') + '_' + crt_token() + '.' + ext;
 	let now_timer = sillyDateTime.format(new Date(), 'YYYYMMMDD');
 	// let dirname = '/home/wwwroot/node/blog.mcloudhub.com/app/public/images/uploads/' + now_timer + '/';
-	let dirname = '/Users/bluelifeleer/www/node/blog.mcloudhub.com/app/public/images/uploads/'+ now_timer + '/';
+	let dirname = '/home/wwwroot/node/blog.mcloudhub.com/app/public/images/uploads/'+ now_timer + '/';
 	fs.existsSync(dirname) || fs.mkdirSync(dirname); // 目录不存在创建目录
 	fs.writeFile(dirname + filename, req.file.buffer, err => {
 		if (!err) {
@@ -2058,7 +2058,7 @@ router.post('/qrcode', (req, res, next) => {
 	};
 	switch(key){
 		case 'article':
-		text = 'https://blog.mcloudhub.com/article/m/details'+id;
+		text = 'https://blog.mcloudhub.com/article/m/details?id='+id;
 		break;
 		default: 
 		break;
