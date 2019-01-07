@@ -56,7 +56,7 @@
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;}
-.article-details-contents img{display:block;width:auto;}
+.article-details-contents img{display:block;width:750px;}
 .article-details-contents ul{padding:0 0 0 4%;margin:0 0 2% 0;}
 .article-details-contents ol{width:100%;background:#272822;padding:20px 0 20px 5px;}
 .article-details-contents ol li{background:none;list-style-type:decimal;}
