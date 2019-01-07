@@ -21,6 +21,7 @@ const vm = new Vue({
 			like_num: 0,
 			follow_num: 0
 		},
+		queryUserId:'',
 		remember: true,
 		slide_list: {},
 		docs_list: {},
@@ -167,7 +168,8 @@ const vm = new Vue({
 		init: function() {
 			if (uid != '') {
 				this.isSigin = true;
-				this.users.uid = page_type == 'account' ? quid : uid;
+				this.users.uid = uid;
+				this.queryUserId = quid
 				this.getUsers();
 			}
 			this.getDocs();
@@ -179,7 +181,7 @@ const vm = new Vue({
 				this.pageScroller();
 			}
 			if (page_type == 'account') {
-				this.users.uid = quid;
+				this.users.uid = uid;
 				this.getUsers();
 				this.getDocuments();
 				this.getArticles();
