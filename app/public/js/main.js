@@ -21,7 +21,20 @@ const vm = new Vue({
 			like_num: 0,
 			follow_num: 0
 		},
-		queryUserId:'',
+		articleUser:{
+			uid: '',
+			name: '',
+			password: '',
+			avatar: '',
+			accountHref: '',
+			github: {
+				html_url: ''
+			},
+			article_num: 0,
+			world_num: 0,
+			like_num: 0,
+			follow_num: 0
+		},
 		remember: true,
 		slide_list: {},
 		docs_list: {},
@@ -169,8 +182,9 @@ const vm = new Vue({
 			if (uid != '') {
 				this.isSigin = true;
 				this.users.uid = uid;
-				this.queryUserId = quid
+				this.articleUser.uid = quid;
 				this.getUsers();
+				this.getArticleUser();
 			}
 			this.getDocs();
 			this.getSlides();
@@ -182,7 +196,9 @@ const vm = new Vue({
 			}
 			if (page_type == 'account') {
 				this.users.uid = uid;
+				this.articleUser.uid = quid;
 				this.getUsers();
+				this.getArticleUser();
 				this.getDocuments();
 				this.getArticles();
 			}
@@ -438,6 +454,24 @@ const vm = new Vue({
 				data.like_num = 0;
 				data.follow_num = data.follows;
 				this.users = data;
+			});
+		},
+		getArticleUser: function(){
+			this.$http.get('/api/getUsers?uid=' + this.articleUser.uid).then(res => {
+				if (!res) throw console.log(res);
+				let data = res.body.data;
+				data.uid = data._id;
+				data.name = data.name.length > 10 ? data.name.substr(0, 10) + '...' : data.name;
+				data.fullname = data.name;
+				data.avatar = data.avatar ? data.avatar : '/public/images/avatar_default-78d4d1f68984cd6d4379508dd94b4210.png';
+				data.rewardStatus = data.rewardStatus ? data.rewardStatus : 2;
+				data.rewardDesc = data.rewardDesc ? data.rewardDesc : '如果您觉得这文章能帮助到您，您可以对我进行打赏。';
+				data.accountHref = '/account?uid=' + data._id;
+				data.article_num = data.article.length;
+				data.world_num = 0;
+				data.like_num = 0;
+				data.follow_num = data.follows;
+				this.articleUser = data;
 			});
 		},
 		changeAvatar: function(e) {
