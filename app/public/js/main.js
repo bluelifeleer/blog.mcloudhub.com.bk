@@ -1031,7 +1031,7 @@ const vm = new Vue({
 		},
 		accountContentToggle: function(index){
 			console.log(this.$refs.accountContentFlg)
-			console.log(this.$refs.accountContentFlg.styke.width)
+			console.log(this.$refs.accountContentFlg.style.width)
 			this.$refs.accountContentFlg.style.left = parseInt(120*num)+'px';
 		},
 		shart: function(e, id){
