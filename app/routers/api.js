@@ -2058,7 +2058,7 @@ router.post('/qrcode', (req, res, next) => {
 	};
 	switch(key){
 		case 'article':
-		text = 'https://blog.mcloudhub.com/article/details?id='+id;
+		text = 'https://blog.mcloudhub.com/article/m/details'+id;
 		break;
 		default: 
 		break;
