@@ -268,7 +268,7 @@ app.get('*', (req, res) => {
 
 //连接数据库
 mongoose.connect('mongodb://localhost:27017/blog', {
-	dbName: 'blog'
+	dbName: 'blog',
 	user: 'blog',
 	pass: 'xx19890907'
 	useNewUrlParser: true
