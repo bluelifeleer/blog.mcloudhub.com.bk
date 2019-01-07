@@ -270,7 +270,7 @@ app.get('*', (req, res) => {
 mongoose.connect('mongodb://localhost:27017/blog', {
 	dbName: 'blog',
 	user: 'blog',
-	pass: 'xx19890907'
+	pass: 'xx19890907',
 	useNewUrlParser: true
 }, (err, res) => {
 	if (err) {
