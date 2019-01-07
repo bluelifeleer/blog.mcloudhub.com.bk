@@ -182,7 +182,7 @@ const vm = new Vue({
 			if (uid != '') {
 				this.isSigin = true;
 				this.users.uid = uid;
-				this.articleUser.uid = quid ? quid : uid;
+				this.articleUser.uid = uid;
 				this.getUsers();
 				this.getArticleUser();
 			}
