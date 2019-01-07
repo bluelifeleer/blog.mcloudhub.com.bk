@@ -14,7 +14,8 @@ const VM = new Vue({
     methods: {
         init: function() {
             this.validate();
-            if (page_type == 'login') {
+            this.remember = this.getCookieParams('remember')
+            if (page_type == 'login' && this.remember == 'true') {
                 this.name = this.getCookieParams('name');
                 this.password = this.getCookieParams('password');
             }
@@ -136,6 +137,8 @@ const VM = new Vue({
             var cookieValues = document.cookie.match(reg);
             return cookieValues ? decodeURIComponent(cookieValues[2]) : null;
         }
+    },
+    mounted(){
+        this.init();
     }
 });
-VM.init();
