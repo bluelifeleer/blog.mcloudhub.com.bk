@@ -486,7 +486,7 @@ router.post('/signin', (req, res, next) => {
 				req.session.uid = user._id;
 				req.session.name = user.name;
 				if (remember) {
-					res.cookie('remember', remember, {
+					res.cookie('remember', 1, {
 						maxAge: 1800000 * 24 * 7
 					});
 					res.cookie('name', name, {

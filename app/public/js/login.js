@@ -14,8 +14,8 @@ const VM = new Vue({
     methods: {
         init: function() {
             this.validate();
-            this.remember = this.getCookieParams('remember')
-            if (page_type == 'login' && this.remember == 'true') {
+            this.remember = parseInt(this.getCookieParams('remember')) ? true : false;
+            if (page_type == 'login' && this.remember) {
                 this.name = this.getCookieParams('name');
                 this.password = this.getCookieParams('password');
             }
