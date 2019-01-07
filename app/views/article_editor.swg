@@ -62,7 +62,7 @@
                     <!--article-list-default-->
                     <li class="article-list-box" v-for="(article,$index) in articleLsts" v-on:click.stop="selectArticleBut($event,article,$index)" v-bind:class="{'article-active':article.active,'article-unactive':!article.active}" :key="$index">
                         <i class="icon iconfont article-iconfont">&#xe62e;</i>
-                        <span class="article-name" ref="articleTitle">${article.simpleTitle}</span>
+                        <span class="article-name" ref="articleTitle" :title="article.title">${article.simpleTitle}</span>
                         <span class="article-setting-buts" v-on:click.stop="articleSetting($event,article._id,$index)"><i class="icon iconfont">&#xe926;</i></span>
                         <ul class="article-menu-list-group" ref="articleMenu">
                             <li class="article-menu-list-box" v-if="article.permissions == 2" v-on:click.stop="setPermissions($event,article._id,$index,2)"><i class="icon iconfont">&#xe8d4;</i>&nbsp;&nbsp;设为公开</li>
